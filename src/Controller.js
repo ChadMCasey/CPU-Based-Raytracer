@@ -1,4 +1,5 @@
 import MathUtils from "./MathUtils";
+import { CANVAS_DEFAULT_BACKGROUND, CAMERA_POS } from "./constants";
 class Controller {
     constructor(canvas, twoDcontext, spheres) {
         this.viewportWidth = 1;
@@ -88,7 +89,7 @@ class Controller {
         }
         // no intersection > paint as the background color
         if (!closestSphere) {
-            return [255, 255, 255]; // background color, we should set this as a constant.
+            return CANVAS_DEFAULT_BACKGROUND;
         }
         return closestSphere.color;
     }
@@ -97,7 +98,7 @@ class Controller {
         const canvasMaxX = this.canvasW / 2;
         const canvasMinY = -this.canvasH / 2;
         const canvasMaxY = this.canvasH / 2;
-        const O = [0, 0, 0];
+        const O = CAMERA_POS;
         // iterate the entire 2D cartesian plane of our canvas
         for (let x = canvasMinX; x <= canvasMaxX; x++) {
             for (let y = canvasMinY; y <= canvasMaxY; y++) {

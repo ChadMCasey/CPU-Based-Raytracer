@@ -1,5 +1,6 @@
 import {Vec2, Vec3, Sphere} from "./types.js";
 import MathUtils from "./MathUtils";
+import { CANVAS_DEFAULT_BACKGROUND, CAMERA_POS } from "./constants";
 
 class Controller {
   private viewportWidth: number = 1;
@@ -120,7 +121,7 @@ class Controller {
 
     // no intersection > paint as the background color
     if (!closestSphere) {
-      return [255,255,255]; // background color, we should set this as a constant.
+      return CANVAS_DEFAULT_BACKGROUND;
     }
 
     return closestSphere.color;
@@ -133,7 +134,7 @@ class Controller {
     const canvasMinY = -this.canvasH/2;
     const canvasMaxY = this.canvasH/2;
     
-    const O: Vec3 = [0,0,0];
+    const O: Vec3 = CAMERA_POS;
     
     // iterate the entire 2D cartesian plane of our canvas
     for (let x: number = canvasMinX; x <= canvasMaxX; x++) {
