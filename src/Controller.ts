@@ -1,4 +1,5 @@
-import {NumberTuple, NumberTriple, Sphere} from "./types.js";
+import {Vec2, Vec3, Sphere} from "./types.js";
+import MathUtils from "./MathUtils";
 
 class Controller {
   private viewportWidth: number = 1;
@@ -9,6 +10,8 @@ class Controller {
   private canvas: HTMLElement;
   private twoDContext: CanvasRenderingContext2D;
   private spheres: Sphere[];
+
+  private mathUtils = new MathUtils();
   
   constructor(
     canvas: HTMLCanvasElement, 
@@ -22,26 +25,26 @@ class Controller {
   }
 
   // x coordinate, y coordinate and color of the given pixel on the canvas
-  putPixel(x: number, y:number, color: NumberTriple): void {
+  putPixel(x: number, y:number, color: Vec3): void {
     this.twoDContext.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
     this.twoDContext.fillRect(x, y, 1, 1);
   }
 
   // coodinate system conversion to 2D cartesian plane
-  canvasCoordConversion(Cx: number, Cy: number): NumberTuple {
+  canvasCoordConversion(Cx: number, Cy: number): Vec2 {
     const Sx: number = this.canvasW/2 + Cx;
     const Sy: number = this.canvasH/2 - Cy;
     return [Sx, Sy];
   } 
 
-  canvasToViewportCoord(Cx: number, Cy: number): NumberTriple {
+  canvasToViewportCoord(Cx: number, Cy: number): Vec3 {
     const Vx: number = (this.viewportWidth / this.canvasW) * Cx;
     const Vy: number = (this.viewportHeight / this.canvasH ) * Cy;
     const Vz: number = this.viewportDistance; // fixed viewport distance, for now.
     return [Vx, Vy, Vz];
   }
 
-  ScaleColorVector(R: number, G: number, B: number, kScale: number): NumberTriple {
+  ScaleColorVector(R: number, G: number, B: number, kScale: number): Vec3 {
     const clampedR = Math.max(Math.min(R  * kScale, 255),  0);
     const clampedG = Math.max(Math.min(G  * kScale, 255),  0);
     const clampedB = Math.max(Math.min(B  * kScale, 255),  0);
@@ -50,22 +53,20 @@ class Controller {
   }
 
   // the ray equation
-  computeRay(O: NumberTriple, V: NumberTriple, TScalar: number): NumberTriple {
-    const diffX: number = V[0] - O[0];
-    const diffY: number = V[1] - O[1];
-    const diffZ: number = V[2] - O[2];
-    const scaled: NumberTriple = [TScalar * diffX, TScalar * diffY, TScalar * diffZ];
-    const point: NumberTriple = [O[0] + scaled[0], O[1] + scaled[1], O[2] + scaled[2]]
-    return point; 
+  computeRay(O: Vec3, V: Vec3, TScalar: number): Vec3 {
+    const D = this.mathUtils.subtractVectors(V, O);
+    const Dscaled = this.mathUtils.scaleVector(D, TScalar);
+    const ray = this.mathUtils.addVectors(O, Dscaled);
+    return ray; 
   }
 
-  intersectRaySphere(O: NumberTriple, D: NumberTriple, sphere: Sphere): NumberTuple {
+  intersectRaySphere(O: Vec3, D: Vec3, sphere: Sphere): Vec2 {
     const r: number = sphere.radius;
-    const CO: NumberTriple = [O[0] - sphere.center[0], O[1] - sphere.center[1], O[2] - sphere.center[2]];
+    const CO: Vec3 = this.mathUtils.subtractVectors(O, sphere.center);
 
-    const a: number = this.dotP(D, D);
-    const b: number = 2 * this.dotP(CO, D);
-    const c: number = this.dotP(CO, CO) - r*r;
+    const a: number = this.mathUtils.dotVectors(D, D);
+    const b: number = 2 * this.mathUtils.dotVectors(CO, D);
+    const c: number = this.mathUtils.dotVectors(CO, CO) - r*r;
 
     // at^2 +bt + c = 0 solution for t (ray intersection with sphere)
     const discriminantSquared: number = b**2 - 4*a*c;
@@ -81,16 +82,16 @@ class Controller {
   }
 
   // distance from C to point P on sphere
-  distFromCenter(C: NumberTriple, P: NumberTriple) {
-    const diff: NumberTriple = [C[0] - P[0], C[1] - P[1], C[2] - P[2]];
-    const rSquared: number = this.dotP(diff, diff);
+  distFromCenter(C: Vec3, P: Vec3) {
+    const CMinusP: Vec3 = this.mathUtils.subtractVectors(C, P);
+    const rSquared: number = this.mathUtils.dotVectors(CMinusP, CMinusP);
     return rSquared;
   }
 
   // compute the intersection of the ray with every sphere and 
   // return the color of the sphere at the nearest intersection
   // inside of some requested range t.
-  traceRay(O: NumberTriple, D: NumberTriple, minT: number, maxT: number) : NumberTriple
+  traceRay(O: Vec3, D: Vec3, minT: number, maxT: number) : Vec3
   {
     // create vars for closest t and sphere
     let closestT: number = Number.POSITIVE_INFINITY;
@@ -102,7 +103,7 @@ class Controller {
 
       // check if the ray running from the origin through the viewport
       // intersects some object within the scene. In this context its a sphere
-      const [t1, t2]: NumberTuple = this.intersectRaySphere(O, D, sphere);    
+      const [t1, t2]: Vec2 = this.intersectRaySphere(O, D, sphere);    
       
       // check if t1 is inbounds and see if its our closest intersection
       if ((t1 >= minT && t1 <= maxT) && t1 < closestT) {
@@ -125,10 +126,6 @@ class Controller {
     return closestSphere.color;
   }
 
-  dotP(a: NumberTriple, b: NumberTriple) {
-    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-  }
-
   render() {
     const canvasMinX = -this.canvasW/2;
     const canvasMaxX = this.canvasW/2;
@@ -136,7 +133,7 @@ class Controller {
     const canvasMinY = -this.canvasH/2;
     const canvasMaxY = this.canvasH/2;
     
-    const O: NumberTriple = [0,0,0];
+    const O: Vec3 = [0,0,0];
     
     // iterate the entire 2D cartesian plane of our canvas
     for (let x: number = canvasMinX; x <= canvasMaxX; x++) {
@@ -153,8 +150,6 @@ class Controller {
     }    
   }
 }
-
-
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d") as CanvasRenderingContext2D;
