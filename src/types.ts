@@ -8,6 +8,15 @@ export type Vec3 = [number, number, number];
 // an RGB value 
 export type RGB = [number, number, number];
 
+export type HitRecord = {
+  distance: number;
+}
+
+// every object in the scene can be intersected by a ray
+export interface SceneObject {
+  intersect(origin: Vec3, direction: Vec3): HitRecord | null;
+}
+
 // sphere representation
 export interface Sphere {
   center: Vec3,
