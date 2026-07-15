@@ -1,6 +1,6 @@
-import {Vec2, Vec3, SceneObject, HitRecord } from "./types.js";
-import MathUtils from "./MathUtils";
-import { CANVAS_DEFAULT_BACKGROUND, CAMERA_POS } from "./constants";
+import {Vec2, Vec3, SceneObject } from "./types.js";
+import { CAMERA_POS } from "./constants";
+import Scene from "./Scene";
 import Sphere from "./Sphere";
 
 class Controller {
@@ -11,19 +11,17 @@ class Controller {
   private canvasH: number;
   private canvas: HTMLElement;
   private twoDContext: CanvasRenderingContext2D;
-  private sceneObjs: SceneObject[];
-
-  private mathUtils = new MathUtils();
+  private scene: Scene;
   
   constructor(
     canvas: HTMLCanvasElement, 
     twoDcontext: CanvasRenderingContext2D, 
-    sceneObjs: SceneObject[]) {
+    scene: Scene) {
       this.canvas = canvas;
-      this.canvasW = canvas?.width || -1; // -1 indicates error
-      this.canvasH = canvas?.height || -1;
+      this.canvasW = canvas?.width; // -1 indicates error
+      this.canvasH = canvas?.height;
       this.twoDContext = twoDcontext
-      this.sceneObjs = sceneObjs;
+      this.scene = scene;
   }
 
   // x coordinate, y coordinate and color of the given pixel on the canvas
@@ -46,73 +44,13 @@ class Controller {
     return [Vx, Vy, Vz];
   }
 
-  ScaleColorVector(R: number, G: number, B: number, kScale: number): Vec3 {
-    const clampedR = Math.max(Math.min(R  * kScale, 255),  0);
-    const clampedG = Math.max(Math.min(G  * kScale, 255),  0);
-    const clampedB = Math.max(Math.min(B  * kScale, 255),  0);
-
-    return [clampedR, clampedG, clampedB];
-  }
-
-  // the ray equation
-  computeRay(O: Vec3, V: Vec3, TScalar: number): Vec3 {
-    const D = this.mathUtils.subtractVectors(V, O);
-    const Dscaled = this.mathUtils.scaleVector(D, TScalar);
-    const ray = this.mathUtils.addVectors(O, Dscaled);
-    return ray; 
-  }
-
-  // distance from C to point P on sphere
-  distFromCenter(C: Vec3, P: Vec3) {
-    const CMinusP: Vec3 = this.mathUtils.subtractVectors(C, P);
-    const rSquared: number = this.mathUtils.dotVectors(CMinusP, CMinusP);
-    return rSquared;
-  }
-
-  // compute the intersection of the ray with every sphere and 
-  // return the color of the sphere at the nearest intersection
-  // inside of some requested range t.
-  traceRay(O: Vec3, D: Vec3, minT: number, maxT: number) : Vec3
-  {
-    let closestIntersection: number = Number.POSITIVE_INFINITY;
-    let closestObj: SceneObject | null = null;
-
-    for (let i = 0; i < this.sceneObjs.length; i++) {
-      const sceneObj = this.sceneObjs[i];
-
-      const intersection: HitRecord | null = sceneObj.intersect(O, D);    
-      
-      if (!intersection) continue;
-
-      const distance = intersection.distance;
-      if ((distance >= minT && distance <= maxT) && distance < closestIntersection) {
-        closestIntersection = distance;
-        closestObj = sceneObj;
-      }
-    }
-
-    if (!closestObj) {
-      return CANVAS_DEFAULT_BACKGROUND;
-    }
-
-    return closestObj.color;
-  }
-
   render() {
-    const canvasMinX = -this.canvasW/2;
-    const canvasMaxX = this.canvasW/2;
-    
-    const canvasMinY = -this.canvasH/2;
-    const canvasMaxY = this.canvasH/2;
-    
     const O: Vec3 = CAMERA_POS;
     
-    for (let x: number = canvasMinX; x <= canvasMaxX; x++) {
-      for (let y: number = canvasMinY; y <= canvasMaxY; y++) {
+    for (let x: number = -this.canvasW/2; x <= this.canvasW/2; x++) {
+      for (let y: number = -this.canvasH/2; y <= this.canvasH/2; y++) {
         const D = this.canvasToViewportCoord(x, y);
-
-        const color = this.traceRay(O, D, 1, Number.POSITIVE_INFINITY);
-
+        const color = this.scene.traceRay(O, D, 1, Number.POSITIVE_INFINITY);
         const [putX, putY] = this.canvasCoordConversion(x,y);
         this.putPixel(putX, putY, color);
       }
@@ -123,13 +61,13 @@ class Controller {
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-
 const sceneObjs: Array<SceneObject> = [
   new Sphere([0, -1, 3], 1, [255, 0, 0]),
   new Sphere([2, 0, 4], 1, [0, 0, 255]),
   new Sphere([-2, 0, 4], 1, [0, 255, 0])
 ];
 
-//  instantiate controller
-const control = new Controller(canvas, context, sceneObjs);
+const scene = new Scene(sceneObjs);
+const control = new Controller(canvas, context, scene);
+
 document.addEventListener("click", () => control.render());
