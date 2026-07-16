@@ -1,5 +1,5 @@
-import { SceneObject, HitRecord, Vec3, RGB } from "./types";
-import MathUtils from "./MathUtils";
+import { SceneObject, HitRecord, Vec3, RGB } from "./types.js";
+import MathUtils from "./MathUtils.js";
 
 const mathUtils = new MathUtils();
 

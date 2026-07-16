@@ -1,7 +1,12 @@
-import { CANVAS_DEFAULT_BACKGROUND } from "./constants";
+import { CANVAS_DEFAULT_BACKGROUND } from "./constants.js";
+import Sphere from "./Sphere.js";
 export default class Scene {
-    constructor(sceneObjs) {
-        this.sceneObjs = sceneObjs;
+    constructor() {
+        this.sceneObjs = [
+            new Sphere([0, -1, 3], 1, [255, 0, 0]),
+            new Sphere([2, 0, 4], 1, [0, 0, 255]),
+            new Sphere([-2, 0, 4], 1, [0, 255, 0])
+        ];
     }
     traceRay(O, D, minT, maxT) {
         let closestIntersection = Number.POSITIVE_INFINITY;

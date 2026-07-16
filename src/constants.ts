@@ -1,4 +1,4 @@
-import {Vec3} from "./types";
+import {Vec3} from "./types.js";
 
 // Canvas
 const CANVAS_WIDTH: number = 1080;

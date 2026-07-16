@@ -1,9 +1,8 @@
-import {Vec2, Vec3, SceneObject } from "./types.js";
+import { Vec3 } from "./types.js";
 import { CAMERA_POS } from "./constants.js";
 import Scene from "./Scene.js";
-import Sphere from "./Sphere.js";
 import Camera from "./Camera.js";
-import RenderTarget from "./RenderTarget";
+import RenderTarget from "./RenderTarget.js";
 
 class Controller {
   private scene: Scene;
@@ -22,7 +21,7 @@ class Controller {
   render() {
     const cameraPos: Vec3 = this.camera.position;
     const renderW = this.renderTarget.width;
-    const renderH = this.renderTarget.width;
+    const renderH = this.renderTarget.height;
     
     for (let x: number = -renderW/2; x <= renderW/2; x++) {
       for (let y: number = -renderH/2; y <= renderH/2; y++) {
@@ -33,19 +32,13 @@ class Controller {
 
         const [putX, putY] = this.renderTarget.canvasCoordConversion(x,y);
 
-        renderTarget.putPixel(putX, putY, color);
+        this.renderTarget.putPixel(putX, putY, color);
       }
     }    
   }
 }
 
-const sceneObjs: Array<SceneObject> = [
-  new Sphere([0, -1, 3], 1, [255, 0, 0]),
-  new Sphere([2, 0, 4], 1, [0, 0, 255]),
-  new Sphere([-2, 0, 4], 1, [0, 255, 0])
-];
-
-const scene = new Scene(sceneObjs);
+const scene = new Scene();
 const camera = new Camera(CAMERA_POS);
 const renderTarget = new RenderTarget();
 const control = new Controller(renderTarget, scene, camera);

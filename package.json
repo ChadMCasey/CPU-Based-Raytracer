@@ -4,7 +4,7 @@
     "typescript": "^7.0.2"
   },
   "scripts": {
-    "build": "tsc",
+    "compile": "tsc",
     "watch": "tsc --watch",
     "serve": "live-server src --entry-file=index.html"
   }
