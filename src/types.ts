@@ -24,3 +24,9 @@ export interface Sphere {
   radius: number,
   color: RGB
 }
+
+// generic light representation
+export interface Light {
+  type: "directional" | "point" | "ambient";
+  intensity: number;
+}
