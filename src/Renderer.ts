@@ -1,7 +1,7 @@
 import {Vec2, Vec3, SceneObject } from "./types.js";
-import { CAMERA_POS } from "./constants";
-import Scene from "./Scene";
-import Sphere from "./Sphere";
+import { CAMERA_POS } from "./constants.js";
+import Scene from "./Scene.js";
+import Sphere from "./Sphere.js";
 
 class Controller {
   private viewportWidth: number = 1;
@@ -9,7 +9,6 @@ class Controller {
   private viewportDistance: number = 1;
   private canvasW: number;
   private canvasH: number;
-  private canvas: HTMLElement;
   private twoDContext: CanvasRenderingContext2D;
   private scene: Scene;
   
@@ -17,7 +16,6 @@ class Controller {
     canvas: HTMLCanvasElement, 
     twoDcontext: CanvasRenderingContext2D, 
     scene: Scene) {
-      this.canvas = canvas;
       this.canvasW = canvas?.width; // -1 indicates error
       this.canvasH = canvas?.height;
       this.twoDContext = twoDcontext
