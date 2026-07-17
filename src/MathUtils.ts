@@ -20,4 +20,8 @@ export default class MathUtils {
   scaleVector(a: Vec3, k: number): Vec3 {
     return [a[0]*k, a[1]*k, a[2]*k]
   }
+
+  magnitude(a: Vec3) {
+    return Math.sqrt(this.dotVectors(a,a));
+  }
 }

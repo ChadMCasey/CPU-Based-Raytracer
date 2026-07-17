@@ -30,10 +30,21 @@ export default class Sphere implements SceneObject {
     const discriminant: number = Math.sqrt(b**2 - 4*a*c);
     const intersections: Array<number> = [(-b + discriminant) / (2*a),(-b - discriminant) / (2*a)];
 
-    const validIntersections = intersections.filter(t =>  t > 0);
+    const validIntersections: number[] = intersections.filter(t =>  t > 0);
 
     if (!validIntersections.length) return null;
 
-    return { distance: Math.min(...validIntersections) };
+    const distance: number = Math.min(...validIntersections);
+    const position: Vec3 = mathUtils.addVectors(O, mathUtils.scaleVector(D, distance)); // P = O + t(V - O);
+    const normal: Vec3 = this.computeNormal(position);
+
+    return { distance, position, normal };
+  }
+
+  computeNormal(position: Vec3): Vec3 {
+    const CP: Vec3 = mathUtils.subtractVectors(position, this.center);
+    const magnitude = mathUtils.magnitude(CP);
+    const normal = mathUtils.scaleVector(CP, 1/magnitude);
+    return normal;
   }
 }

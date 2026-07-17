@@ -15,4 +15,7 @@ export default class MathUtils {
     scaleVector(a, k) {
         return [a[0] * k, a[1] * k, a[2] * k];
     }
+    magnitude(a) {
+        return Math.sqrt(this.dotVectors(a, a));
+    }
 }

@@ -1,4 +1,3 @@
-
 // a vector of 2 numerical values
 export type Vec2 = [number, number];
 
@@ -10,6 +9,8 @@ export type RGB = [number, number, number];
 
 export type HitRecord = {
   distance: number;
+  position: Vec3;
+  normal: Vec3;
 }
 
 // every object in the scene can be intersected by a ray
@@ -25,8 +26,4 @@ export interface Sphere {
   color: RGB
 }
 
-// generic light representation
-export interface Light {
-  type: "directional" | "point" | "ambient";
-  intensity: number;
-}
+export type LightType = "Ambient" | "Directional" | "Point";

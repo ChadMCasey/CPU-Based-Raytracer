@@ -1,14 +1,18 @@
-import { Vec3, SceneObject, HitRecord, Light } from "./types.js";
+import { Vec3, SceneObject, HitRecord } from "./types.js";
 import { CANVAS_DEFAULT_BACKGROUND } from "./constants.js";
 import Sphere from "./Sphere.js";
-import {AmbientLight, DirectionalLight, PointLight} from "./Light.js";
+import {AmbientLight, DirectionalLight, PointLight, Light } from "./Light.js";
+import MathUtils from "./MathUtils.js";
+
+const mathUtils = new MathUtils();
 
 export default class Scene {
   
   private spheres: Sphere[] = [
     new Sphere([0, -1, 3], 1, [255, 0, 0]),
     new Sphere([2, 0, 4], 1, [0, 0, 255]),
-    new Sphere([-2, 0, 4], 1, [0, 255, 0])
+    new Sphere([-2, 0, 4], 1, [0, 255, 0]),
+    new Sphere([0, -5001, 0], 5000, [255, 255, 0])
   ];
   
   private lights: Light[] = [
@@ -22,6 +26,8 @@ export default class Scene {
   traceRay(O: Vec3, D: Vec3, minT: number, maxT: number) : Vec3 {
     let closestIntersection: number = Number.POSITIVE_INFINITY;
     let closestObj: SceneObject | null = null;
+    let closestP: Vec3 | null = null;
+    let normalAtP: Vec3 | null = null;
 
     for (let i = 0; i < this.sceneObjs.length; i++) {
       const sceneObj = this.sceneObjs[i];
@@ -30,22 +36,30 @@ export default class Scene {
       
       if (!intersection) continue;
 
-      const distance = intersection.distance;
-      if ((distance >= minT && distance <= maxT) && distance < closestIntersection) {
-        closestIntersection = distance;
+      if ((intersection.distance >= minT && 
+           intersection.distance <= maxT) && 
+           intersection.distance < closestIntersection) {
+        closestIntersection = intersection.distance;
+        closestP = intersection.position;
+        normalAtP = intersection.normal;
         closestObj = sceneObj;
       }
     }
 
-    if (!closestObj) return CANVAS_DEFAULT_BACKGROUND;
+    // we have an intersection at P
+    if (closestObj && closestP && normalAtP) {
+      const lightIntensity = this.computeLighting(closestP, normalAtP);
+      return mathUtils.scaleVector(closestObj.color, lightIntensity);
+    } 
 
-    // we have intersected an object, we cant just render the given color
-    // we must account for the lighting. Split out the traceRay method so the
-    // logic is clean
-    const intensity = this.computeLighting();
-
-    return closestObj.color;
+    // we have no intersection
+    return CANVAS_DEFAULT_BACKGROUND;
   }
 
-  computeLighting() {}
+  computeLighting(P: Vec3, N: Vec3) {
+    let intensity: number = 0.0;
+    for (let light of this.lights) 
+      intensity += light.computeIllumination(P, N);
+    return intensity;
+  }
 }

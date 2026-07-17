@@ -20,6 +20,15 @@ export default class Sphere {
         const validIntersections = intersections.filter(t => t > 0);
         if (!validIntersections.length)
             return null;
-        return { distance: Math.min(...validIntersections) };
+        const distance = Math.min(...validIntersections);
+        const position = mathUtils.addVectors(O, mathUtils.scaleVector(D, distance)); // P = O + t(V - O);
+        const normal = this.computeNormal(position);
+        return { distance, position, normal };
+    }
+    computeNormal(position) {
+        const CP = mathUtils.subtractVectors(position, this.center);
+        const magnitude = mathUtils.magnitude(CP);
+        const normal = mathUtils.scaleVector(CP, 1 / magnitude);
+        return normal;
     }
 }
