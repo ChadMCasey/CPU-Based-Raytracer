@@ -1,8 +1,11 @@
 import { Vec3, SceneObject, HitRecord } from "./types.js";
 import { CANVAS_DEFAULT_BACKGROUND } from "./constants.js";
 import Sphere from "./Sphere.js";
-import {AmbientLight, DirectionalLight, PointLight, Light } from "./Light.js";
 import MathUtils from "./MathUtils.js";
+import Light from "./Light.js";
+import AmbientLight from "./AmbientLight.js";
+import DirectionalLight from "./DirectionalLight.js";
+import PointLight from "./PointLight.js";
 
 const mathUtils = new MathUtils();
 

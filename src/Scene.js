@@ -1,7 +1,9 @@
 import { CANVAS_DEFAULT_BACKGROUND } from "./constants.js";
 import Sphere from "./Sphere.js";
-import { AmbientLight, DirectionalLight, PointLight } from "./Light.js";
 import MathUtils from "./MathUtils.js";
+import AmbientLight from "./AmbientLight.js";
+import DirectionalLight from "./DirectionalLight.js";
+import PointLight from "./PointLight.js";
 const mathUtils = new MathUtils();
 export default class Scene {
     constructor() {
