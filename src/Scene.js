@@ -11,7 +11,7 @@ export default class Scene {
             new Sphere([0, -1, 3], 1, [255, 0, 0], 500), // Red
             new Sphere([2, 0, 4], 1, [0, 0, 255], 500), // Blue
             new Sphere([-2, 0, 4], 1, [0, 255, 0], 10), // Green
-            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000) // Yellow
+            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000), // Yellow
         ];
         this.lights = [
             new AmbientLight(0.2),
@@ -30,8 +30,8 @@ export default class Scene {
             const intersection = sceneObj.intersect(O, D);
             if (!intersection)
                 continue;
-            if ((intersection.distance >= minT &&
-                intersection.distance <= maxT) &&
+            if (intersection.distance >= minT &&
+                intersection.distance <= maxT &&
                 intersection.distance < closestIntersection) {
                 closestIntersection = intersection.distance;
                 closestP = intersection.position;

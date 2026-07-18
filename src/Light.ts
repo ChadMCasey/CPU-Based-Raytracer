@@ -9,5 +9,5 @@ export default abstract class Light {
     this.type = type;
   }
 
-  abstract computeIllumination(P: Vec3,  N: Vec3, V: Vec3, s: number): number;
+  abstract computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number;
 }

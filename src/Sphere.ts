@@ -22,22 +22,27 @@ export default class Sphere implements SceneObject {
 
     const a: number = mathUtils.dotVectors(D, D);
     const b: number = 2 * mathUtils.dotVectors(CO, D);
-    const c: number = mathUtils.dotVectors(CO, CO) - r*r;
+    const c: number = mathUtils.dotVectors(CO, CO) - r * r;
 
-    const discriminantSquared: number = b**2 - 4*a*c;
+    const discriminantSquared: number = b ** 2 - 4 * a * c;
 
-    if (discriminantSquared < 0) 
-      return null; // NO INTERSECTION
-    
-    const discriminant: number = Math.sqrt(b**2 - 4*a*c);
-    const intersections: Array<number> = [(-b + discriminant) / (2*a),(-b - discriminant) / (2*a)];
+    if (discriminantSquared < 0) return null; // NO INTERSECTION
 
-    const validIntersections: number[] = intersections.filter(t =>  t > 0);
+    const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
+    const intersections: Array<number> = [
+      (-b + discriminant) / (2 * a),
+      (-b - discriminant) / (2 * a),
+    ];
+
+    const validIntersections: number[] = intersections.filter((t) => t > 0);
 
     if (!validIntersections.length) return null;
 
     const distance: number = Math.min(...validIntersections);
-    const position: Vec3 = mathUtils.addVectors(O, mathUtils.scaleVector(D, distance)); // P = O + t(V - O);
+    const position: Vec3 = mathUtils.addVectors(
+      O,
+      mathUtils.scaleVector(D, distance),
+    ); // P = O + t(V - O);
     const normal: Vec3 = this.computeNormal(position);
 
     return { distance, position, normal };
@@ -46,7 +51,7 @@ export default class Sphere implements SceneObject {
   computeNormal(position: Vec3): Vec3 {
     const CP: Vec3 = mathUtils.subtractVectors(position, this.center);
     const magnitude = mathUtils.magnitude(CP);
-    const normal = mathUtils.scaleVector(CP, 1/magnitude);
+    const normal = mathUtils.scaleVector(CP, 1 / magnitude);
     return normal;
   }
 }

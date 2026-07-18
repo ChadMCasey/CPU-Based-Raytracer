@@ -13,7 +13,7 @@ export default class Camera {
   // i am looking at a 2D coordinate, please provide me a three dimensional direction ray
   canvasToViewportCoord(Cw: number, Ch: number, Cx: number, Cy: number): Vec3 {
     const Vx: number = (this.viewportWidth / Cw) * Cx;
-    const Vy: number = (this.viewportHeight / Ch ) * Cy;
+    const Vy: number = (this.viewportHeight / Ch) * Cy;
     const Vz: number = this.viewportDistance;
     return [Vx, Vy, Vz];
   }
