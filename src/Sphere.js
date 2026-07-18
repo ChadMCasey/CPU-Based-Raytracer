@@ -17,8 +17,11 @@ export default class Sphere {
         if (discriminantSquared < 0)
             return null; // NO INTERSECTION
         const discriminant = Math.sqrt(b ** 2 - 4 * a * c);
-        const intersections = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
-        const validIntersections = intersections.filter(t => t > 0);
+        const intersections = [
+            (-b + discriminant) / (2 * a),
+            (-b - discriminant) / (2 * a),
+        ];
+        const validIntersections = intersections.filter((t) => t > 0);
         if (!validIntersections.length)
             return null;
         const distance = Math.min(...validIntersections);

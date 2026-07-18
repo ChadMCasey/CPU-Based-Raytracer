@@ -1,14 +1,15 @@
-import Light from './Light.js';
-import MathUtils from './MathUtils.js';
+import Light from "./Light.js";
+import MathUtils from "./MathUtils.js";
 const mathUtils = new MathUtils();
 export default class DirectionalLight extends Light {
     constructor(intensity, direction) {
-        super('Directional', intensity);
+        super("Directional", intensity);
         this.direction = direction;
     }
     computeIllumination(P, N, V, s) {
         const DotNL = mathUtils.dotVectors(N, this.direction);
-        if (DotNL < 0) // dont contribute negative light 
+        if (DotNL < 0)
+            // dont contribute negative light
             return 0;
         const diffuseScalar = this.computeScalarDiffuse(N, this.direction, DotNL);
         const specularScalar = this.computeScalarHighlight(N, V, s, this.direction, DotNL);

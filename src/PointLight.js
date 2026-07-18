@@ -1,16 +1,17 @@
-import Light from './Light.js';
-import MathUtils from './MathUtils.js';
+import Light from "./Light.js";
+import MathUtils from "./MathUtils.js";
 const mathUtils = new MathUtils();
 export default class PointLight extends Light {
     constructor(intensity, position) {
-        super('Point', intensity);
+        super("Point", intensity);
         this.position = position;
     }
     computeIllumination(P, N, V, s) {
         // precompute shared values
         const L = mathUtils.subtractVectors(this.position, P);
         const DotNL = mathUtils.dotVectors(N, L);
-        if (DotNL < 0) // dont contribute negative light
+        if (DotNL < 0)
+            // dont contribute negative light
             return 0;
         const diffuseScalar = this.computeScalarDiffuse(N, L, DotNL);
         const specularScalar = this.computeScalarHighlight(N, V, s, L, DotNL);
