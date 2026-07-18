@@ -5,8 +5,7 @@
     "typescript": "^7.0.2"
   },
   "scripts": {
-    "compile": "tsc",
-    "watch": "tsc --watch",
-    "serve": "live-server src --entry-file=index.html"
+    "compile": "rm -rf dist && tsc",
+    "serve": "live-server . --entry-file=src/index.html"
   }
 }
