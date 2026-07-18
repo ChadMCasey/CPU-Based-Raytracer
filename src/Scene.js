@@ -6,10 +6,10 @@ const mathUtils = new MathUtils();
 export default class Scene {
     constructor() {
         this.spheres = [
-            new Sphere([0, -1, 3], 1, [255, 0, 0]),
-            new Sphere([2, 0, 4], 1, [0, 0, 255]),
-            new Sphere([-2, 0, 4], 1, [0, 255, 0]),
-            new Sphere([0, -5001, 0], 5000, [255, 255, 0])
+            new Sphere([0, -1, 3], 1, [255, 0, 0], 500), // Red
+            new Sphere([2, 0, 4], 1, [0, 0, 255], 500), // Blue
+            new Sphere([-2, 0, 4], 1, [0, 255, 0], 10), // Green
+            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000) // Yellow
         ];
         this.lights = [
             new AmbientLight(0.2),
@@ -39,16 +39,16 @@ export default class Scene {
         }
         // we have an intersection at P
         if (closestObj && closestP && normalAtP) {
-            const lightIntensity = this.computeLighting(closestP, normalAtP);
+            const lightIntensity = this.computeLighting(closestP, normalAtP, mathUtils.subtractVectors(O, closestP), closestObj.specular);
             return mathUtils.scaleVector(closestObj.color, lightIntensity);
         }
         // we have no intersection
         return CANVAS_DEFAULT_BACKGROUND;
     }
-    computeLighting(P, N) {
+    computeLighting(P, N, V, s) {
         let intensity = 0.0;
         for (let light of this.lights)
-            intensity += light.computeIllumination(P, N);
+            intensity += light.computeIllumination(P, N, V, s);
         return intensity;
     }
 }
