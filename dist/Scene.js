@@ -8,10 +8,10 @@ const mathUtils = new MathUtils();
 export default class Scene {
     constructor() {
         this.spheres = [
-            new Sphere([0, -1, 3], 1, [255, 0, 0], 500), // Red
-            new Sphere([2, 0, 4], 1, [0, 0, 255], 500), // Blue
-            new Sphere([-2, 0, 4], 1, [0, 255, 0], 10), // Green
-            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000), // Yellow
+            new Sphere([0, -1, 3], 1, [255, 0, 0], 500, 0.2), // Red
+            new Sphere([2, 0, 4], 1, [0, 0, 255], 500, 0.3), // Blue
+            new Sphere([-2, 0, 4], 1, [0, 255, 0], 10, 0.4), // Green
+            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000, 0.5), // Yellow
         ];
         this.lights = [
             new AmbientLight(0.2),

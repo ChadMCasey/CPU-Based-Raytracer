@@ -13,12 +13,10 @@ export default class PointLight extends Light {
   }
 
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
-    // precompute shared values
     const L: Vec3 = mathUtils.subtractVectors(this.position, P);
     const DotNL: number = mathUtils.dotVectors(N, L);
 
     if (DotNL < 0)
-      // dont contribute negative light
       return 0;
 
     const diffuseScalar: number = this.computeScalarDiffuse(N, L, DotNL);
@@ -26,8 +24,7 @@ export default class PointLight extends Light {
       N,
       V,
       s,
-      L,
-      DotNL,
+      L
     );
 
     const totalScalar: number =
@@ -46,13 +43,10 @@ export default class PointLight extends Light {
     V: Vec3,
     s: number,
     L: Vec3,
-    DotNL: number,
   ): number {
     if (s === -1) return -1;
 
-    const TwoN: Vec3 = mathUtils.scaleVector(N, 2);
-    const ScaleTwoN: Vec3 = mathUtils.scaleVector(TwoN, DotNL);
-    const R: Vec3 = mathUtils.subtractVectors(ScaleTwoN, L);
+    const R: Vec3 = mathUtils.reflectVector(L, N);
     const RDotV: number = mathUtils.dotVectors(R, V);
 
     if (RDotV < 0) return -1;
@@ -66,7 +60,6 @@ export default class PointLight extends Light {
   }
 
   getShadowProperties(P: Vec3): [Vec3, number] {
-    // max t of 1, we dont care about intersections beyond the light
     return [mathUtils.subtractVectors(this.position, P), 1];
   }
 }
