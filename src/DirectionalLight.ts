@@ -16,7 +16,6 @@ export default class DirectionalLight extends Light {
     const DotNL = mathUtils.dotVectors(N, this.direction);
 
     if (DotNL < 0)
-      // dont contribute negative light
       return 0;
 
     const diffuseScalar: number = this.computeScalarDiffuse(
@@ -28,8 +27,7 @@ export default class DirectionalLight extends Light {
       N,
       V,
       s,
-      this.direction,
-      DotNL,
+      this.direction
     );
 
     const totalScalar: number =
@@ -48,13 +46,10 @@ export default class DirectionalLight extends Light {
     V: Vec3,
     s: number,
     L: Vec3,
-    DotNL: number,
   ): number {
     if (s === -1) return -1;
 
-    const TwoN: Vec3 = mathUtils.scaleVector(N, 2);
-    const ScaleTwoN: Vec3 = mathUtils.scaleVector(TwoN, DotNL);
-    const R: Vec3 = mathUtils.subtractVectors(ScaleTwoN, L);
+    const R: Vec3 = mathUtils.reflectVector(L, N);
     const RDotV: number = mathUtils.dotVectors(R, V);
 
     if (RDotV < 0) return -1;
@@ -68,8 +63,6 @@ export default class DirectionalLight extends Light {
   }
 
   getShadowProperties(P: Vec3): [Vec3, number] | null {
-    // directional lights are defined by a fixed direction vector
-    // we need to look out into the infinite space for intersections (maxT = inf)
     return [this.direction, Number.POSITIVE_INFINITY];
   }
 }

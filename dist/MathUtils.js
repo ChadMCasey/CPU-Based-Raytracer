@@ -18,4 +18,12 @@ export default class MathUtils {
     magnitude(a) {
         return Math.sqrt(this.dotVectors(a, a));
     }
+    // reflect R about normal N
+    reflectVector(R, N) {
+        const TwoN = this.scaleVector(N, 2);
+        const RDotN = this.dotVectors(R, N);
+        const Scale2N = this.scaleVector(TwoN, RDotN);
+        const subR = this.subtractVectors(Scale2N, R);
+        return subR; // reflected vector
+    }
 }

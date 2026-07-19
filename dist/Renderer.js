@@ -1,4 +1,4 @@
-import { CAMERA_POS } from "./constants.js";
+import { CAMERA_POS, MAX_REFLECT_RECUR } from "./constants.js";
 import Scene from "./Scene.js";
 import Camera from "./Camera.js";
 import RenderTarget from "./RenderTarget.js";
@@ -15,7 +15,7 @@ class Controller {
         for (let x = -renderW / 2; x <= renderW / 2; x++) {
             for (let y = -renderH / 2; y <= renderH / 2; y++) {
                 const D = this.camera.canvasToViewportCoord(renderW, renderH, x, y);
-                const color = this.scene.traceRay(cameraPos, D, 1, Number.POSITIVE_INFINITY);
+                const color = this.scene.traceRay(cameraPos, D, 1, Number.POSITIVE_INFINITY, MAX_REFLECT_RECUR);
                 const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);
                 this.renderTarget.putPixel(putX, putY, color);
             }
