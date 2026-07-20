@@ -87,4 +87,13 @@ export default class MathUtils {
       [0, 0, 1]
     ]
   } 
+  
+  // reflect R about normal N
+  reflectVector(R: Vec3, N: Vec3): Vec3 {
+    const TwoN: Vec3 = this.scaleVector(N, 2);
+    const RDotN: number = this.dotVectors(R, N);
+    const Scale2N: Vec3 = this.scaleVector(TwoN, RDotN);
+    const subR: Vec3 = this.subtractVectors(Scale2N, R);
+    return subR; // reflected vector
+  }
 }

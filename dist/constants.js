@@ -1,9 +1,10 @@
 // Canvas
-const CANVAS_WIDTH = 1080;
-const CANVAS_HEIGHT = 1080;
-const CANVAS_DEFAULT_BACKGROUND = [255, 255, 255];
+export const CANVAS_WIDTH = 1080;
+export const CANVAS_HEIGHT = 1080;
+export const CANVAS_DEFAULT_BACKGROUND = [0, 0, 0];
 // Camera
-const CAMERA_POS = [0, 0, 0];
+export const CAMERA_POS = [0, 0, 0];
 // Minimal T for shadow determination
-const MIN_T_FOR_SHADOW = 0.001;
-export { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_DEFAULT_BACKGROUND, CAMERA_POS, MIN_T_FOR_SHADOW, };
+export const MIN_T = 0.001;
+// Recursive bound on reflection computation
+export const MAX_REFLECT_RECUR = 3;

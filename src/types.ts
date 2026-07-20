@@ -26,6 +26,7 @@ export type SceneIntersection = {
 export interface SceneObject {
   readonly color: RGB;
   readonly specular: number;
+  readonly reflective: number;
   intersect(origin: Vec3, direction: Vec3): HitRecord | null;
 }
 
@@ -33,7 +34,6 @@ export interface SceneObject {
 export interface Sphere {
   center: Vec3;
   radius: number;
-  color: RGB;
 }
 
 export type LightType = "Ambient" | "Directional" | "Point";

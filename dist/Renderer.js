@@ -1,4 +1,4 @@
-import { CAMERA_POS } from "./constants.js";
+import { CAMERA_POS, MAX_REFLECT_RECUR } from "./constants.js";
 import Scene from "./Scene.js";
 import Camera from "./Camera.js";
 import RenderTarget from "./RenderTarget.js";
@@ -20,7 +20,7 @@ class Controller {
                 // rotate directional vector D via rotation matrix
                 const rotatedD = this.camera.computeRotatedVector(cameraRotation, D);
                 // notice that rotatedD originates at cameraPos here
-                const color = this.scene.traceRay(cameraPos, rotatedD, 1, Number.POSITIVE_INFINITY);
+                const color = this.scene.traceRay(cameraPos, rotatedD, 1, Number.POSITIVE_INFINITY, MAX_REFLECT_RECUR);
                 // map back to JS canvas coordinate system
                 const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);
                 // paint cell accordingly

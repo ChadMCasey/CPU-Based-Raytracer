@@ -10,7 +10,7 @@ export default class Camera {
   public readonly viewportDistance: number = 1;
   
   // Pitch, Yaw and Roll in degrees
-  public readonly rotation: Rotation = { pitch: 0, yaw: 0, roll: 0 };
+  public readonly rotation: Rotation = { pitch: -20, yaw: 0, roll: 0 };
 
   constructor(position: Vec3) {
     this.position = position; // starting position

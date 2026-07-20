@@ -1,5 +1,5 @@
 import { Vec3 } from "./types.js";
-import { CAMERA_POS } from "./constants.js";
+import { CAMERA_POS, MAX_REFLECT_RECUR } from "./constants.js";
 import Scene from "./Scene.js";
 import Camera from "./Camera.js";
 import RenderTarget from "./RenderTarget.js";
@@ -38,6 +38,7 @@ class Controller {
           rotatedD,
           1,
           Number.POSITIVE_INFINITY,
+          MAX_REFLECT_RECUR
         );
 
         // map back to JS canvas coordinate system
