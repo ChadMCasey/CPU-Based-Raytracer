@@ -1,4 +1,4 @@
-import MathUtils from "./MathUtils.js";
+import MathUtils from "../Utils/MathUtils.js";
 const mathUtils = new MathUtils();
 export default class Sphere {
     constructor(center, radius, color, specular, reflective) {

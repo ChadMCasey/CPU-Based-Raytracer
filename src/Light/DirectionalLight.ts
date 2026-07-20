@@ -1,30 +1,33 @@
 import Light from "./Light.js";
-import { Vec3 } from "./types.js";
-import MathUtils from "./MathUtils.js";
+import { Vec3 } from "../Configuration/types.js";
+import MathUtils from "../Utils/MathUtils.js";
 
 const mathUtils = new MathUtils();
 
-export default class PointLight extends Light {
-  readonly position: Vec3;
+export default class DirectionalLight extends Light {
+  readonly direction: Vec3;
 
-  constructor(intensity: number, position: Vec3) {
-    super("Point", intensity);
-    this.position = position;
+  constructor(intensity: number, direction: Vec3) {
+    super("Directional", intensity);
+    this.direction = direction;
   }
 
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
-    const L: Vec3 = mathUtils.subtractVectors(this.position, P);
-    const DotNL: number = mathUtils.dotVectors(N, L);
+    const DotNL = mathUtils.dotVectors(N, this.direction);
 
     if (DotNL < 0)
       return 0;
 
-    const diffuseScalar: number = this.computeScalarDiffuse(N, L, DotNL);
+    const diffuseScalar: number = this.computeScalarDiffuse(
+      N,
+      this.direction,
+      DotNL,
+    );
     const specularScalar: number = this.computeScalarHighlight(
       N,
       V,
       s,
-      L
+      this.direction
     );
 
     const totalScalar: number =
@@ -59,7 +62,7 @@ export default class PointLight extends Light {
     return specularScalar;
   }
 
-  getShadowProperties(P: Vec3): [Vec3, number] {
-    return [mathUtils.subtractVectors(this.position, P), 1];
+  getShadowProperties(P: Vec3): [Vec3, number] | null {
+    return [this.direction, Number.POSITIVE_INFINITY];
   }
 }
