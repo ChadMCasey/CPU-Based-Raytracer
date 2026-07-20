@@ -37,3 +37,9 @@ export interface Sphere {
 }
 
 export type LightType = "Ambient" | "Directional" | "Point";
+
+export type Rotation = {
+  pitch: number;
+  yaw: number;
+  roll: number;
+}
