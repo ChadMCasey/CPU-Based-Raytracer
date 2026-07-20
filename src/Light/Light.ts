@@ -1,4 +1,4 @@
-import { LightType, Vec3 } from "./types.js";
+import { LightType, Vec3 } from "../Configuration/types.js";
 
 export default abstract class Light {
   readonly type: LightType;

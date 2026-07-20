@@ -1,4 +1,4 @@
-import { Vec3 } from "./types";
+import { Vec3 } from "../Configuration/types";
 
 export default class Camera {
   public readonly position: Vec3;

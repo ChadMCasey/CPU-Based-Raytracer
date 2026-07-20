@@ -1,4 +1,4 @@
-import { Vec2, Vec3 } from "./types";
+import { Vec2, Vec3 } from "../Configuration/types.js";
 
 // The canvas is a render target in the context of the web
 export default class RenderTarget {

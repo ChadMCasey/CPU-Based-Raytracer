@@ -1,5 +1,5 @@
 import Light from "./Light.js";
-import { Vec3 } from "./types.js";
+import { Vec3 } from "../Configuration/types.js";
 
 export default class AmbientLight extends Light {
   constructor(intensity: number) {

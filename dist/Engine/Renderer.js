@@ -1,7 +1,7 @@
-import { CAMERA_POS, MAX_REFLECT_RECUR } from "./constants.js";
+import { CAMERA_POS, MAX_REFLECT_RECUR } from "../Configuration/constants.js";
 import Scene from "./Scene.js";
-import Camera from "./Camera.js";
-import RenderTarget from "./RenderTarget.js";
+import Camera from "../Engine/Camera.js";
+import RenderTarget from "../Engine/RenderTarget.js";
 class Controller {
     constructor(renderTarget, scene, camera) {
         this.renderTarget = renderTarget;
