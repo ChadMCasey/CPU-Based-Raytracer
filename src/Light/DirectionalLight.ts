@@ -15,8 +15,7 @@ export default class DirectionalLight extends Light {
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
     const DotNL = mathUtils.dotVectors(N, this.direction);
 
-    if (DotNL < 0)
-      return 0;
+    if (DotNL < 0) return 0;
 
     const diffuseScalar: number = this.computeScalarDiffuse(
       N,
@@ -27,7 +26,7 @@ export default class DirectionalLight extends Light {
       N,
       V,
       s,
-      this.direction
+      this.direction,
     );
 
     const totalScalar: number =
@@ -41,12 +40,7 @@ export default class DirectionalLight extends Light {
     return DotNL / (mathUtils.magnitude(L) * mathUtils.magnitude(N));
   }
 
-  computeScalarHighlight(
-    N: Vec3,
-    V: Vec3,
-    s: number,
-    L: Vec3,
-  ): number {
+  computeScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
     if (s === -1) return -1;
 
     const R: Vec3 = mathUtils.reflectVector(L, N);

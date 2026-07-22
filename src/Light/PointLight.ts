@@ -16,16 +16,10 @@ export default class PointLight extends Light {
     const L: Vec3 = mathUtils.subtractVectors(this.position, P);
     const DotNL: number = mathUtils.dotVectors(N, L);
 
-    if (DotNL < 0)
-      return 0;
+    if (DotNL < 0) return 0;
 
     const diffuseScalar: number = this.computeScalarDiffuse(N, L, DotNL);
-    const specularScalar: number = this.computeScalarHighlight(
-      N,
-      V,
-      s,
-      L
-    );
+    const specularScalar: number = this.computeScalarHighlight(N, V, s, L);
 
     const totalScalar: number =
       (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
@@ -38,12 +32,7 @@ export default class PointLight extends Light {
     return DotNL / (mathUtils.magnitude(L) * mathUtils.magnitude(N));
   }
 
-  computeScalarHighlight(
-    N: Vec3,
-    V: Vec3,
-    s: number,
-    L: Vec3,
-  ): number {
+  computeScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
     if (s === -1) return -1;
 
     const R: Vec3 = mathUtils.reflectVector(L, N);

@@ -11,16 +11,17 @@ export default class Sphere implements SceneObject {
   public readonly reflective: number;
 
   constructor(
-    center: Vec3, 
-    radius: number, 
-    color: RGB, 
-    specular: number, 
-    reflective: number) {
-      this.center = center;
-      this.radius = radius;
-      this.color = color;
-      this.specular = specular;
-      this.reflective = reflective;
+    center: Vec3,
+    radius: number,
+    color: RGB,
+    specular: number,
+    reflective: number,
+  ) {
+    this.center = center;
+    this.radius = radius;
+    this.color = color;
+    this.specular = specular;
+    this.reflective = reflective;
   }
 
   intersect(O: Vec3, D: Vec3): HitRecord | null {
