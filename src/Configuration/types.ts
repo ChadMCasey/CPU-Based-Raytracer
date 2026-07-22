@@ -42,4 +42,4 @@ export type Rotation = {
   pitch: number;
   yaw: number;
   roll: number;
-}
+};

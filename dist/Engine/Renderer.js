@@ -1,15 +1,12 @@
-import { CAMERA_POS, MAX_REFLECT_RECUR } from "../Configuration/constants.js";
-import Scene from "./Scene.js";
-import Camera from "../Engine/Camera.js";
-import RenderTarget from "../Engine/RenderTarget.js";
-class Controller {
+import { MAX_REFLECT_RECUR } from "../Configuration/constants.js";
+export default class Renderer {
     constructor(renderTarget, scene, camera) {
         this.renderTarget = renderTarget;
         this.scene = scene;
         this.camera = camera;
     }
     render() {
-        const cameraPos = this.camera.position;
+        const cameraPos = this.camera.getCameraPosition();
         const cameraRotation = this.camera.computeRotationMatrix();
         const renderW = this.renderTarget.width;
         const renderH = this.renderTarget.height;
@@ -29,8 +26,3 @@ class Controller {
         }
     }
 }
-const renderTarget = new RenderTarget();
-const scene = new Scene();
-const camera = new Camera(CAMERA_POS);
-const control = new Controller(renderTarget, scene, camera);
-document.addEventListener("click", () => control.render());
