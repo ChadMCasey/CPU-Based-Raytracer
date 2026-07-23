@@ -1,4 +1,4 @@
-import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Configuration/constants.js";
+import { CANVAS_DEFAULT_BACKGROUND, MIN_T, } from "../Configuration/constants.js";
 import Sphere from "../Primitives/Sphere.js";
 import MathUtils from "../Utils/MathUtils.js";
 import AmbientLight from "../Light/AmbientLight.js";
@@ -11,7 +11,7 @@ export default class Scene {
             new Sphere([0, -1, 3], 1, [255, 0, 0], 500, 0.2), // Red
             new Sphere([2, 0, 4], 1, [0, 0, 255], 500, 0.3), // Blue
             new Sphere([-2, 0, 4], 1, [0, 255, 0], 10, 0.4), // Green
-            new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000, 0.5), // Yellow
+            new Sphere([0, -5001, 0], 5000, [255, 255, 255], 1000, 0.5), // Yellow
         ];
         this.lights = [
             new AmbientLight(0.2),
@@ -26,18 +26,18 @@ export default class Scene {
         if (!intersection)
             return CANVAS_DEFAULT_BACKGROUND;
         // apply lighting to the closest intersection to the camera
-        const lightIntensity = this.computeLighting(intersection.position, intersection.normal, mathUtils.scaleVector(D, -1), intersection.object.specular);
-        const localColor = mathUtils.scaleVector(intersection.object.color, lightIntensity);
+        const lightIntensity = this.computeLighting(intersection.position, intersection.normal, mathUtils.scaleVectorV3(D, -1), intersection.object.specular);
+        const localColor = mathUtils.scaleVectorV3(intersection.object.color, lightIntensity);
         // if we recur limit or the object is not reflective at all..
         const reflective = intersection.object.reflective;
         if (RecurAmt <= 0 || reflective <= 0)
             return localColor;
         // otherwise compute the reflected color
-        const R = mathUtils.reflectVector(mathUtils.scaleVector(D, -1), intersection.normal);
+        const R = mathUtils.reflectVector(mathUtils.scaleVectorV3(D, -1), intersection.normal);
         const reflectedColor = this.traceRay(intersection.position, R, MIN_T, Number.POSITIVE_INFINITY, RecurAmt - 1);
         // aggregate color data for reflection + local color
-        const localContribution = mathUtils.scaleVector(localColor, 1 - reflective);
-        const reflectedContribution = mathUtils.scaleVector(reflectedColor, reflective);
+        const localContribution = mathUtils.scaleVectorV3(localColor, 1 - reflective);
+        const reflectedContribution = mathUtils.scaleVectorV3(reflectedColor, reflective);
         // sum the two values to produce the output value
         return mathUtils.addVectors(localContribution, reflectedContribution);
     }

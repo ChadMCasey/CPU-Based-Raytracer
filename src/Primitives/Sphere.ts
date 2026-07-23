@@ -11,25 +11,26 @@ export default class Sphere implements SceneObject {
   public readonly reflective: number;
 
   constructor(
-    center: Vec3, 
-    radius: number, 
-    color: RGB, 
-    specular: number, 
-    reflective: number) {
-      this.center = center;
-      this.radius = radius;
-      this.color = color;
-      this.specular = specular;
-      this.reflective = reflective;
+    center: Vec3,
+    radius: number,
+    color: RGB,
+    specular: number,
+    reflective: number,
+  ) {
+    this.center = center;
+    this.radius = radius;
+    this.color = color;
+    this.specular = specular;
+    this.reflective = reflective;
   }
 
   intersect(O: Vec3, D: Vec3): HitRecord | null {
     const r: number = this.radius;
     const CO: Vec3 = mathUtils.subtractVectors(O, this.center);
 
-    const a: number = mathUtils.dotVectors(D, D);
-    const b: number = 2 * mathUtils.dotVectors(CO, D);
-    const c: number = mathUtils.dotVectors(CO, CO) - r * r;
+    const a: number = mathUtils.dotVectorsV3(D, D);
+    const b: number = 2 * mathUtils.dotVectorsV3(CO, D);
+    const c: number = mathUtils.dotVectorsV3(CO, CO) - r * r;
 
     const discriminantSquared: number = b ** 2 - 4 * a * c;
 
@@ -48,7 +49,7 @@ export default class Sphere implements SceneObject {
     const distance: number = Math.min(...validIntersections);
     const position: Vec3 = mathUtils.addVectors(
       O,
-      mathUtils.scaleVector(D, distance),
+      mathUtils.scaleVectorV3(D, distance),
     ); // P = O + t(V - O);
     const normal: Vec3 = this.computeNormal(position);
 
@@ -57,8 +58,8 @@ export default class Sphere implements SceneObject {
 
   computeNormal(position: Vec3): Vec3 {
     const CP: Vec3 = mathUtils.subtractVectors(position, this.center);
-    const magnitude = mathUtils.magnitude(CP);
-    const normal = mathUtils.scaleVector(CP, 1 / magnitude);
+    const magnitude = mathUtils.magnitudeV3(CP);
+    const normal = mathUtils.scaleVectorV3(CP, 1 / magnitude);
     return normal;
   }
 }

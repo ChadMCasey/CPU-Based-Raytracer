@@ -1,11 +1,11 @@
 import MathUtils from "../Utils/MathUtils.js";
 import { Vec3, Rotation } from "../Configuration/types.js";
-import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Configuration/constants.js";
+import { ASPECT_RATIO } from "../Configuration/constants.js";
 
 export default class Camera {
   private readonly mathUtils = new MathUtils();
 
-  public readonly position: Vec3;
+  private position: Vec3;
   public readonly viewportHeight: number;
   public readonly viewportDistance: number;
 
@@ -57,4 +57,14 @@ export default class Camera {
   computeRotatedVector(R: number[][], D: Vec3) {
     return this.mathUtils.multiplyDirectionByRotation(R, D);
   }
+
+  updateCameraX(Dx: number) {
+    this.position[0] += Dx;
+  }
+
+  updateCameraZ(Dz: number) {
+    this.position[2] += Dz;
+  }
+
+  getCameraPosition = () => this.position;
 }

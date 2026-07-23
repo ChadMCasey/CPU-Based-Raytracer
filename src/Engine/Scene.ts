@@ -1,5 +1,14 @@
-import { Vec3, SceneObject, HitRecord, SceneIntersection, RGB } from "../Configuration/types.js";
-import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Configuration/constants.js";
+import {
+  Vec3,
+  SceneObject,
+  HitRecord,
+  SceneIntersection,
+  RGB,
+} from "../Configuration/types.js";
+import {
+  CANVAS_DEFAULT_BACKGROUND,
+  MIN_T,
+} from "../Configuration/constants.js";
 import Sphere from "../Primitives/Sphere.js";
 import MathUtils from "../Utils/MathUtils.js";
 import Light from "../Light/Light.js";
@@ -14,7 +23,7 @@ export default class Scene {
     new Sphere([0, -1, 3], 1, [255, 0, 0], 500, 0.2), // Red
     new Sphere([2, 0, 4], 1, [0, 0, 255], 500, 0.3), // Blue
     new Sphere([-2, 0, 4], 1, [0, 255, 0], 10, 0.4), // Green
-    new Sphere([0, -5001, 0], 5000, [255, 255, 0], 1000, 0.5), // Yellow
+    new Sphere([0, -5001, 0], 5000, [255, 255, 255], 1000, 0.5), // Yellow
   ];
 
   private lights: Light[] = [
@@ -25,7 +34,13 @@ export default class Scene {
 
   private sceneObjs: SceneObject[] = [...this.spheres];
 
-  traceRay(O: Vec3, D: Vec3, minT: number, maxT: number, RecurAmt: number): Vec3 {
+  traceRay(
+    O: Vec3,
+    D: Vec3,
+    minT: number,
+    maxT: number,
+    RecurAmt: number,
+  ): Vec3 {
     // find the intersection between orignation O and closest scene object
     const intersection: SceneIntersection | null = this.closestIntersection(
       O,
@@ -34,39 +49,47 @@ export default class Scene {
       maxT,
     );
 
-    if (!intersection)
-      return CANVAS_DEFAULT_BACKGROUND;
+    if (!intersection) return CANVAS_DEFAULT_BACKGROUND;
 
     // apply lighting to the closest intersection to the camera
     const lightIntensity = this.computeLighting(
       intersection.position,
       intersection.normal,
-      mathUtils.scaleVector(D, -1),
+      mathUtils.scaleVectorV3(D, -1),
       intersection.object.specular,
     );
 
-    const localColor: RGB = mathUtils.scaleVector(
-      intersection.object.color, lightIntensity); 
+    const localColor: RGB = mathUtils.scaleVectorV3(
+      intersection.object.color,
+      lightIntensity,
+    );
 
     // if we recur limit or the object is not reflective at all..
     const reflective: number = intersection.object.reflective;
-    if (RecurAmt <= 0 || reflective <= 0) 
-      return localColor;
-    
+    if (RecurAmt <= 0 || reflective <= 0) return localColor;
+
     // otherwise compute the reflected color
     const R: Vec3 = mathUtils.reflectVector(
-      mathUtils.scaleVector(D, -1), intersection.normal);
+      mathUtils.scaleVectorV3(D, -1),
+      intersection.normal,
+    );
     const reflectedColor: RGB = this.traceRay(
-      intersection.position, 
-      R, 
-      MIN_T, 
-      Number.POSITIVE_INFINITY, 
-      RecurAmt - 1
+      intersection.position,
+      R,
+      MIN_T,
+      Number.POSITIVE_INFINITY,
+      RecurAmt - 1,
     );
 
     // aggregate color data for reflection + local color
-    const localContribution: RGB = mathUtils.scaleVector(localColor, 1-reflective);
-    const reflectedContribution: RGB = mathUtils.scaleVector(reflectedColor, reflective);
+    const localContribution: RGB = mathUtils.scaleVectorV3(
+      localColor,
+      1 - reflective,
+    );
+    const reflectedContribution: RGB = mathUtils.scaleVectorV3(
+      reflectedColor,
+      reflective,
+    );
 
     // sum the two values to produce the output value
     return mathUtils.addVectors(localContribution, reflectedContribution);

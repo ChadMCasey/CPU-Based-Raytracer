@@ -4,7 +4,7 @@ import Scene from "./Scene.js";
 import Camera from "../Engine/Camera.js";
 import RenderTarget from "../Engine/RenderTarget.js";
 
-class Controller {
+export default class Renderer {
   private scene: Scene;
   private camera: Camera;
   private renderTarget: RenderTarget;
@@ -16,7 +16,7 @@ class Controller {
   }
 
   render() {
-    const cameraPos: Vec3 = this.camera.position;
+    const cameraPos: Vec3 = this.camera.getCameraPosition();
     const cameraRotation: number[][] = this.camera.computeRotationMatrix();
 
     const renderW = this.renderTarget.width;
@@ -48,10 +48,3 @@ class Controller {
     }
   }
 }
-
-const renderTarget = new RenderTarget();
-const scene = new Scene();
-const camera = new Camera(CAMERA_POS);
-const control = new Controller(renderTarget, scene, camera);
-
-document.addEventListener("click", () => control.render());

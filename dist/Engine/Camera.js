@@ -7,6 +7,7 @@ export default class Camera {
         this.viewportWidth = window.innerWidth / window.innerHeight;
         // Pitch, Yaw and Roll in degrees
         this.rotation = { pitch: 0, yaw: 0, roll: 0 };
+        this.getCameraPosition = () => this.position;
         this.position = position;
         // determine viewport size based off aspect ratio of browser
         this.viewportDistance = 1;
@@ -37,5 +38,11 @@ export default class Camera {
     }
     computeRotatedVector(R, D) {
         return this.mathUtils.multiplyDirectionByRotation(R, D);
+    }
+    updateCameraX(Dx) {
+        this.position[0] += Dx;
+    }
+    updateCameraZ(Dz) {
+        this.position[2] += Dz;
     }
 }
