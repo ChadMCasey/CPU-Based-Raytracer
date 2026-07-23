@@ -14,7 +14,7 @@ export default class PointLight extends Light {
 
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
     const L: Vec3 = mathUtils.subtractVectors(this.position, P);
-    const DotNL: number = mathUtils.dotVectors(N, L);
+    const DotNL: number = mathUtils.dotVectorsV3(N, L);
 
     if (DotNL < 0) return 0;
 
@@ -29,19 +29,19 @@ export default class PointLight extends Light {
   }
 
   computeScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
-    return DotNL / (mathUtils.magnitude(L) * mathUtils.magnitude(N));
+    return DotNL / (mathUtils.magnitudeV3(L) * mathUtils.magnitudeV3(N));
   }
 
   computeScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
     if (s === -1) return -1;
 
     const R: Vec3 = mathUtils.reflectVector(L, N);
-    const RDotV: number = mathUtils.dotVectors(R, V);
+    const RDotV: number = mathUtils.dotVectorsV3(R, V);
 
     if (RDotV < 0) return -1;
 
-    const magR: number = mathUtils.magnitude(R);
-    const magV: number = mathUtils.magnitude(V);
+    const magR: number = mathUtils.magnitudeV3(R);
+    const magV: number = mathUtils.magnitudeV3(V);
     const cosA: number = RDotV / (magR * magV);
     const specularScalar: number = cosA ** s;
 

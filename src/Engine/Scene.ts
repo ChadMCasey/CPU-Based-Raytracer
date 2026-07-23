@@ -55,11 +55,11 @@ export default class Scene {
     const lightIntensity = this.computeLighting(
       intersection.position,
       intersection.normal,
-      mathUtils.scaleVector(D, -1),
+      mathUtils.scaleVectorV3(D, -1),
       intersection.object.specular,
     );
 
-    const localColor: RGB = mathUtils.scaleVector(
+    const localColor: RGB = mathUtils.scaleVectorV3(
       intersection.object.color,
       lightIntensity,
     );
@@ -70,7 +70,7 @@ export default class Scene {
 
     // otherwise compute the reflected color
     const R: Vec3 = mathUtils.reflectVector(
-      mathUtils.scaleVector(D, -1),
+      mathUtils.scaleVectorV3(D, -1),
       intersection.normal,
     );
     const reflectedColor: RGB = this.traceRay(
@@ -82,11 +82,11 @@ export default class Scene {
     );
 
     // aggregate color data for reflection + local color
-    const localContribution: RGB = mathUtils.scaleVector(
+    const localContribution: RGB = mathUtils.scaleVectorV3(
       localColor,
       1 - reflective,
     );
-    const reflectedContribution: RGB = mathUtils.scaleVector(
+    const reflectedContribution: RGB = mathUtils.scaleVectorV3(
       reflectedColor,
       reflective,
     );

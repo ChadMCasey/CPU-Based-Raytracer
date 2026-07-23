@@ -11,9 +11,9 @@ export default class Sphere {
     intersect(O, D) {
         const r = this.radius;
         const CO = mathUtils.subtractVectors(O, this.center);
-        const a = mathUtils.dotVectors(D, D);
-        const b = 2 * mathUtils.dotVectors(CO, D);
-        const c = mathUtils.dotVectors(CO, CO) - r * r;
+        const a = mathUtils.dotVectorsV3(D, D);
+        const b = 2 * mathUtils.dotVectorsV3(CO, D);
+        const c = mathUtils.dotVectorsV3(CO, CO) - r * r;
         const discriminantSquared = b ** 2 - 4 * a * c;
         if (discriminantSquared < 0)
             return null; // NO INTERSECTION
@@ -26,14 +26,14 @@ export default class Sphere {
         if (!validIntersections.length)
             return null;
         const distance = Math.min(...validIntersections);
-        const position = mathUtils.addVectors(O, mathUtils.scaleVector(D, distance)); // P = O + t(V - O);
+        const position = mathUtils.addVectors(O, mathUtils.scaleVectorV3(D, distance)); // P = O + t(V - O);
         const normal = this.computeNormal(position);
         return { distance, position, normal };
     }
     computeNormal(position) {
         const CP = mathUtils.subtractVectors(position, this.center);
-        const magnitude = mathUtils.magnitude(CP);
-        const normal = mathUtils.scaleVector(CP, 1 / magnitude);
+        const magnitude = mathUtils.magnitudeV3(CP);
+        const normal = mathUtils.scaleVectorV3(CP, 1 / magnitude);
         return normal;
     }
 }

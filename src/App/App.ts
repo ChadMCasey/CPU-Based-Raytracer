@@ -15,6 +15,8 @@ class App {
   private readonly renderer: Renderer;
   private readonly controller: Controller;
 
+  private lastTime: number = 0;
+
   constructor() {
     this.renderTarget = new RenderTarget();
     this.scene = new Scene();
@@ -23,18 +25,20 @@ class App {
     this.controller = new Controller(this.camera);
   }
 
-  runAppLoop(): void {
+  runAppLoop(currentTime: number): void {
     // the scene responds to user input
-    this.controller.update();
+    this.controller.update(currentTime - this.lastTime);
+
+    this.lastTime = currentTime;
 
     // the scene can be drawn now
     this.renderer.render();
 
     // loop continously
-    window.requestAnimationFrame(() => this.runAppLoop());
+    window.requestAnimationFrame((currentTime) => this.runAppLoop(currentTime));
   }
 }
 
 // execute app
 const app = new App();
-window.requestAnimationFrame(() => app.runAppLoop());
+window.requestAnimationFrame((currentTime) => app.runAppLoop(currentTime));

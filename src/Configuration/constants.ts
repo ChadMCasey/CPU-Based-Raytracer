@@ -17,3 +17,6 @@ export const MIN_T = 0.001;
 
 // Recursive bound on reflection computation
 export const MAX_REFLECT_RECUR = 3;
+
+export const VALID_MOVEMENT_KEYS = ["w", "a", "s", "d"];
+export const CAMERA_MOVEMENT_SPEED = 2;

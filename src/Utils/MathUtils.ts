@@ -1,9 +1,13 @@
-import { Vec3 } from "../Configuration/types.js";
+import { Vec3, Vec2 } from "../Configuration/types.js";
 
 export default class MathUtils {
   // calculate the dot product of 2 vectors
-  dotVectors(a: Vec3, b: Vec3): number {
+  dotVectorsV3(a: Vec3, b: Vec3): number {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  }
+
+  dotVectorsV2(a: Vec2, b: Vec2): number {
+    return a[0] * b[0] + a[1] * b[1];
   }
 
   // subtract two vectors
@@ -17,12 +21,20 @@ export default class MathUtils {
   }
 
   // scale vector by constant k
-  scaleVector(a: Vec3, k: number): Vec3 {
+  scaleVectorV3(a: Vec3, k: number): Vec3 {
     return [a[0] * k, a[1] * k, a[2] * k];
   }
 
-  magnitude(a: Vec3): number {
-    return Math.sqrt(this.dotVectors(a, a));
+  scaleVectorV2(a: Vec2, k: number): Vec2 {
+    return [a[0] * k, a[1] * k];
+  }
+
+  magnitudeV2(a: Vec2): number {
+    return Math.sqrt(this.dotVectorsV2(a, a));
+  }
+
+  magnitudeV3(a: Vec3): number {
+    return Math.sqrt(this.dotVectorsV3(a, a));
   }
 
   convertDegToRad(degrees: number): number {
@@ -98,9 +110,9 @@ export default class MathUtils {
 
   // reflect R about normal N
   reflectVector(R: Vec3, N: Vec3): Vec3 {
-    const TwoN: Vec3 = this.scaleVector(N, 2);
-    const RDotN: number = this.dotVectors(R, N);
-    const Scale2N: Vec3 = this.scaleVector(TwoN, RDotN);
+    const TwoN: Vec3 = this.scaleVectorV3(N, 2);
+    const RDotN: number = this.dotVectorsV3(R, N);
+    const Scale2N: Vec3 = this.scaleVectorV3(TwoN, RDotN);
     const subR: Vec3 = this.subtractVectors(Scale2N, R);
     return subR; // reflected vector
   }
