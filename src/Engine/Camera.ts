@@ -25,14 +25,19 @@ export default class Camera {
   }
 
   // compute directional ray originating from origin (0,0,0)
-  canvasToViewport(Cw: number, Ch: number, Cx: number, Cy: number): Vec3 {
+  public canvasToViewport(
+    Cw: number,
+    Ch: number,
+    Cx: number,
+    Cy: number,
+  ): Vec3 {
     const Vx: number = (this.viewportWidth / Cw) * Cx;
     const Vy: number = (this.viewportHeight / Ch) * Cy;
     const Vz: number = this.viewportDistance;
     return [Vx, Vy, Vz];
   }
 
-  computeRotationMatrix() {
+  public computeRotationMatrix() {
     // pitch yaw and roll of camera in radians
     const pitch: number = this.mathUtils.convertDegToRad(this.rotation.pitch);
     const yaw: number = this.mathUtils.convertDegToRad(this.rotation.yaw);
@@ -54,17 +59,27 @@ export default class Camera {
     return RxRyRz;
   }
 
-  computeRotatedVector(R: number[][], D: Vec3) {
+  public computeRotatedVector(R: number[][], D: Vec3): Vec3 {
     return this.mathUtils.multiplyDirectionByRotation(R, D);
   }
 
-  updateCameraX(Dx: number) {
+  public updateCameraX(Dx: number): void {
     this.position[0] += Dx;
   }
 
-  updateCameraZ(Dz: number) {
+  public updateCameraZ(Dz: number): void {
     this.position[2] += Dz;
   }
 
-  getCameraPosition = () => this.position;
+  public updatePitch(Dy: number): void {
+    this.rotation.pitch += Dy;
+  }
+
+  public updateYaw(Dx: number): void {
+    this.rotation.yaw -= Dx;
+  }
+
+  public getCameraPosition(): Vec3 {
+    return this.position;
+  }
 }

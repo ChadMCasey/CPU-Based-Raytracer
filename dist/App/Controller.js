@@ -2,16 +2,23 @@ import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED, } from "../Configuration/co
 import MathUtils from "../Utils/MathUtils.js";
 // read user input and update application
 export default class Controller {
-    constructor(camera) {
+    constructor(camera, renderTarget) {
         this.mathUtils = new MathUtils();
         // camera movement
         this.keyPressedSet = new Set();
         this.validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
         // camera orientation
         this.rotationDeltas = [0, 0];
+        this.cameraDx = 0;
+        this.cameraDy = 0;
         this.camera = camera;
+        this.renderTarget = renderTarget;
         // hookup event listeners
         this.addEventListeners();
+    }
+    update(elapsedMs) {
+        this.updateCameraPosition(elapsedMs);
+        this.updateCameraOrientation();
     }
     addEventListeners() {
         document.addEventListener("keydown", (e) => {
@@ -22,19 +29,13 @@ export default class Controller {
             if (this.validMovementKeySet.has(e.key))
                 this.keyPressedSet.delete(e.key);
         });
-        document.addEventListener("pointerlockchange", (lockEvent) => {
-            console.log("Enter");
-            if (lockEvent.target.id === "canvas")
-                document.addEventListener("mousemove", (mouseEvent) => {
-                    this.rotationDeltas[0] = mouseEvent.movementX;
-                    this.rotationDeltas[1] = mouseEvent.movementY;
-                    console.log(this.rotationDeltas);
-                });
+        document.addEventListener("click", () => {
+            this.renderTarget.canvas.requestPointerLock();
+            document.addEventListener("mousemove", (e) => {
+                this.cameraDx = e.movementX;
+                this.cameraDy = e.movementY;
+            });
         });
-    }
-    update(elapsedMs) {
-        this.updateCameraPosition(elapsedMs);
-        this.updateCameraOrientation();
     }
     updateCameraPosition(elapsedMs) {
         let changeX = 0;
@@ -58,5 +59,9 @@ export default class Controller {
         this.camera.updateCameraX(Dx);
         this.camera.updateCameraZ(Dz);
     }
-    updateCameraOrientation() { }
+    updateCameraOrientation() {
+        // tell camera about the delta for pitch and yaw
+        this.camera.updatePitch(this.cameraDy);
+        this.camera.updateYaw(this.cameraDx);
+    }
 }

@@ -5,6 +5,7 @@ import {
 } from "../Configuration/constants.js";
 import { Vec2 } from "../Configuration/types.js";
 import MathUtils from "../Utils/MathUtils.js";
+import RenderTarget from "../Engine/RenderTarget.js";
 
 // read user input and update application
 export default class Controller {
@@ -16,14 +17,23 @@ export default class Controller {
 
   // camera orientation
   private readonly rotationDeltas: Vec2 = [0, 0];
+  private cameraDx: number = 0;
+  private cameraDy: number = 0;
 
   public readonly camera: Camera;
+  public readonly renderTarget: RenderTarget;
 
-  constructor(camera: Camera) {
+  constructor(camera: Camera, renderTarget: RenderTarget) {
     this.camera = camera;
+    this.renderTarget = renderTarget;
 
     // hookup event listeners
     this.addEventListeners();
+  }
+
+  update(elapsedMs: number) {
+    this.updateCameraPosition(elapsedMs);
+    this.updateCameraOrientation();
   }
 
   addEventListeners() {
@@ -33,12 +43,13 @@ export default class Controller {
     document.addEventListener("keyup", (e) => {
       if (this.validMovementKeySet.has(e.key)) this.keyPressedSet.delete(e.key);
     });
-    document.addEventListener("pointerlockchange", (lockEvent) => {});
-  }
-
-  update(elapsedMs: number) {
-    this.updateCameraPosition(elapsedMs);
-    this.updateCameraOrientation();
+    document.addEventListener("click", () => {
+      this.renderTarget.canvas.requestPointerLock();
+      document.addEventListener("mousemove", (e) => {
+        this.cameraDx = e.movementX;
+        this.cameraDy = e.movementY;
+      });
+    });
   }
 
   updateCameraPosition(elapsedMs: number) {
@@ -73,5 +84,9 @@ export default class Controller {
     this.camera.updateCameraZ(Dz);
   }
 
-  updateCameraOrientation() {}
+  updateCameraOrientation() {
+    // tell camera about the delta for pitch and yaw
+    this.camera.updatePitch(this.cameraDy);
+    this.camera.updateYaw(this.cameraDx);
+  }
 }
