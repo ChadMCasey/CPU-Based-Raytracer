@@ -22,7 +22,7 @@ class App {
     this.scene = new Scene();
     this.camera = new Camera(CAMERA_POS);
     this.renderer = new Renderer(this.renderTarget, this.scene, this.camera);
-    this.controller = new Controller(this.camera);
+    this.controller = new Controller(this.camera, this.renderTarget);
   }
 
   runAppLoop(currentTime: number): void {
@@ -32,7 +32,7 @@ class App {
     this.lastTime = currentTime;
 
     // the scene can be drawn now
-    this.renderer.render();
+    this.renderer.render(this.camera.computeRotationMatrix());
 
     // loop continously
     window.requestAnimationFrame((currentTime) => this.runAppLoop(currentTime));

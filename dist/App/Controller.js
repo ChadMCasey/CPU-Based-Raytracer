@@ -2,13 +2,22 @@ import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED, } from "../Configuration/co
 import MathUtils from "../Utils/MathUtils.js";
 // read user input and update application
 export default class Controller {
-    constructor(camera) {
-        this.validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
+    constructor(camera, renderTarget) {
         this.mathUtils = new MathUtils();
+        // camera movement
         this.keyPressedSet = new Set();
+        this.validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
+        // camera orientation
+        this.cameraDx = 0;
+        this.cameraDy = 0;
         this.camera = camera;
+        this.renderTarget = renderTarget;
         // hookup event listeners
         this.addEventListeners();
+    }
+    update(elapsedMs) {
+        this.updateCameraPosition(elapsedMs);
+        this.updateCameraOrientation();
     }
     addEventListeners() {
         document.addEventListener("keydown", (e) => {
@@ -19,8 +28,17 @@ export default class Controller {
             if (this.validMovementKeySet.has(e.key))
                 this.keyPressedSet.delete(e.key);
         });
+        document.addEventListener("click", () => {
+            this.renderTarget.canvas.requestPointerLock();
+            document.addEventListener("mousemove", (e) => {
+                if (document.pointerLockElement === this.renderTarget.canvas) {
+                    this.cameraDx = e.movementX;
+                    this.cameraDy = e.movementY;
+                }
+            });
+        });
     }
-    update(elapsedMs) {
+    updateCameraPosition(elapsedMs) {
         let changeX = 0;
         let changeZ = 0;
         // accumulate change in position
@@ -41,5 +59,14 @@ export default class Controller {
         const Dz = (elapsedMs / 1000) * movementVector[1] * CAMERA_MOVEMENT_SPEED;
         this.camera.updateCameraX(Dx);
         this.camera.updateCameraZ(Dz);
+    }
+    updateCameraOrientation() {
+        // tell camera about the delta for pitch and yaw
+        if (this.cameraDy !== 0)
+            this.camera.updatePitch(this.cameraDy);
+        if (this.cameraDx !== 0)
+            this.camera.updateYaw(this.cameraDx);
+        this.cameraDx = 0;
+        this.cameraDy = 0;
     }
 }

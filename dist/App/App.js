@@ -13,14 +13,14 @@ class App {
         this.scene = new Scene();
         this.camera = new Camera(CAMERA_POS);
         this.renderer = new Renderer(this.renderTarget, this.scene, this.camera);
-        this.controller = new Controller(this.camera);
+        this.controller = new Controller(this.camera, this.renderTarget);
     }
     runAppLoop(currentTime) {
         // the scene responds to user input
         this.controller.update(currentTime - this.lastTime);
         this.lastTime = currentTime;
         // the scene can be drawn now
-        this.renderer.render();
+        this.renderer.render(this.camera.computeRotationMatrix());
         // loop continously
         window.requestAnimationFrame((currentTime) => this.runAppLoop(currentTime));
     }

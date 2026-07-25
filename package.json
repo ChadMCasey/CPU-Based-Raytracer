@@ -6,6 +6,6 @@
   },
   "scripts": {
     "compile": "rm -rf dist && tsc",
-    "serve": "live-server . --entry-file=src/index.html"
+    "serve": "npm run compile && live-server . --entry-file=src/index.html"
   }
 }

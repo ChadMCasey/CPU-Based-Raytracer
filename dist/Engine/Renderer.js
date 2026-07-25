@@ -5,9 +5,8 @@ export default class Renderer {
         this.scene = scene;
         this.camera = camera;
     }
-    render() {
+    render(cameraRotation) {
         const cameraPos = this.camera.getCameraPosition();
-        const cameraRotation = this.camera.computeRotationMatrix();
         const renderW = this.renderTarget.width;
         const renderH = this.renderTarget.height;
         for (let x = -renderW / 2; x <= renderW / 2; x++) {

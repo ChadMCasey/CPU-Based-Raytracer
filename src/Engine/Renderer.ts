@@ -15,10 +15,8 @@ export default class Renderer {
     this.camera = camera;
   }
 
-  render() {
+  render(cameraRotation: number[][]): void {
     const cameraPos: Vec3 = this.camera.getCameraPosition();
-    const cameraRotation: number[][] = this.camera.computeRotationMatrix();
-
     const renderW = this.renderTarget.width;
     const renderH = this.renderTarget.height;
 

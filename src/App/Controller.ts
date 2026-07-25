@@ -5,20 +5,34 @@ import {
 } from "../Configuration/constants.js";
 import { Vec2 } from "../Configuration/types.js";
 import MathUtils from "../Utils/MathUtils.js";
+import RenderTarget from "../Engine/RenderTarget.js";
 
 // read user input and update application
 export default class Controller {
-  private readonly validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
   private readonly mathUtils = new MathUtils();
 
+  // camera movement
   public readonly keyPressedSet = new Set<string>();
-  public readonly camera: Camera;
+  private readonly validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
 
-  constructor(camera: Camera) {
+  // camera orientation
+  private cameraDx: number = 0;
+  private cameraDy: number = 0;
+
+  public readonly camera: Camera;
+  public readonly renderTarget: RenderTarget;
+
+  constructor(camera: Camera, renderTarget: RenderTarget) {
     this.camera = camera;
+    this.renderTarget = renderTarget;
 
     // hookup event listeners
     this.addEventListeners();
+  }
+
+  update(elapsedMs: number) {
+    this.updateCameraPosition(elapsedMs);
+    this.updateCameraOrientation();
   }
 
   addEventListeners() {
@@ -28,9 +42,18 @@ export default class Controller {
     document.addEventListener("keyup", (e) => {
       if (this.validMovementKeySet.has(e.key)) this.keyPressedSet.delete(e.key);
     });
+    document.addEventListener("click", () => {
+      this.renderTarget.canvas.requestPointerLock();
+      document.addEventListener("mousemove", (e) => {
+        if (document.pointerLockElement === this.renderTarget.canvas) {
+          this.cameraDx = e.movementX;
+          this.cameraDy = e.movementY;
+        }
+      });
+    });
   }
 
-  update(elapsedMs: number) {
+  updateCameraPosition(elapsedMs: number) {
     let changeX: number = 0;
     let changeZ: number = 0;
 
@@ -60,5 +83,13 @@ export default class Controller {
 
     this.camera.updateCameraX(Dx);
     this.camera.updateCameraZ(Dz);
+  }
+
+  updateCameraOrientation() {
+    // tell camera about the delta for pitch and yaw
+    if (this.cameraDy !== 0) this.camera.updatePitch(this.cameraDy);
+    if (this.cameraDx !== 0) this.camera.updateYaw(this.cameraDx);
+    this.cameraDx = 0;
+    this.cameraDy = 0;
   }
 }
