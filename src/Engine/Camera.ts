@@ -3,6 +3,7 @@ import { Vec3, Rotation } from "../Configuration/types.js";
 import {
   ASPECT_RATIO,
   CAMERA_ORIENTATION_SPEED,
+  CAMERA_ORIENTATION,
 } from "../Configuration/constants.js";
 
 export default class Camera {
@@ -17,6 +18,8 @@ export default class Camera {
 
   // Pitch, Yaw and Roll in degrees
   public readonly rotation: Rotation = { pitch: 0, yaw: 0, roll: 0 };
+  private cachedRotationMatrix: number[][] = CAMERA_ORIENTATION;
+  private rotationChanged: boolean = false; // cache flag
 
   constructor(position: Vec3) {
     this.position = position;
@@ -40,26 +43,34 @@ export default class Camera {
     return [Vx, Vy, Vz];
   }
 
-  public computeRotationMatrix() {
-    // pitch yaw and roll of camera in radians
-    const pitch: number = this.mathUtils.convertDegToRad(this.rotation.pitch);
-    const yaw: number = this.mathUtils.convertDegToRad(this.rotation.yaw);
-    const roll: number = this.mathUtils.convertDegToRad(this.rotation.roll);
+  public computeRotationMatrix(): number[][] {
+    if (this.rotationChanged) {
+      // pitch yaw and roll of camera in radians
+      const pitch: number = this.mathUtils.convertDegToRad(this.rotation.pitch);
+      const yaw: number = this.mathUtils.convertDegToRad(this.rotation.yaw);
+      const roll: number = this.mathUtils.convertDegToRad(this.rotation.roll);
 
-    // compute rotational matrices for rotation about each axis
-    const Rx: number[][] = this.mathUtils.computeRx(pitch);
-    const Ry: number[][] = this.mathUtils.computeRy(yaw);
-    const Rz: number[][] = this.mathUtils.computeRz(roll);
+      // compute rotational matrices for rotation about each axis
+      const Rx: number[][] = this.mathUtils.computeRx(pitch);
+      const Ry: number[][] = this.mathUtils.computeRy(yaw);
+      const Rz: number[][] = this.mathUtils.computeRz(roll);
 
-    // produce the final orthonormal rotation matrix
-    const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(Rz, Ry);
-    const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
-      RzRy,
-      Rx,
-    );
+      // produce the final orthonormal rotation matrix
+      const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(
+        Rz,
+        Ry,
+      );
+      const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
+        RzRy,
+        Rx,
+      );
 
-    // this captures the 3 transformations
-    return RzRyRz;
+      this.cachedRotationMatrix = RzRyRz;
+      this.rotationChanged = false;
+      return RzRyRz;
+    }
+
+    return this.cachedRotationMatrix; // cache hit
   }
 
   public computeRotatedVector(R: number[][], D: Vec3): Vec3 {
@@ -76,10 +87,12 @@ export default class Camera {
 
   public updatePitch(Dy: number): void {
     this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
+    this.rotationChanged = true;
   }
 
   public updateYaw(Dx: number): void {
     this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
+    this.rotationChanged = true;
   }
 
   public getCameraPosition(): Vec3 {
