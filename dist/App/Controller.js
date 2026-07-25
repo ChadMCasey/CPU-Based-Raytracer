@@ -8,7 +8,6 @@ export default class Controller {
         this.keyPressedSet = new Set();
         this.validMovementKeySet = new Set(VALID_MOVEMENT_KEYS);
         // camera orientation
-        this.rotationDeltas = [0, 0];
         this.cameraDx = 0;
         this.cameraDy = 0;
         this.camera = camera;
@@ -32,8 +31,10 @@ export default class Controller {
         document.addEventListener("click", () => {
             this.renderTarget.canvas.requestPointerLock();
             document.addEventListener("mousemove", (e) => {
-                this.cameraDx = e.movementX;
-                this.cameraDy = e.movementY;
+                if (document.pointerLockElement === this.renderTarget.canvas) {
+                    this.cameraDx = e.movementX;
+                    this.cameraDy = e.movementY;
+                }
             });
         });
     }
@@ -61,7 +62,11 @@ export default class Controller {
     }
     updateCameraOrientation() {
         // tell camera about the delta for pitch and yaw
-        this.camera.updatePitch(this.cameraDy);
-        this.camera.updateYaw(this.cameraDx);
+        if (this.cameraDy !== 0)
+            this.camera.updatePitch(this.cameraDy);
+        if (this.cameraDx !== 0)
+            this.camera.updateYaw(this.cameraDx);
+        this.cameraDx = 0;
+        this.cameraDy = 0;
     }
 }

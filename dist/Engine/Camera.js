@@ -1,5 +1,5 @@
 import MathUtils from "../Utils/MathUtils.js";
-import { ASPECT_RATIO } from "../Configuration/constants.js";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, } from "../Configuration/constants.js";
 export default class Camera {
     constructor(position) {
         this.mathUtils = new MathUtils();
@@ -30,10 +30,10 @@ export default class Camera {
         const Ry = this.mathUtils.computeRy(yaw);
         const Rz = this.mathUtils.computeRz(roll);
         // produce the final orthonormal rotation matrix
-        const RxRy = this.mathUtils.multiplyRotationalMatrices(Rx, Ry);
-        const RxRyRz = this.mathUtils.multiplyRotationalMatrices(RxRy, Rz);
+        const RzRy = this.mathUtils.multiplyRotationalMatrices(Rz, Ry);
+        const RzRyRz = this.mathUtils.multiplyRotationalMatrices(RzRy, Rx);
         // this captures the 3 transformations
-        return RxRyRz;
+        return RzRyRz;
     }
     computeRotatedVector(R, D) {
         return this.mathUtils.multiplyDirectionByRotation(R, D);
@@ -45,10 +45,10 @@ export default class Camera {
         this.position[2] += Dz;
     }
     updatePitch(Dy) {
-        this.rotation.pitch += Dy;
+        this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
     }
     updateYaw(Dx) {
-        this.rotation.yaw -= Dx;
+        this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
     }
     getCameraPosition() {
         return this.position;

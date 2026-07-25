@@ -1,6 +1,9 @@
 import MathUtils from "../Utils/MathUtils.js";
 import { Vec3, Rotation } from "../Configuration/types.js";
-import { ASPECT_RATIO } from "../Configuration/constants.js";
+import {
+  ASPECT_RATIO,
+  CAMERA_ORIENTATION_SPEED,
+} from "../Configuration/constants.js";
 
 export default class Camera {
   private readonly mathUtils = new MathUtils();
@@ -49,14 +52,14 @@ export default class Camera {
     const Rz: number[][] = this.mathUtils.computeRz(roll);
 
     // produce the final orthonormal rotation matrix
-    const RxRy: number[][] = this.mathUtils.multiplyRotationalMatrices(Rx, Ry);
-    const RxRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
-      RxRy,
-      Rz,
+    const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(Rz, Ry);
+    const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
+      RzRy,
+      Rx,
     );
 
     // this captures the 3 transformations
-    return RxRyRz;
+    return RzRyRz;
   }
 
   public computeRotatedVector(R: number[][], D: Vec3): Vec3 {
@@ -72,11 +75,11 @@ export default class Camera {
   }
 
   public updatePitch(Dy: number): void {
-    this.rotation.pitch += Dy;
+    this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
   }
 
   public updateYaw(Dx: number): void {
-    this.rotation.yaw -= Dx;
+    this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
   }
 
   public getCameraPosition(): Vec3 {
