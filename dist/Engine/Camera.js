@@ -35,12 +35,10 @@ export default class Camera {
             // produce the final orthonormal rotation matrix
             const RzRy = this.mathUtils.multiplyRotationalMatrices(Rz, Ry);
             const RzRyRz = this.mathUtils.multiplyRotationalMatrices(RzRy, Rx);
-            console.log("compute rotation");
             this.cachedRotationMatrix = RzRyRz;
             this.rotationChanged = false;
             return RzRyRz;
         }
-        console.log("cached hit ");
         return this.cachedRotationMatrix; // cache hit
     }
     computeRotatedVector(R, D) {
@@ -54,10 +52,13 @@ export default class Camera {
     }
     updatePitch(Dy) {
         this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
+        this.rotation.pitch = this.rotation.pitch % 360;
         this.rotationChanged = true;
     }
     updateYaw(Dx) {
         this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
+        this.rotation.yaw = this.rotation.yaw % 360;
+        console.log(`Yaw: ${this.rotation.yaw}`);
         this.rotationChanged = true;
     }
     getCameraPosition() {

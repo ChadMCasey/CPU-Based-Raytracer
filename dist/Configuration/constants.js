@@ -1,6 +1,6 @@
 // Canvas
 export const CANVAS_DEFAULT_BACKGROUND = [0, 0, 0];
-export const CANVAS_HEIGHT = 300;
+export const CANVAS_HEIGHT = 200;
 // aspect ratio
 export const ASPECT_RATIO = () => {
     return window.innerWidth / window.innerHeight;

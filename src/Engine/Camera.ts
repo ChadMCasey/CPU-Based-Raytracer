@@ -87,11 +87,13 @@ export default class Camera {
 
   public updatePitch(Dy: number): void {
     this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
+    this.rotation.pitch = this.rotation.pitch % 360;
     this.rotationChanged = true;
   }
 
   public updateYaw(Dx: number): void {
     this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
+    this.rotation.yaw = this.rotation.yaw % 360;
     this.rotationChanged = true;
   }
 
