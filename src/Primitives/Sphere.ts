@@ -1,4 +1,10 @@
-import { SceneObject, HitRecord, Vec3, RGB } from "../Configuration/types.js";
+import {
+  SceneObject,
+  HitRecord,
+  Vec3,
+  RGB,
+  SerializedSphere,
+} from "../Utility/types.js";
 import MathUtils from "../Utils/MathUtils.js";
 
 const mathUtils = new MathUtils();
@@ -61,5 +67,14 @@ export default class Sphere implements SceneObject {
     const magnitude = mathUtils.magnitudeV3(CP);
     const normal = mathUtils.scaleVectorV3(CP, 1 / magnitude);
     return normal;
+  }
+
+  serialize(): SerializedSphere {
+    return {
+      type: "sphere",
+      center: this.center,
+      radius: this.radius,
+      color: this.color,
+    };
   }
 }

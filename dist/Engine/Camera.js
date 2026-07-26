@@ -1,5 +1,5 @@
 import MathUtils from "../Utils/MathUtils.js";
-import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION, } from "../Configuration/constants.js";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION, } from "../Utility/constants.js";
 export default class Camera {
     constructor(position) {
         this.mathUtils = new MathUtils();

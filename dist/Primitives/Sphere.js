@@ -36,4 +36,12 @@ export default class Sphere {
         const normal = mathUtils.scaleVectorV3(CP, 1 / magnitude);
         return normal;
     }
+    serialize() {
+        return {
+            type: "sphere",
+            center: this.center,
+            radius: this.radius,
+            color: this.color,
+        };
+    }
 }

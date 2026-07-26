@@ -1,5 +1,5 @@
 import Light from "./Light.js";
-import { Vec3 } from "../Configuration/types.js";
+import { RGB, serializedDirectionLight, Vec3 } from "../Utility/types.js";
 import MathUtils from "../Utils/MathUtils.js";
 
 const mathUtils = new MathUtils();
@@ -7,8 +7,8 @@ const mathUtils = new MathUtils();
 export default class DirectionalLight extends Light {
   readonly direction: Vec3;
 
-  constructor(intensity: number, direction: Vec3) {
-    super("Directional", intensity);
+  constructor(intensity: number, direction: Vec3, color: RGB) {
+    super("Directional", intensity, color);
     this.direction = direction;
   }
 
@@ -58,5 +58,14 @@ export default class DirectionalLight extends Light {
 
   getShadowProperties(P: Vec3): [Vec3, number] | null {
     return [this.direction, Number.POSITIVE_INFINITY];
+  }
+
+  serialize(): serializedDirectionLight {
+    return {
+      type: "directional",
+      direction: this.direction,
+      intensity: this.intensity,
+      color: this.color,
+    };
   }
 }

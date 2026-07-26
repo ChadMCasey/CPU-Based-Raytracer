@@ -1,4 +1,4 @@
-import { MAX_REFLECT_RECUR } from "../Configuration/constants.js";
+import { MAX_REFLECT_RECUR } from "../Utility/constants.js";
 export default class Renderer {
     constructor(renderTarget, scene, camera) {
         this.renderTarget = renderTarget;

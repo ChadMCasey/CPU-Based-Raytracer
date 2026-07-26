@@ -2,8 +2,8 @@ import Light from "./Light.js";
 import MathUtils from "../Utils/MathUtils.js";
 const mathUtils = new MathUtils();
 export default class DirectionalLight extends Light {
-    constructor(intensity, direction) {
-        super("Directional", intensity);
+    constructor(intensity, direction, color) {
+        super("Directional", intensity, color);
         this.direction = direction;
     }
     computeIllumination(P, N, V, s) {
@@ -34,5 +34,13 @@ export default class DirectionalLight extends Light {
     }
     getShadowProperties(P) {
         return [this.direction, Number.POSITIVE_INFINITY];
+    }
+    serialize() {
+        return {
+            type: "directional",
+            direction: this.direction,
+            intensity: this.intensity,
+            color: this.color,
+        };
     }
 }

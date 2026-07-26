@@ -1,4 +1,4 @@
-import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED, } from "../Configuration/constants.js";
+import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED, } from "../Utility/constants.js";
 import MathUtils from "../Utils/MathUtils.js";
 // read user input and update application
 export default class Controller {

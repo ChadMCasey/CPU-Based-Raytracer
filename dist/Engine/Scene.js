@@ -1,4 +1,4 @@
-import { CANVAS_DEFAULT_BACKGROUND, MIN_T, } from "../Configuration/constants.js";
+import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants.js";
 import Sphere from "../Primitives/Sphere.js";
 import MathUtils from "../Utils/MathUtils.js";
 import AmbientLight from "../Light/AmbientLight.js";
@@ -14,9 +14,9 @@ export default class Scene {
             new Sphere([0, -5001, 0], 5000, [255, 255, 255], 1000, 0.5), // white
         ];
         this.lights = [
-            new AmbientLight(0.2),
-            new DirectionalLight(0.2, [1, 4, 4]),
-            new PointLight(0.6, [2, 1, 0]),
+            new AmbientLight(0.2, [255, 255, 255]),
+            new DirectionalLight(0.2, [1, 4, 4], [255, 255, 255]),
+            new PointLight(0.6, [2, 1, 0], [255, 255, 255]),
         ];
         this.sceneObjs = [...this.spheres];
     }

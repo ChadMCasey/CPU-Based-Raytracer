@@ -4,11 +4,8 @@ import {
   HitRecord,
   SceneIntersection,
   RGB,
-} from "../Configuration/types.js";
-import {
-  CANVAS_DEFAULT_BACKGROUND,
-  MIN_T,
-} from "../Configuration/constants.js";
+} from "../Utility/types.js";
+import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants.js";
 import Sphere from "../Primitives/Sphere.js";
 import MathUtils from "../Utils/MathUtils.js";
 import Light from "../Light/Light.js";
@@ -27,9 +24,9 @@ export default class Scene {
   ];
 
   private lights: Light[] = [
-    new AmbientLight(0.2),
-    new DirectionalLight(0.2, [1, 4, 4]),
-    new PointLight(0.6, [2, 1, 0]),
+    new AmbientLight(0.2, [255, 255, 255]),
+    new DirectionalLight(0.2, [1, 4, 4], [255, 255, 255]),
+    new PointLight(0.6, [2, 1, 0], [255, 255, 255]),
   ];
 
   private sceneObjs: SceneObject[] = [...this.spheres];

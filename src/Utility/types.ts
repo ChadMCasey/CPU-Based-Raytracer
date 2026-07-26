@@ -28,6 +28,7 @@ export interface SceneObject {
   readonly specular: number;
   readonly reflective: number;
   intersect(origin: Vec3, direction: Vec3): HitRecord | null;
+  serialize(): SerializedPrimative;
 }
 
 // sphere representation
@@ -43,3 +44,41 @@ export type Rotation = {
   yaw: number;
   roll: number;
 };
+
+// Data oriented design - flatten the world for workers
+export type SerialzedPayload = {
+  cameraPosition: Vec3;
+  primativeGeometry: SerializedPrimative[];
+};
+
+// serialized sphere
+export type SerializedSphere = {
+  type: "sphere";
+  center: [number, number, number];
+  radius: number;
+  color: [number, number, number];
+};
+
+export type serializedDirectionLight = {
+  type: "directional";
+  direction: [number, number, number];
+  intensity: number;
+  color: [number, number, number];
+};
+
+export type serializedPointLight = {
+  type: "point";
+  position: [number, number, number];
+  intensity: number;
+  color: [number, number, number];
+};
+
+export type serializedAmbientLight = {
+  type: "ambient";
+  intensity: number;
+  color: [number, number, number];
+};
+
+export type SerializedPrimative = SerializedSphere;
+export type SerializedLight =
+  serializedAmbientLight | serializedDirectionLight | serializedPointLight;

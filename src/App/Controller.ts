@@ -2,8 +2,8 @@ import Camera from "../Engine/Camera.js";
 import {
   VALID_MOVEMENT_KEYS,
   CAMERA_MOVEMENT_SPEED,
-} from "../Configuration/constants.js";
-import { Vec2 } from "../Configuration/types.js";
+} from "../Utility/constants.js";
+import { Vec2 } from "../Utility/types.js";
 import MathUtils from "../Utils/MathUtils.js";
 import RenderTarget from "../Engine/RenderTarget.js";
 

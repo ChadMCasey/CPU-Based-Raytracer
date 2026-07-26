@@ -2,8 +2,8 @@ import Light from "./Light.js";
 import MathUtils from "../Utils/MathUtils.js";
 const mathUtils = new MathUtils();
 export default class PointLight extends Light {
-    constructor(intensity, position) {
-        super("Point", intensity);
+    constructor(intensity, position, color) {
+        super("Point", intensity, color);
         this.position = position;
     }
     computeIllumination(P, N, V, s) {
@@ -35,5 +35,13 @@ export default class PointLight extends Light {
     }
     getShadowProperties(P) {
         return [mathUtils.subtractVectors(this.position, P), 1];
+    }
+    serialize() {
+        return {
+            type: "point",
+            position: this.position,
+            intensity: this.intensity,
+            color: this.color,
+        };
     }
 }

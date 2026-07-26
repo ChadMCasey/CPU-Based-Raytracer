@@ -1,5 +1,10 @@
 import Light from "./Light.js";
-import { Vec3 } from "../Configuration/types.js";
+import {
+  RGB,
+  SerializedLight,
+  serializedPointLight,
+  Vec3,
+} from "../Utility/types.js";
 import MathUtils from "../Utils/MathUtils.js";
 
 const mathUtils = new MathUtils();
@@ -7,8 +12,8 @@ const mathUtils = new MathUtils();
 export default class PointLight extends Light {
   readonly position: Vec3;
 
-  constructor(intensity: number, position: Vec3) {
-    super("Point", intensity);
+  constructor(intensity: number, position: Vec3, color: RGB) {
+    super("Point", intensity, color);
     this.position = position;
   }
 
@@ -50,5 +55,14 @@ export default class PointLight extends Light {
 
   getShadowProperties(P: Vec3): [Vec3, number] {
     return [mathUtils.subtractVectors(this.position, P), 1];
+  }
+
+  serialize(): serializedPointLight {
+    return {
+      type: "point",
+      position: this.position,
+      intensity: this.intensity,
+      color: this.color,
+    };
   }
 }

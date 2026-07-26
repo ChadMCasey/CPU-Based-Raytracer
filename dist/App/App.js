@@ -1,4 +1,4 @@
-import { CAMERA_POS } from "../Configuration/constants.js";
+import { CAMERA_POS } from "../Utility/constants.js";
 // dependent services
 import Renderer from "../Engine/Renderer.js";
 import RenderTarget from "../Engine/RenderTarget.js";

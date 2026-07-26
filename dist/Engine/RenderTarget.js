@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Configuration/constants.js";
+import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants.js";
 // The canvas is a render target in the context of the web
 export default class RenderTarget {
     constructor() {
