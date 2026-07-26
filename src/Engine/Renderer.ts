@@ -40,9 +40,10 @@ export default class Renderer {
         // map back to JS canvas coordinate system
         const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);
 
-        // paint cell accordingly
-        this.renderTarget.putPixel(putX, putY, color);
+        // write color data to 1D shared array buffer
+        this.renderTarget.writeColorToBuffer(putX, putY, color);
       }
     }
+    this.renderTarget.updateScreen();
   }
 }

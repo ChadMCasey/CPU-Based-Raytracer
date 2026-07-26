@@ -58,7 +58,6 @@ export default class Camera {
     updateYaw(Dx) {
         this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
         this.rotation.yaw = this.rotation.yaw % 360;
-        console.log(`Yaw: ${this.rotation.yaw}`);
         this.rotationChanged = true;
     }
     getCameraPosition() {

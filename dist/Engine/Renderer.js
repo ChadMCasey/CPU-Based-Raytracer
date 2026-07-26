@@ -19,9 +19,10 @@ export default class Renderer {
                 const color = this.scene.traceRay(cameraPos, rotatedD, 1, Number.POSITIVE_INFINITY, MAX_REFLECT_RECUR);
                 // map back to JS canvas coordinate system
                 const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);
-                // paint cell accordingly
-                this.renderTarget.putPixel(putX, putY, color);
+                // write color data to 1D shared array buffer
+                this.renderTarget.writeColorToBuffer(putX, putY, color);
             }
         }
+        this.renderTarget.updateScreen();
     }
 }
