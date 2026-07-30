@@ -1,5 +1,5 @@
 import { Vec3 } from "../Utility/types.js";
-import { CAMERA_POS, MAX_REFLECT_RECUR } from "../Utility/constants.js";
+import { MAX_REFLECT_RECUR } from "../Utility/constants.js";
 import Scene from "./Scene.js";
 import Camera from "../Engine/Camera.js";
 import RenderTarget from "../Engine/RenderTarget.js";
@@ -44,6 +44,8 @@ export default class Renderer {
         this.renderTarget.writeColorToBuffer(putX, putY, color);
       }
     }
+
+    // write shared buffer data to canvas
     this.renderTarget.updateScreen();
   }
 }
