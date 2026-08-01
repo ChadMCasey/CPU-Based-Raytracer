@@ -1,6 +1,12 @@
 import Camera from "../Engine/Camera";
 import Light from "../Light/Light";
-import { SceneObject, SerializedPrimative, SerializedLight, SerializedPayload, Vec3 } from "./types";
+import {
+  SceneObject,
+  SerializedPrimative,
+  SerializedLight,
+  SerializedPayload,
+  Vec3,
+} from "./types";
 
 // create a primiative representation of our 3D scene
 export default class Serializer {

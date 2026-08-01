@@ -1,8 +1,8 @@
-import Camera from "../Engine/Camera.js";
-import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED } from "../Utility/constants.js";
-import { Vec2 } from "../Utility/types.js";
+import Camera from "../Engine/Camera";
+import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED } from "../Utility/constants";
+import { Vec2 } from "../Utility/types";
 import MathUtils from "../Utility/MathUtils";
-import RenderTarget from "../Engine/RenderTarget.js";
+import RenderTarget from "../Engine/RenderTarget";
 
 // read user input and update application
 export default class Controller {

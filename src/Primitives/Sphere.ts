@@ -1,5 +1,5 @@
-import { SceneObject, HitRecord, Vec3, RGB, SerializedSphere } from "../Utility/types.js";
-import MathUtils from "../Utility/MathUtils.js";
+import { SceneObject, HitRecord, Vec3, RGB, SerializedSphere } from "../Utility/types";
+import MathUtils from "../Utility/MathUtils";
 
 const mathUtils = new MathUtils();
 
@@ -31,7 +31,10 @@ export default class Sphere implements SceneObject {
     if (discriminantSquared < 0) return null; // NO INTERSECTION
 
     const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-    const intersections: Array<number> = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
+    const intersections: Array<number> = [
+      (-b + discriminant) / (2 * a),
+      (-b - discriminant) / (2 * a),
+    ];
 
     const validIntersections: number[] = intersections.filter((t) => t > 0);
 

@@ -1,4 +1,4 @@
-import { Vec3, Vec2 } from "../Utility/types.js";
+import { Vec3, Vec2 } from "../Utility/types";
 
 export default class MathUtils {
   // calculate the dot product of 2 vectors

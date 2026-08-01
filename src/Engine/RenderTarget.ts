@@ -1,5 +1,5 @@
-import { Vec2, Vec3 } from "../Utility/types.js";
-import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants.js";
+import { Vec2, Vec3 } from "../Utility/types";
+import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants";
 
 // The canvas is a render target in the context of the web
 export default class RenderTarget {

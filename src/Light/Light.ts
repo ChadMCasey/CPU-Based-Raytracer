@@ -1,4 +1,4 @@
-import { LightType, Vec3, RGB, SerializedLight } from "../Utility/types.js";
+import { LightType, Vec3, RGB, SerializedLight } from "../Utility/types";
 
 export default abstract class Light {
   readonly type: LightType;

@@ -1,6 +1,6 @@
-import Light from "./Light.js";
-import { RGB, SerializedLight, serializedPointLight, Vec3 } from "../Utility/types.js";
-import MathUtils from "../Utility/MathUtils.js";
+import Light from "./Light";
+import { RGB, SerializedLight, serializedPointLight, Vec3 } from "../Utility/types";
+import MathUtils from "../Utility/MathUtils";
 
 const mathUtils = new MathUtils();
 

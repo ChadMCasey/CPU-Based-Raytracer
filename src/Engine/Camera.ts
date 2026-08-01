@@ -1,6 +1,6 @@
 import MathUtils from "../Utility/MathUtils";
-import { Vec3, Rotation } from "../Utility/types.js";
-import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION } from "../Utility/constants.js";
+import { Vec3, Rotation } from "../Utility/types";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION } from "../Utility/constants";
 
 export default class Camera {
   private readonly mathUtils = new MathUtils();

@@ -1,11 +1,11 @@
-import { Vec3, SceneObject, HitRecord, SceneIntersection, RGB } from "../Utility/types.js";
-import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants.js";
-import Sphere from "../Primitives/Sphere.js";
-import MathUtils from "../Utility/MathUtils.js";
-import Light from "../Light/Light.js";
-import AmbientLight from "../Light/AmbientLight.js";
-import DirectionalLight from "../Light/DirectionalLight.js";
-import PointLight from "../Light/PointLight.js";
+import { Vec3, SceneObject, HitRecord, SceneIntersection, RGB } from "../Utility/types";
+import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants";
+import Sphere from "../Primitives/Sphere";
+import MathUtils from "../Utility/MathUtils";
+import Light from "../Light/Light";
+import AmbientLight from "../Light/AmbientLight";
+import DirectionalLight from "../Light/DirectionalLight";
+import PointLight from "../Light/PointLight";
 
 const mathUtils = new MathUtils();
 
