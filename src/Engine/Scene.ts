@@ -47,7 +47,13 @@ export default class Scene {
 
   //   // otherwise compute the reflected color
   //   const R: Vec3 = MathUtils.reflectVector(MathUtils.scaleVectorV3(D, -1), intersection.normal);
-  //   const reflectedColor: RGB = this.traceRay(intersection.position, R, MIN_T, Number.POSITIVE_INFINITY, RecurAmt - 1);
+  //   const reflectedColor: RGB = this.traceRay(
+  //     intersection.position,
+  //     R,
+  //     MIN_T,
+  //     Number.POSITIVE_INFINITY,
+  //     RecurAmt - 1,
+  //   );
 
   //   // aggregate color data for reflection + local color
   //   const localContribution: RGB = MathUtils.scaleVectorV3(localColor, 1 - reflective);
@@ -68,7 +74,11 @@ export default class Scene {
 
   //     if (!intersection) continue;
 
-  //     if (intersection.distance >= minT && intersection.distance <= maxT && intersection.distance < closestT) {
+  //     if (
+  //       intersection.distance >= minT &&
+  //       intersection.distance <= maxT &&
+  //       intersection.distance < closestT
+  //     ) {
   //       closestT = intersection.distance;
   //       closestHit = {
   //         distance: intersection.distance,

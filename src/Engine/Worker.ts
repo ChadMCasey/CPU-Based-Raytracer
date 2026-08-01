@@ -16,11 +16,17 @@ import MathUtils from "../Utility/MathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
   const serializedScene: SerializedPayload = event.data.serializedScene;
-  const sharedArrayBuffer: SharedArrayBuffer = event.data.sharedArrayBuffer;
-  const { startX, startY, width, height, targetWidth, targetHeight, viewportWidth, viewportHeight }: Task =
-    event.data.openTask;
-
-  const uint8ClampedArray = new Uint8ClampedArray(sharedArrayBuffer);
+  const sharedArrayBuffer: Uint8ClampedArray = event.data.sharedArrayBuffer;
+  const {
+    startX,
+    startY,
+    width,
+    height,
+    targetWidth,
+    targetHeight,
+    viewportWidth,
+    viewportHeight,
+  }: Task = event.data.openTask;
 
   // iterate section of render target upon which our calculations will be done
   for (let y = startY; y < startY + height; y++) {
@@ -39,7 +45,10 @@ self.addEventListener("message", (event: MessageEvent) => {
       );
 
       // rotate D to account for camera rotation
-      const rotatedD: Vec3 = MathUtils.multiplyDirectionByRotation(serializedScene.cameraRotation, rawD);
+      const rotatedD: Vec3 = MathUtils.multiplyDirectionByRotation(
+        serializedScene.cameraRotation,
+        rawD,
+      );
 
       // trace ray (this will originate D from the cameras position)
       const computedColor: RGB = traceRay(
@@ -52,7 +61,7 @@ self.addEventListener("message", (event: MessageEvent) => {
       );
 
       // write color data to buffer
-      writeColorDataToBuffer(uint8ClampedArray, computedColor, targetWidth, x, y);
+      writeColorDataToBuffer(sharedArrayBuffer, computedColor, targetWidth, x, y);
     }
   }
 
@@ -78,15 +87,28 @@ function writeColorDataToBuffer(
 }
 
 // mapp x to 2D cartesian X
-function mapToCartesianPoints(targetW: number, targetH: number, x: number, y: number): [number, number] {
+function mapToCartesianPoints(
+  targetW: number,
+  targetH: number,
+  x: number,
+  y: number,
+): [number, number] {
   let cartX: number, cartY: number;
   cartX = x - targetW / 2;
   cartY = targetH / 2 - y;
+
   return [cartX, cartY];
 }
 
 // compute directional D raw (scale and place 1 unit away at VP)
-function computeDirectionalVector(Tw: number, Th: number, Vw: number, Vh: number, cartX: number, cartY: number): Vec3 {
+function computeDirectionalVector(
+  Tw: number,
+  Th: number,
+  Vw: number,
+  Vh: number,
+  cartX: number,
+  cartY: number,
+): Vec3 {
   const Vx = (Vw / Tw) * cartX;
   const Vy = (Vh / Th) * cartY;
   const Vz = 1;
@@ -103,7 +125,13 @@ function traceRay(
   serializedScene: SerializedPayload,
 ): RGB {
   // we first need to find the closest intersection between the ray and the scene objects
-  const intersection: SceneIntersection | null = closestIntersection(cameraPOS, rotatedD, minT, maxT, serializedScene);
+  const intersection: SceneIntersection | null = closestIntersection(
+    cameraPOS,
+    rotatedD,
+    minT,
+    maxT,
+    serializedScene,
+  );
 
   // return default background color if no intersection
   if (!intersection) return CANVAS_DEFAULT_BACKGROUND;
@@ -125,7 +153,10 @@ function traceRay(
   if (recurLeft <= 0 || reflective <= 0) return localColor;
 
   // otherwise compute the reflected color
-  const R: Vec3 = MathUtils.reflectVector(MathUtils.scaleVectorV3(rotatedD, -1), intersection.normal);
+  const R: Vec3 = MathUtils.reflectVector(
+    MathUtils.scaleVectorV3(rotatedD, -1),
+    intersection.normal,
+  );
   const reflectedColor: RGB = traceRay(
     intersection.position,
     R,
@@ -158,7 +189,11 @@ function closestIntersection(
 
     if (!intersection) continue;
 
-    if (intersection.distance >= minT && intersection.distance <= maxT) {
+    if (
+      intersection.distance >= minT &&
+      intersection.distance <= maxT &&
+      intersection.distance < closestT
+    ) {
       closestT = intersection.distance;
       closestIntersection = {
         distance: intersection.distance,
@@ -192,7 +227,10 @@ function computeSphereIntersection(O: Vec3, D: Vec3, sphere: SerializedSphere) {
   if (discriminantSquared < 0) return null; // NO INTERSECTION
 
   const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-  const intersections: Array<number> = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
+  const intersections: Array<number> = [
+    (-b + discriminant) / (2 * a),
+    (-b - discriminant) / (2 * a),
+  ];
 
   const validIntersections: number[] = intersections.filter((t) => t > 0);
 
@@ -212,7 +250,13 @@ function computeNormal(position: Vec3, sphere: SerializedSphere): Vec3 {
   return normal;
 }
 
-function computeLighting(P: Vec3, N: Vec3, V: Vec3, specular: number, scene: SerializedPayload): number {
+function computeLighting(
+  P: Vec3,
+  N: Vec3,
+  V: Vec3,
+  specular: number,
+  scene: SerializedPayload,
+): number {
   let intensity: number = 0.0;
 
   for (let light of scene.sceneLights) {
@@ -249,7 +293,13 @@ function computeDirectionalLighting(
   const maxT: number = light.maxT;
 
   // compute closest intersection between P and light
-  const lightObstruction: SceneIntersection | null = closestIntersection(P, lightDirectionFromP, MIN_T, maxT, scene);
+  const lightObstruction: SceneIntersection | null = closestIntersection(
+    P,
+    lightDirectionFromP,
+    MIN_T,
+    maxT,
+    scene,
+  );
 
   // no obstruction so add in lighting
   if (!lightObstruction) {
@@ -258,7 +308,12 @@ function computeDirectionalLighting(
     if (DotNL < 0) return 0;
 
     const diffuseScalar: number = computeDirectionalScalarDiffuse(N, lightDirectionFromP, DotNL);
-    const specularScalar: number = computeDirectionalScalarHighlight(N, V, specular, lightDirectionFromP);
+    const specularScalar: number = computeDirectionalScalarHighlight(
+      N,
+      V,
+      specular,
+      lightDirectionFromP,
+    );
 
     const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
@@ -303,7 +358,13 @@ function computePointLighting(
   const maxT: number = 1;
 
   // compute closest intersection between P and light
-  const lightObstruction: SceneIntersection | null = closestIntersection(P, lightDirectionFromP, MIN_T, maxT, scene);
+  const lightObstruction: SceneIntersection | null = closestIntersection(
+    P,
+    lightDirectionFromP,
+    MIN_T,
+    maxT,
+    scene,
+  );
 
   // no obstruction so add in lighting
   if (!lightObstruction) {

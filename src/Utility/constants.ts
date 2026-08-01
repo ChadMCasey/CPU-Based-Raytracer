@@ -27,4 +27,4 @@ export const CAMERA_MOVEMENT_SPEED: number = 2.5;
 export const CAMERA_ORIENTATION_SPEED: number = 0.15;
 
 // canvas partition
-export const BANDS: number = 64;
+export const BANDS: number = 20;

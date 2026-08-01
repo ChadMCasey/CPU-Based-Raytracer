@@ -48,7 +48,7 @@ export default class Parallelize {
     }
   }
 
-  private createTasks(Ch: number, Cw: number, Vw: number, Vh: number, bands: number): Task[] {
+  private createTasks(Cw: number, Ch: number, Vw: number, Vh: number, bands: number): Task[] {
     // clear existing tasks
     this.tasks = [];
 

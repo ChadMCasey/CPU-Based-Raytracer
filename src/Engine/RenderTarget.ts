@@ -46,9 +46,9 @@ export default class RenderTarget {
   }
 
   // write shared array buffer data into context
-  updateScreen(Dx: number = 0, Dy: number = 0): void {
+  updateScreen = (Dx: number = 0, Dy: number = 0): void => {
     const clampedArray = new Uint8ClampedArray(this.sharedArrayBuffer);
     const imageData = new ImageData(clampedArray, this.width, this.height);
     this.context.putImageData(imageData, Dx, Dy);
-  }
+  };
 }
