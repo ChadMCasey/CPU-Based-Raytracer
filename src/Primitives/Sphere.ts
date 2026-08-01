@@ -7,8 +7,6 @@ import {
 } from "../Utility/types";
 import MathUtils from "../Utility/MathUtils";
 
-const mathUtils = new MathUtils();
-
 export default class Sphere implements SceneObject {
   private center: Vec3;
   private radius: number;

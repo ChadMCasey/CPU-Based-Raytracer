@@ -2,8 +2,6 @@ import Light from "./Light";
 import { RGB, serializedDirectionLight, Vec3 } from "../Utility/types";
 import MathUtils from "../Utility/MathUtils";
 
-const mathUtils = new MathUtils();
-
 export default class DirectionalLight extends Light {
   readonly direction: Vec3;
 
