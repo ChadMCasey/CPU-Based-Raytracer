@@ -7,12 +7,14 @@ export default class Parallelize {
   private workers: Worker[] = new Array<Worker>();
 
   private serializedScene?: SerializedPayload;
-  private sharedArrayBuffer?: SharedArrayBuffer;
+  private sharedArrayBuffer?: Uint8ClampedArray;
 
   private updateScreenCallback: Function = () => {};
 
   private tasks: Task[] = new Array<Task>();
   public outstandingTasks: number = 0;
+
+  private onRenderComplete?: () => void;
 
   constructor() {
     this.createWorkers();
@@ -40,7 +42,10 @@ export default class Parallelize {
     }
 
     // if we have no remaining tasks then we can update the screen
-    if (!this.outstandingTasks) this.updateScreenCallback();
+    if (!this.outstandingTasks) {
+      this.updateScreenCallback();
+      if (this.onRenderComplete) this.onRenderComplete();
+    }
   }
 
   private createTasks(Ch: number, Cw: number, Vw: number, Vh: number, bands: number): Task[] {
@@ -70,36 +75,33 @@ export default class Parallelize {
     return this.tasks;
   }
 
-  public renderFrame(
+  public async renderFrame(
     Cw: number,
     Ch: number,
     Vw: number,
     Vh: number,
     bands: number,
     serializedScene: SerializedPayload,
-    sharedArrayBuffer: SharedArrayBuffer,
+    sharedArrayBuffer: Uint8ClampedArray,
     updateScreenCallback: Function,
-  ): void {
-    // partition the canvas into sections / tasks
-    this.createTasks(Cw, Ch, Vw, Vh, bands);
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      this.createTasks(Cw, Ch, Vw, Vh, bands);
+      this.serializedScene = serializedScene;
+      this.sharedArrayBuffer = sharedArrayBuffer;
+      this.updateScreenCallback = updateScreenCallback;
 
-    // add ref to serialized scene and array buffer for the worker response
-    this.serializedScene = serializedScene;
-    this.sharedArrayBuffer = sharedArrayBuffer;
+      this.onRenderComplete = resolve;
 
-    // callback that should fire when all tasks are finished
-    // the parallelize class houses the logic to determine when this
-    // operation should be executed
-    this.updateScreenCallback = updateScreenCallback;
-
-    // iterate our workers and give them an initial task
-    for (let worker of this.workers) {
-      const openTask = this.tasks.pop();
-      if (openTask) {
-        const serializedScene = this.serializedScene;
-        const sharedArrayBuffer = this.sharedArrayBuffer;
-        worker.postMessage({ serializedScene, sharedArrayBuffer, openTask });
+      // iterate our workers and give them an initial task
+      for (let worker of this.workers) {
+        const openTask = this.tasks.pop();
+        if (openTask) {
+          const serializedScene = this.serializedScene;
+          const sharedArrayBuffer = this.sharedArrayBuffer;
+          worker.postMessage({ serializedScene, sharedArrayBuffer, openTask });
+        }
       }
-    }
+    });
   }
 }

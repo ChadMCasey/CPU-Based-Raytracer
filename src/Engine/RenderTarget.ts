@@ -9,7 +9,7 @@ export default class RenderTarget {
   readonly width: number;
   readonly height: number;
 
-  private sharedArrayBuffer: Uint8ClampedArray;
+  public readonly sharedArrayBuffer: Uint8ClampedArray;
 
   constructor() {
     // determine camera dimensions based off browser window aspect ratio
