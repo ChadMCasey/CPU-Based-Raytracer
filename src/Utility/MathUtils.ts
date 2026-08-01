@@ -6,7 +6,7 @@ export default class MathUtils {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   }
 
-  dotVectorsV2(a: Vec2, b: Vec2): number {
+  static dotVectorsV2(a: Vec2, b: Vec2): number {
     return a[0] * b[0] + a[1] * b[1];
   }
 
@@ -25,11 +25,11 @@ export default class MathUtils {
     return [a[0] * k, a[1] * k, a[2] * k];
   }
 
-  scaleVectorV2(a: Vec2, k: number): Vec2 {
+  static scaleVectorV2(a: Vec2, k: number): Vec2 {
     return [a[0] * k, a[1] * k];
   }
 
-  magnitudeV2(a: Vec2): number {
+  static magnitudeV2(a: Vec2): number {
     return Math.sqrt(this.dotVectorsV2(a, a));
   }
 
@@ -37,35 +37,26 @@ export default class MathUtils {
     return Math.sqrt(MathUtils.dotVectorsV3(a, a));
   }
 
-  convertDegToRad(degrees: number): number {
+  static convertDegToRad(degrees: number): number {
     return (Math.PI / 180) * degrees;
   }
 
   // hard coding the shit out of this, we need to fix this later
-  multiplyRotationalMatrices(A: number[][], B: number[][]): number[][] {
+  static multiplyRotationalMatrices(A: number[][], B: number[][]): number[][] {
     // top row
-    const TopLeft: number =
-      A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
-    const TopCenter: number =
-      A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
-    const TopRight: number =
-      A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
+    const TopLeft: number = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
+    const TopCenter: number = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
+    const TopRight: number = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
 
     // middle row
-    const MiddleLeft: number =
-      A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
-    const MiddleCenter: number =
-      A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
-    const MiddleRight: number =
-      A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
+    const MiddleLeft: number = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
+    const MiddleCenter: number = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
+    const MiddleRight: number = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
 
     // bottom row
-    const BottomLeft: number =
-      A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
-    const BottomCenter: number =
-      A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
-    const BottomRight: number =
-      A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
+    const BottomLeft: number = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
+    const BottomCenter: number = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
+    const BottomRight: number = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
 
     const resultingMatrix: number[][] = [
       [TopLeft, TopCenter, TopRight],
@@ -84,7 +75,7 @@ export default class MathUtils {
   }
 
   // compute pitch (x - axis) rotation matrix
-  computeRx(pitchInRad: number): number[][] {
+  static computeRx(pitchInRad: number): number[][] {
     return [
       [1, 0, 0],
       [0, Math.cos(pitchInRad), Math.sin(pitchInRad)],
@@ -92,7 +83,7 @@ export default class MathUtils {
     ];
   }
 
-  computeRy(yawInRad: number): number[][] {
+  static computeRy(yawInRad: number): number[][] {
     return [
       [Math.cos(yawInRad), 0, Math.sin(yawInRad)],
       [0, 1, 0],
@@ -100,7 +91,7 @@ export default class MathUtils {
     ];
   }
 
-  computeRz(rollInRad: number): number[][] {
+  static computeRz(rollInRad: number): number[][] {
     return [
       [Math.cos(rollInRad), Math.sin(rollInRad), 0],
       [-Math.sin(rollInRad), Math.cos(rollInRad), 0],

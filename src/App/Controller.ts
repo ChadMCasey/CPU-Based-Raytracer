@@ -1,8 +1,5 @@
 import Camera from "../Engine/Camera";
-import {
-  VALID_MOVEMENT_KEYS,
-  CAMERA_MOVEMENT_SPEED,
-} from "../Utility/constants";
+import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED } from "../Utility/constants";
 import { Vec2 } from "../Utility/types";
 import MathUtils from "../Utility/MathUtils";
 import RenderTarget from "../Engine/RenderTarget";
@@ -65,17 +62,13 @@ export default class Controller {
 
     // compute magnitude of vector for change in camera position
     let movementVector: Vec2 = [changeX, changeZ];
-    const movementMagnitude: number =
-      this.mathUtils.magnitudeV2(movementVector);
+    const movementMagnitude: number = MathUtils.magnitudeV2(movementVector);
 
     // the user is not moving at all
     if (movementMagnitude === 0) return;
 
     // create directional vector with magnitude 1
-    movementVector = this.mathUtils.scaleVectorV2(
-      movementVector,
-      1 / movementMagnitude,
-    );
+    movementVector = MathUtils.scaleVectorV2(movementVector, 1 / movementMagnitude);
 
     // normalize change in position based on time since last frame
     const Dx = (elapsedMs / 1000) * movementVector[0] * CAMERA_MOVEMENT_SPEED;

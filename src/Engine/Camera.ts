@@ -1,10 +1,6 @@
 import MathUtils from "../Utility/MathUtils";
 import { Vec3, Rotation } from "../Utility/types";
-import {
-  ASPECT_RATIO,
-  CAMERA_ORIENTATION_SPEED,
-  CAMERA_ORIENTATION,
-} from "../Utility/constants";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION } from "../Utility/constants";
 
 export default class Camera {
   private readonly mathUtils = new MathUtils();
@@ -31,12 +27,7 @@ export default class Camera {
   }
 
   // compute directional ray originating from origin (0,0,0)
-  public canvasToViewport(
-    Cw: number,
-    Ch: number,
-    Cx: number,
-    Cy: number,
-  ): Vec3 {
+  public canvasToViewport(Cw: number, Ch: number, Cx: number, Cy: number): Vec3 {
     const Vx: number = (this.viewportWidth / Cw) * Cx;
     const Vy: number = (this.viewportHeight / Ch) * Cy;
     const Vz: number = this.viewportDistance;
@@ -46,24 +37,18 @@ export default class Camera {
   public computeRotationMatrix(): number[][] {
     if (this.rotationChanged) {
       // pitch yaw and roll of camera in radians
-      const pitch: number = this.mathUtils.convertDegToRad(this.rotation.pitch);
-      const yaw: number = this.mathUtils.convertDegToRad(this.rotation.yaw);
-      const roll: number = this.mathUtils.convertDegToRad(this.rotation.roll);
+      const pitch: number = MathUtils.convertDegToRad(this.rotation.pitch);
+      const yaw: number = MathUtils.convertDegToRad(this.rotation.yaw);
+      const roll: number = MathUtils.convertDegToRad(this.rotation.roll);
 
       // compute rotational matrices for rotation about each axis
-      const Rx: number[][] = this.mathUtils.computeRx(pitch);
-      const Ry: number[][] = this.mathUtils.computeRy(yaw);
-      const Rz: number[][] = this.mathUtils.computeRz(roll);
+      const Rx: number[][] = MathUtils.computeRx(pitch);
+      const Ry: number[][] = MathUtils.computeRy(yaw);
+      const Rz: number[][] = MathUtils.computeRz(roll);
 
       // produce the final orthonormal rotation matrix
-      const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        Rz,
-        Ry,
-      );
-      const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        RzRy,
-        Rx,
-      );
+      const RzRy: number[][] = MathUtils.multiplyRotationalMatrices(Rz, Ry);
+      const RzRyRz: number[][] = MathUtils.multiplyRotationalMatrices(RzRy, Rx);
 
       this.cachedRotationMatrix = RzRyRz;
       this.rotationChanged = false;
