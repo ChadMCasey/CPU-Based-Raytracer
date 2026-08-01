@@ -29,13 +29,7 @@ export default class Renderer {
         const rotatedD = this.camera.computeRotatedVector(cameraRotation, D);
 
         // notice that rotatedD originates at cameraPos here
-        const color = this.scene.traceRay(
-          cameraPos,
-          rotatedD,
-          1,
-          Number.POSITIVE_INFINITY,
-          MAX_REFLECT_RECUR,
-        );
+        const color = this.scene.traceRay(cameraPos, rotatedD, 1, Number.POSITIVE_INFINITY, MAX_REFLECT_RECUR);
 
         // map back to JS canvas coordinate system
         const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);

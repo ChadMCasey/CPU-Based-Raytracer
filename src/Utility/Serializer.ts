@@ -1,25 +1,25 @@
 import Camera from "../Engine/Camera";
 import Light from "../Light/Light";
-import { SceneObject, SerializedPrimative, SerializedLight } from "./types";
+import { SceneObject, SerializedPrimative, SerializedLight, SerializedPayload, Vec3 } from "./types";
 
 // create a primiative representation of our 3D scene
 export class Serializer {
-  serialize(camera: Camera, sceneObjs: SceneObject[], sceneLights: Light[]) {
+  serialize(camera: Camera, sceneObjs: SceneObject[], sceneLts: Light[]): SerializedPayload {
     const [cameraPOS, cameraRotation] = this.serializeCamera(camera);
-    const serializedSceneObjs = this.serializeSceneObjs(sceneObjs);
-    const serializedLights = this.serializeSceneLights(sceneLights);
+    const sceneObjects: SerializedPrimative[] = this.serializeSceneObjs(sceneObjs);
+    const sceneLights: SerializedLight[] = this.serializeSceneLights(sceneLts);
 
     return {
       cameraPOS,
       cameraRotation,
-      serializedSceneObjs,
-      serializedLights,
+      sceneObjects,
+      sceneLights,
     };
   }
 
   // map camara position and rotation matrix
-  serializeCamera(camera: Camera) {
-    const position: number[] = camera.getCameraPosition();
+  serializeCamera(camera: Camera): [Vec3, number[][]] {
+    const position: Vec3 = camera.getCameraPosition();
     const rotation: number[][] = camera.computeRotationMatrix();
     return [position, rotation];
   }

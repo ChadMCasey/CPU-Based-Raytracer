@@ -14,12 +14,23 @@ export type HitRecord = {
   normal: Vec3;
 };
 
+export type Task = {
+  startX: number;
+  startY: number;
+  width: number;
+  height: number;
+  targetWidth: number;
+  targetHeight: number;
+  viewportWidth: number;
+  viewportHeight: number;
+};
+
 // a generic scene intersection
 export type SceneIntersection = {
   distance: number;
   position: Vec3;
   normal: Vec3;
-  object: SceneObject;
+  object: SerializedPrimative;
 };
 
 // every object in the scene can be intersected by a ray
@@ -46,9 +57,11 @@ export type Rotation = {
 };
 
 // Data oriented design - flatten the world for workers
-export type SerialzedPayload = {
-  cameraPosition: Vec3;
-  primativeGeometry: SerializedPrimative[];
+export type SerializedPayload = {
+  cameraPOS: Vec3;
+  cameraRotation: number[][];
+  sceneObjects: SerializedPrimative[];
+  sceneLights: SerializedLight[];
 };
 
 // serialized sphere
@@ -57,6 +70,8 @@ export type SerializedSphere = {
   center: [number, number, number];
   radius: number;
   color: [number, number, number];
+  specular: number;
+  reflective: number;
 };
 
 export type serializedDirectionLight = {
@@ -64,6 +79,7 @@ export type serializedDirectionLight = {
   direction: [number, number, number];
   intensity: number;
   color: [number, number, number];
+  maxT: number;
 };
 
 export type serializedPointLight = {
@@ -80,5 +96,4 @@ export type serializedAmbientLight = {
 };
 
 export type SerializedPrimative = SerializedSphere;
-export type SerializedLight =
-  serializedAmbientLight | serializedDirectionLight | serializedPointLight;
+export type SerializedLight = serializedAmbientLight | serializedDirectionLight | serializedPointLight;

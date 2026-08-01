@@ -1,13 +1,7 @@
-import {
-  Vec3,
-  SceneObject,
-  HitRecord,
-  SceneIntersection,
-  RGB,
-} from "../Utility/types.js";
+import { Vec3, SceneObject, HitRecord, SceneIntersection, RGB } from "../Utility/types.js";
 import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants.js";
 import Sphere from "../Primitives/Sphere.js";
-import MathUtils from "../Utils/MathUtils.js";
+import MathUtils from "../Utility/MathUtils.js";
 import Light from "../Light/Light.js";
 import AmbientLight from "../Light/AmbientLight.js";
 import DirectionalLight from "../Light/DirectionalLight.js";
@@ -31,20 +25,9 @@ export default class Scene {
 
   private sceneObjs: SceneObject[] = [...this.spheres];
 
-  traceRay(
-    O: Vec3,
-    D: Vec3,
-    minT: number,
-    maxT: number,
-    RecurAmt: number,
-  ): Vec3 {
+  traceRay(O: Vec3, D: Vec3, minT: number, maxT: number, RecurAmt: number): Vec3 {
     // find the intersection between orignation O and closest scene object
-    const intersection: SceneIntersection | null = this.closestIntersection(
-      O,
-      D,
-      minT,
-      maxT,
-    );
+    const intersection: SceneIntersection | null = this.closestIntersection(O, D, minT, maxT);
 
     if (!intersection) return CANVAS_DEFAULT_BACKGROUND;
 
@@ -52,52 +35,29 @@ export default class Scene {
     const lightIntensity = this.computeLighting(
       intersection.position,
       intersection.normal,
-      mathUtils.scaleVectorV3(D, -1),
+      MathUtils.scaleVectorV3(D, -1),
       intersection.object.specular,
     );
 
-    const localColor: RGB = mathUtils.scaleVectorV3(
-      intersection.object.color,
-      lightIntensity,
-    );
+    const localColor: RGB = MathUtils.scaleVectorV3(intersection.object.color, lightIntensity);
 
     // if we recur limit or the object is not reflective at all..
     const reflective: number = intersection.object.reflective;
     if (RecurAmt <= 0 || reflective <= 0) return localColor;
 
     // otherwise compute the reflected color
-    const R: Vec3 = mathUtils.reflectVector(
-      mathUtils.scaleVectorV3(D, -1),
-      intersection.normal,
-    );
-    const reflectedColor: RGB = this.traceRay(
-      intersection.position,
-      R,
-      MIN_T,
-      Number.POSITIVE_INFINITY,
-      RecurAmt - 1,
-    );
+    const R: Vec3 = MathUtils.reflectVector(MathUtils.scaleVectorV3(D, -1), intersection.normal);
+    const reflectedColor: RGB = this.traceRay(intersection.position, R, MIN_T, Number.POSITIVE_INFINITY, RecurAmt - 1);
 
     // aggregate color data for reflection + local color
-    const localContribution: RGB = mathUtils.scaleVectorV3(
-      localColor,
-      1 - reflective,
-    );
-    const reflectedContribution: RGB = mathUtils.scaleVectorV3(
-      reflectedColor,
-      reflective,
-    );
+    const localContribution: RGB = MathUtils.scaleVectorV3(localColor, 1 - reflective);
+    const reflectedContribution: RGB = MathUtils.scaleVectorV3(reflectedColor, reflective);
 
     // sum the two values to produce the output value
-    return mathUtils.addVectors(localContribution, reflectedContribution);
+    return MathUtils.addVectors(localContribution, reflectedContribution);
   }
 
-  closestIntersection(
-    O: Vec3,
-    D: Vec3,
-    minT: number,
-    maxT: number,
-  ): SceneIntersection | null {
+  closestIntersection(O: Vec3, D: Vec3, minT: number, maxT: number): SceneIntersection | null {
     let closestT: number = Number.POSITIVE_INFINITY;
     let closestHit: SceneIntersection | null = null;
 
@@ -108,11 +68,7 @@ export default class Scene {
 
       if (!intersection) continue;
 
-      if (
-        intersection.distance >= minT &&
-        intersection.distance <= maxT &&
-        intersection.distance < closestT
-      ) {
+      if (intersection.distance >= minT && intersection.distance <= maxT && intersection.distance < closestT) {
         closestT = intersection.distance;
         closestHit = {
           distance: intersection.distance,
@@ -140,12 +96,7 @@ export default class Scene {
 
       // do we have an intersection between us and the light?
       const [lightDirectionFromP, maxT] = shadowProps;
-      const obstruction = this.closestIntersection(
-        P,
-        lightDirectionFromP,
-        MIN_T,
-        maxT,
-      );
+      const obstruction = this.closestIntersection(P, lightDirectionFromP, MIN_T, maxT);
 
       // no intersection, means the light has made it to P unimpeded
       if (!obstruction) {

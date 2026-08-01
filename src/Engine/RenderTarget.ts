@@ -21,8 +21,7 @@ export default class RenderTarget {
 
     // compute shared array buffer with 4 bytes per pixel
     const bytes = this.width * this.height * 4;
-    const sharedArrayBuffer = new SharedArrayBuffer(bytes);
-    this.sharedArrayBuffer = new Uint8ClampedArray(sharedArrayBuffer);
+    this.sharedArrayBuffer = new Uint8ClampedArray(new SharedArrayBuffer(bytes));
   }
 
   // write color data into shared array buffer
@@ -31,7 +30,7 @@ export default class RenderTarget {
     this.sharedArrayBuffer[bufferIndexR] = color[0]; // R
     this.sharedArrayBuffer[bufferIndexR + 1] = color[1]; // G
     this.sharedArrayBuffer[bufferIndexR + 2] = color[2]; // B
-    this.sharedArrayBuffer[bufferIndexR + 3] = 1; // A
+    this.sharedArrayBuffer[bufferIndexR + 3] = 255; // A
   }
 
   // coodinate system conversion to 2D cartesian plane

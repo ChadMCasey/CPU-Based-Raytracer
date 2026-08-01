@@ -1,6 +1,6 @@
 import Light from "./Light.js";
 import { RGB, serializedDirectionLight, Vec3 } from "../Utility/types.js";
-import MathUtils from "../Utils/MathUtils.js";
+import MathUtils from "../Utility/MathUtils.js";
 
 const mathUtils = new MathUtils();
 
@@ -13,43 +13,33 @@ export default class DirectionalLight extends Light {
   }
 
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
-    const DotNL = mathUtils.dotVectorsV3(N, this.direction);
+    const DotNL = MathUtils.dotVectorsV3(N, this.direction);
 
     if (DotNL < 0) return 0;
 
-    const diffuseScalar: number = this.computeScalarDiffuse(
-      N,
-      this.direction,
-      DotNL,
-    );
-    const specularScalar: number = this.computeScalarHighlight(
-      N,
-      V,
-      s,
-      this.direction,
-    );
+    const diffuseScalar: number = this.computeScalarDiffuse(N, this.direction, DotNL);
+    const specularScalar: number = this.computeScalarHighlight(N, V, s, this.direction);
 
-    const totalScalar: number =
-      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * this.intensity;
 
     return totalContributedIllumination;
   }
 
   computeScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
-    return DotNL / (mathUtils.magnitudeV3(L) * mathUtils.magnitudeV3(N));
+    return DotNL / (MathUtils.magnitudeV3(L) * MathUtils.magnitudeV3(N));
   }
 
   computeScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
     if (s === -1) return -1;
 
-    const R: Vec3 = mathUtils.reflectVector(L, N);
-    const RDotV: number = mathUtils.dotVectorsV3(R, V);
+    const R: Vec3 = MathUtils.reflectVector(L, N);
+    const RDotV: number = MathUtils.dotVectorsV3(R, V);
 
     if (RDotV < 0) return -1;
 
-    const magR: number = mathUtils.magnitudeV3(R);
-    const magV: number = mathUtils.magnitudeV3(V);
+    const magR: number = MathUtils.magnitudeV3(R);
+    const magV: number = MathUtils.magnitudeV3(V);
     const cosA: number = RDotV / (magR * magV);
     const specularScalar: number = cosA ** s;
 
@@ -66,6 +56,7 @@ export default class DirectionalLight extends Light {
       direction: this.direction,
       intensity: this.intensity,
       color: this.color,
+      maxT: Number.POSITIVE_INFINITY,
     };
   }
 }
