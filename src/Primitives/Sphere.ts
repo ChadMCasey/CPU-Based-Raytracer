@@ -5,7 +5,13 @@ import {
   RGB,
   SerializedSphere,
 } from "../Utility/types";
-import MathUtils from "../Utility/MathUtils";
+import {
+  dotVectorsV3,
+  subtractVectors,
+  addVectors,
+  scaleVectorV3,
+  magnitudeV3,
+} from "../Utility/MathUtils";
 
 export default class Sphere implements SceneObject {
   private center: Vec3;
@@ -30,11 +36,11 @@ export default class Sphere implements SceneObject {
 
   intersect(O: Vec3, D: Vec3): HitRecord | null {
     const r: number = this.radius;
-    const CO: Vec3 = MathUtils.subtractVectors(O, this.center);
+    const CO: Vec3 = subtractVectors(O, this.center);
 
-    const a: number = MathUtils.dotVectorsV3(D, D);
-    const b: number = 2 * MathUtils.dotVectorsV3(CO, D);
-    const c: number = MathUtils.dotVectorsV3(CO, CO) - r * r;
+    const a: number = dotVectorsV3(D, D);
+    const b: number = 2 * dotVectorsV3(CO, D);
+    const c: number = dotVectorsV3(CO, CO) - r * r;
 
     const discriminantSquared: number = b ** 2 - 4 * a * c;
 
@@ -51,19 +57,16 @@ export default class Sphere implements SceneObject {
     if (!validIntersections.length) return null;
 
     const distance: number = Math.min(...validIntersections);
-    const position: Vec3 = MathUtils.addVectors(
-      O,
-      MathUtils.scaleVectorV3(D, distance),
-    ); // P = O + t(V - O);
+    const position: Vec3 = addVectors(O, scaleVectorV3(D, distance)); // P = O + t(V - O);
     const normal: Vec3 = this.computeNormal(position);
 
     return { distance, position, normal };
   }
 
   computeNormal(position: Vec3): Vec3 {
-    const CP: Vec3 = MathUtils.subtractVectors(position, this.center);
-    const magnitude = MathUtils.magnitudeV3(CP);
-    const normal = MathUtils.scaleVectorV3(CP, 1 / magnitude);
+    const CP: Vec3 = subtractVectors(position, this.center);
+    const magnitude = magnitudeV3(CP);
+    const normal = scaleVectorV3(CP, 1 / magnitude);
     return normal;
   }
 
