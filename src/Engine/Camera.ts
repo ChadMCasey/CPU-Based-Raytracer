@@ -1,10 +1,6 @@
-import MathUtils from "../Utils/MathUtils.js";
-import { Vec3, Rotation } from "../Configuration/types.js";
-import {
-  ASPECT_RATIO,
-  CAMERA_ORIENTATION_SPEED,
-  CAMERA_ORIENTATION,
-} from "../Configuration/constants.js";
+import MathUtils from "../Utility/MathUtils";
+import { Vec3, Rotation } from "../Utility/types.js";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED, CAMERA_ORIENTATION } from "../Utility/constants.js";
 
 export default class Camera {
   private readonly mathUtils = new MathUtils();
@@ -31,12 +27,7 @@ export default class Camera {
   }
 
   // compute directional ray originating from origin (0,0,0)
-  public canvasToViewport(
-    Cw: number,
-    Ch: number,
-    Cx: number,
-    Cy: number,
-  ): Vec3 {
+  public canvasToViewport(Cw: number, Ch: number, Cx: number, Cy: number): Vec3 {
     const Vx: number = (this.viewportWidth / Cw) * Cx;
     const Vy: number = (this.viewportHeight / Ch) * Cy;
     const Vz: number = this.viewportDistance;
@@ -56,14 +47,8 @@ export default class Camera {
       const Rz: number[][] = this.mathUtils.computeRz(roll);
 
       // produce the final orthonormal rotation matrix
-      const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        Rz,
-        Ry,
-      );
-      const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        RzRy,
-        Rx,
-      );
+      const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(Rz, Ry);
+      const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(RzRy, Rx);
 
       this.cachedRotationMatrix = RzRyRz;
       this.rotationChanged = false;
@@ -74,7 +59,7 @@ export default class Camera {
   }
 
   public computeRotatedVector(R: number[][], D: Vec3): Vec3 {
-    return this.mathUtils.multiplyDirectionByRotation(R, D);
+    return MathUtils.multiplyDirectionByRotation(R, D);
   }
 
   public updateCameraX(Dx: number): void {

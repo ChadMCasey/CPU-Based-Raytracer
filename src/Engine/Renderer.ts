@@ -1,48 +1,49 @@
-import { Vec3 } from "../Configuration/types.js";
-import { CAMERA_POS, MAX_REFLECT_RECUR } from "../Configuration/constants.js";
-import Scene from "./Scene.js";
-import Camera from "../Engine/Camera.js";
-import RenderTarget from "../Engine/RenderTarget.js";
+import Scene from "./Scene";
+import Camera from "../Engine/Camera";
+import RenderTarget from "../Engine/RenderTarget";
+import Serializer from "../Utility/Serializer";
+import Parallelize from "./Parallelize";
+import { BANDS } from "../Utility/constants";
 
 export default class Renderer {
   private scene: Scene;
   private camera: Camera;
   private renderTarget: RenderTarget;
+  private serializer: Serializer;
+  private parallelize: Parallelize;
 
-  constructor(renderTarget: RenderTarget, scene: Scene, camera: Camera) {
+  constructor(
+    renderTarget: RenderTarget,
+    scene: Scene,
+    camera: Camera,
+    serializer: Serializer,
+    parallel: Parallelize,
+  ) {
     this.renderTarget = renderTarget;
     this.scene = scene;
     this.camera = camera;
+    this.serializer = serializer;
+    this.parallelize = parallel;
   }
 
-  render(cameraRotation: number[][]): void {
-    const cameraPos: Vec3 = this.camera.getCameraPosition();
-    const renderW = this.renderTarget.width;
-    const renderH = this.renderTarget.height;
+  async render(): Promise<void> {
+    // serialize our world for this frame
+    const serializedScene = this.serializer.serialize(
+      this.camera,
+      this.scene.sceneObjs,
+      this.scene.lights,
+    );
 
-    for (let x: number = -renderW / 2; x <= renderW / 2; x++) {
-      for (let y: number = -renderH / 2; y <= renderH / 2; y++) {
-        // determine directional vector D
-        const D = this.camera.canvasToViewport(renderW, renderH, x, y);
-
-        // rotate directional vector D via rotation matrix
-        const rotatedD = this.camera.computeRotatedVector(cameraRotation, D);
-
-        // notice that rotatedD originates at cameraPos here
-        const color = this.scene.traceRay(
-          cameraPos,
-          rotatedD,
-          1,
-          Number.POSITIVE_INFINITY,
-          MAX_REFLECT_RECUR,
-        );
-
-        // map back to JS canvas coordinate system
-        const [putX, putY] = this.renderTarget.canvasCoordConversion(x, y);
-
-        // paint cell accordingly
-        this.renderTarget.putPixel(putX, putY, color);
-      }
-    }
+    // task creation is handled inside the the parallel class
+    await this.parallelize.renderFrame(
+      this.renderTarget.width,
+      this.renderTarget.height,
+      this.camera.viewportWidth,
+      this.camera.viewportHeight,
+      BANDS,
+      serializedScene,
+      this.renderTarget.sharedArrayBuffer,
+      this.renderTarget.updateScreen,
+    );
   }
 }

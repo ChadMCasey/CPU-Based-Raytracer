@@ -1,9 +1,9 @@
 import Light from "./Light.js";
-import { Vec3 } from "../Configuration/types.js";
+import { RGB, serializedAmbientLight, Vec3 } from "../Utility/types.js";
 
 export default class AmbientLight extends Light {
-  constructor(intensity: number) {
-    super("Ambient", intensity);
+  constructor(intensity: number, color: RGB) {
+    super("Ambient", intensity, color);
   }
 
   computeIllumination(P: Vec3, N: Vec3, V: Vec3, s: number): number {
@@ -12,5 +12,13 @@ export default class AmbientLight extends Light {
 
   getShadowProperties(P: Vec3): [Vec3, number] | null {
     return null;
+  }
+
+  serialize(): serializedAmbientLight {
+    return {
+      type: "ambient",
+      color: this.color,
+      intensity: this.intensity,
+    };
   }
 }
