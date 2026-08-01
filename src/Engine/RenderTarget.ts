@@ -21,7 +21,9 @@ export default class RenderTarget {
 
     // compute shared array buffer with 4 bytes per pixel
     const bytes = this.width * this.height * 4;
-    this.sharedArrayBuffer = new Uint8ClampedArray(new SharedArrayBuffer(bytes));
+    this.sharedArrayBuffer = new Uint8ClampedArray(
+      new SharedArrayBuffer(bytes),
+    );
   }
 
   // write color data into shared array buffer

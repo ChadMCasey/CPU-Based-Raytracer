@@ -96,4 +96,5 @@ export type serializedAmbientLight = {
 };
 
 export type SerializedPrimative = SerializedSphere;
-export type SerializedLight = serializedAmbientLight | serializedDirectionLight | serializedPointLight;
+export type SerializedLight =
+  serializedAmbientLight | serializedDirectionLight | serializedPointLight;

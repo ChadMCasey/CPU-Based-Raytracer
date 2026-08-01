@@ -17,10 +17,20 @@ export default class DirectionalLight extends Light {
 
     if (DotNL < 0) return 0;
 
-    const diffuseScalar: number = this.computeScalarDiffuse(N, this.direction, DotNL);
-    const specularScalar: number = this.computeScalarHighlight(N, V, s, this.direction);
+    const diffuseScalar: number = this.computeScalarDiffuse(
+      N,
+      this.direction,
+      DotNL,
+    );
+    const specularScalar: number = this.computeScalarHighlight(
+      N,
+      V,
+      s,
+      this.direction,
+    );
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * this.intensity;
 
     return totalContributedIllumination;

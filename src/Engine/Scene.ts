@@ -1,4 +1,10 @@
-import { Vec3, SceneObject, HitRecord, SceneIntersection, RGB } from "../Utility/types";
+import {
+  Vec3,
+  SceneObject,
+  HitRecord,
+  SceneIntersection,
+  RGB,
+} from "../Utility/types";
 import { CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants";
 import Sphere from "../Primitives/Sphere";
 import MathUtils from "../Utility/MathUtils";

@@ -7,6 +7,6 @@
   },
   "scripts": {
     "dev": "npx kill-port 5500 && npm run build && vite",
-    "build": "tsc && vite build"
+    "build": "npx prettier . --write && tsc && vite build"
   }
 }
