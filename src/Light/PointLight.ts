@@ -1,6 +1,11 @@
-import Light from "./Light.js";
-import { RGB, SerializedLight, serializedPointLight, Vec3 } from "../Utility/types.js";
-import MathUtils from "../Utility/MathUtils.js";
+import Light from "./Light";
+import {
+  RGB,
+  SerializedLight,
+  serializedPointLight,
+  Vec3,
+} from "../Utility/types";
+import MathUtils from "../Utility/MathUtils";
 
 const mathUtils = new MathUtils();
 
@@ -21,7 +26,8 @@ export default class PointLight extends Light {
     const diffuseScalar: number = this.computeScalarDiffuse(N, L, DotNL);
     const specularScalar: number = this.computeScalarHighlight(N, V, s, L);
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * this.intensity;
 
     return totalContributedIllumination;

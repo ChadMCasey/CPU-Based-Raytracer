@@ -1,5 +1,5 @@
-import { Vec2, Vec3 } from "../Utility/types.js";
-import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants.js";
+import { Vec2, Vec3 } from "../Utility/types";
+import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants";
 
 // The canvas is a render target in the context of the web
 export default class RenderTarget {
@@ -21,7 +21,9 @@ export default class RenderTarget {
 
     // compute shared array buffer with 4 bytes per pixel
     const bytes = this.width * this.height * 4;
-    this.sharedArrayBuffer = new Uint8ClampedArray(new SharedArrayBuffer(bytes));
+    this.sharedArrayBuffer = new Uint8ClampedArray(
+      new SharedArrayBuffer(bytes),
+    );
   }
 
   // write color data into shared array buffer

@@ -6,7 +6,7 @@
     "vite": "^8.1.5"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build"
+    "dev": "npx kill-port 5500 && npm run build && vite",
+    "build": "npx prettier . --write && tsc && vite build"
   }
 }

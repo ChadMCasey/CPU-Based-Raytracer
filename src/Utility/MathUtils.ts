@@ -1,4 +1,4 @@
-import { Vec3, Vec2 } from "../Utility/types.js";
+import { Vec3, Vec2 } from "../Utility/types";
 
 export default class MathUtils {
   // calculate the dot product of 2 vectors
@@ -44,19 +44,28 @@ export default class MathUtils {
   // hard coding the shit out of this, we need to fix this later
   multiplyRotationalMatrices(A: number[][], B: number[][]): number[][] {
     // top row
-    const TopLeft: number = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
-    const TopCenter: number = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
-    const TopRight: number = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
+    const TopLeft: number =
+      A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
+    const TopCenter: number =
+      A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
+    const TopRight: number =
+      A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
 
     // middle row
-    const MiddleLeft: number = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
-    const MiddleCenter: number = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
-    const MiddleRight: number = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
+    const MiddleLeft: number =
+      A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
+    const MiddleCenter: number =
+      A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
+    const MiddleRight: number =
+      A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
 
     // bottom row
-    const BottomLeft: number = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
-    const BottomCenter: number = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
-    const BottomRight: number = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
+    const BottomLeft: number =
+      A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
+    const BottomCenter: number =
+      A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
+    const BottomRight: number =
+      A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
 
     const resultingMatrix: number[][] = [
       [TopLeft, TopCenter, TopRight],

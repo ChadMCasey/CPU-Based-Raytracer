@@ -1,11 +1,11 @@
-import { CAMERA_POS } from "../Utility/constants.js";
+import { CAMERA_POS } from "../Utility/constants";
 
 // dependent services
-import Renderer from "../Engine/Renderer.js";
-import RenderTarget from "../Engine/RenderTarget.js";
-import Scene from "../Engine/Scene.js";
-import Camera from "../Engine/Camera.js";
-import Controller from "./Controller.js";
+import Renderer from "../Engine/Renderer";
+import RenderTarget from "../Engine/RenderTarget";
+import Scene from "../Engine/Scene";
+import Camera from "../Engine/Camera";
+import Controller from "./Controller";
 import Serializer from "../Utility/Serializer";
 import Parallelize from "../Engine/Parallelize";
 

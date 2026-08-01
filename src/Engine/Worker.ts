@@ -11,7 +11,11 @@ import {
   serializedDirectionLight,
   serializedPointLight,
 } from "../Utility/types";
-import { MAX_REFLECT_RECUR, CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants";
+import {
+  MAX_REFLECT_RECUR,
+  CANVAS_DEFAULT_BACKGROUND,
+  MIN_T,
+} from "../Utility/constants";
 import MathUtils from "../Utility/MathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
@@ -32,7 +36,12 @@ self.addEventListener("message", (event: MessageEvent) => {
   for (let y = startY; y < startY + height; y++) {
     for (let x = startX; x < startX + width; x++) {
       // transform (x,y) into coordinates defined by a 2d cartesian plane
-      const [cartX, cartY] = mapToCartesianPoints(targetWidth, targetHeight, x, y);
+      const [cartX, cartY] = mapToCartesianPoints(
+        targetWidth,
+        targetHeight,
+        x,
+        y,
+      );
 
       // compute D from the origin to the point on the viewport
       const rawD: Vec3 = computeDirectionalVector(
@@ -61,7 +70,13 @@ self.addEventListener("message", (event: MessageEvent) => {
       );
 
       // write color data to buffer
-      writeColorDataToBuffer(sharedArrayBuffer, computedColor, targetWidth, x, y);
+      writeColorDataToBuffer(
+        sharedArrayBuffer,
+        computedColor,
+        targetWidth,
+        x,
+        y,
+      );
     }
   }
 
@@ -146,7 +161,10 @@ function traceRay(
   );
 
   // compute the local color, scale color by intensity of light
-  const localColor: RGB = MathUtils.scaleVectorV3(intersection.object.color, lightIntensity);
+  const localColor: RGB = MathUtils.scaleVectorV3(
+    intersection.object.color,
+    lightIntensity,
+  );
 
   // if an object is not reflective or we hit our recur limit, return local color
   const reflective: number = intersection.object.reflective;
@@ -167,8 +185,14 @@ function traceRay(
   );
 
   // aggregate color data for reflection + local color
-  const localContribution: RGB = MathUtils.scaleVectorV3(localColor, 1 - reflective);
-  const reflectedContribution: RGB = MathUtils.scaleVectorV3(reflectedColor, reflective);
+  const localContribution: RGB = MathUtils.scaleVectorV3(
+    localColor,
+    1 - reflective,
+  );
+  const reflectedContribution: RGB = MathUtils.scaleVectorV3(
+    reflectedColor,
+    reflective,
+  );
 
   // sum the two values to produce the output value
   return MathUtils.addVectors(localContribution, reflectedContribution);
@@ -207,7 +231,11 @@ function closestIntersection(
   return closestIntersection;
 }
 
-function computeIntersection(O: Vec3, D: Vec3, object: SerializedPrimative): HitRecord | null {
+function computeIntersection(
+  O: Vec3,
+  D: Vec3,
+  object: SerializedPrimative,
+): HitRecord | null {
   switch (object.type) {
     case "sphere":
       return computeSphereIntersection(O, D, object);
@@ -237,7 +265,10 @@ function computeSphereIntersection(O: Vec3, D: Vec3, sphere: SerializedSphere) {
   if (!validIntersections.length) return null;
 
   const distance: number = Math.min(...validIntersections);
-  const position: Vec3 = MathUtils.addVectors(O, MathUtils.scaleVectorV3(D, distance)); // P = O + t(V - O);
+  const position: Vec3 = MathUtils.addVectors(
+    O,
+    MathUtils.scaleVectorV3(D, distance),
+  ); // P = O + t(V - O);
   const normal: Vec3 = computeNormal(position, sphere);
 
   return { distance, position, normal };
@@ -265,7 +296,14 @@ function computeLighting(
         intensity += computeAmbientLighting(light);
         break;
       case "directional":
-        intensity += computeDirectionalLighting(P, N, V, specular, light, scene);
+        intensity += computeDirectionalLighting(
+          P,
+          N,
+          V,
+          specular,
+          light,
+          scene,
+        );
         break;
       case "point":
         intensity += computePointLighting(P, N, V, specular, light, scene);
@@ -307,7 +345,11 @@ function computeDirectionalLighting(
 
     if (DotNL < 0) return 0;
 
-    const diffuseScalar: number = computeDirectionalScalarDiffuse(N, lightDirectionFromP, DotNL);
+    const diffuseScalar: number = computeDirectionalScalarDiffuse(
+      N,
+      lightDirectionFromP,
+      DotNL,
+    );
     const specularScalar: number = computeDirectionalScalarHighlight(
       N,
       V,
@@ -315,7 +357,8 @@ function computeDirectionalLighting(
       lightDirectionFromP,
     );
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
 
     return totalContributedIllumination;
@@ -325,11 +368,20 @@ function computeDirectionalLighting(
   return 0;
 }
 
-function computeDirectionalScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
+function computeDirectionalScalarDiffuse(
+  N: Vec3,
+  L: Vec3,
+  DotNL: number,
+): number {
   return DotNL / (MathUtils.magnitudeV3(L) * MathUtils.magnitudeV3(N));
 }
 
-function computeDirectionalScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
+function computeDirectionalScalarHighlight(
+  N: Vec3,
+  V: Vec3,
+  s: number,
+  L: Vec3,
+): number {
   if (s === -1) return -1;
 
   const R: Vec3 = MathUtils.reflectVector(L, N);
@@ -354,7 +406,10 @@ function computePointLighting(
   scene: SerializedPayload,
 ): number {
   // shadow properties
-  const lightDirectionFromP: Vec3 = MathUtils.subtractVectors(light.position, P);
+  const lightDirectionFromP: Vec3 = MathUtils.subtractVectors(
+    light.position,
+    P,
+  );
   const maxT: number = 1;
 
   // compute closest intersection between P and light
@@ -376,7 +431,8 @@ function computePointLighting(
     const diffuseScalar: number = computePointScalarDiffuse(N, L, DotNL);
     const specularScalar: number = computePointScalarHighlight(N, V, s, L);
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
 
     return totalContributedIllumination;
@@ -390,7 +446,12 @@ function computePointScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
   return DotNL / (MathUtils.magnitudeV3(L) * MathUtils.magnitudeV3(N));
 }
 
-function computePointScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
+function computePointScalarHighlight(
+  N: Vec3,
+  V: Vec3,
+  s: number,
+  L: Vec3,
+): number {
   if (s === -1) return -1;
 
   const R: Vec3 = MathUtils.reflectVector(L, N);

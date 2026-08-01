@@ -1,5 +1,11 @@
-import { SceneObject, HitRecord, Vec3, RGB, SerializedSphere } from "../Utility/types.js";
-import MathUtils from "../Utility/MathUtils.js";
+import {
+  SceneObject,
+  HitRecord,
+  Vec3,
+  RGB,
+  SerializedSphere,
+} from "../Utility/types";
+import MathUtils from "../Utility/MathUtils";
 
 const mathUtils = new MathUtils();
 
@@ -10,7 +16,13 @@ export default class Sphere implements SceneObject {
   public readonly specular: number;
   public readonly reflective: number;
 
-  constructor(center: Vec3, radius: number, color: RGB, specular: number, reflective: number) {
+  constructor(
+    center: Vec3,
+    radius: number,
+    color: RGB,
+    specular: number,
+    reflective: number,
+  ) {
     this.center = center;
     this.radius = radius;
     this.color = color;
@@ -31,14 +43,20 @@ export default class Sphere implements SceneObject {
     if (discriminantSquared < 0) return null; // NO INTERSECTION
 
     const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-    const intersections: Array<number> = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
+    const intersections: Array<number> = [
+      (-b + discriminant) / (2 * a),
+      (-b - discriminant) / (2 * a),
+    ];
 
     const validIntersections: number[] = intersections.filter((t) => t > 0);
 
     if (!validIntersections.length) return null;
 
     const distance: number = Math.min(...validIntersections);
-    const position: Vec3 = MathUtils.addVectors(O, MathUtils.scaleVectorV3(D, distance)); // P = O + t(V - O);
+    const position: Vec3 = MathUtils.addVectors(
+      O,
+      MathUtils.scaleVectorV3(D, distance),
+    ); // P = O + t(V - O);
     const normal: Vec3 = this.computeNormal(position);
 
     return { distance, position, normal };

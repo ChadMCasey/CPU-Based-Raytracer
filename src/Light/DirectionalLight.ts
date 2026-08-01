@@ -1,6 +1,6 @@
-import Light from "./Light.js";
-import { RGB, serializedDirectionLight, Vec3 } from "../Utility/types.js";
-import MathUtils from "../Utility/MathUtils.js";
+import Light from "./Light";
+import { RGB, serializedDirectionLight, Vec3 } from "../Utility/types";
+import MathUtils from "../Utility/MathUtils";
 
 const mathUtils = new MathUtils();
 
@@ -17,10 +17,20 @@ export default class DirectionalLight extends Light {
 
     if (DotNL < 0) return 0;
 
-    const diffuseScalar: number = this.computeScalarDiffuse(N, this.direction, DotNL);
-    const specularScalar: number = this.computeScalarHighlight(N, V, s, this.direction);
+    const diffuseScalar: number = this.computeScalarDiffuse(
+      N,
+      this.direction,
+      DotNL,
+    );
+    const specularScalar: number = this.computeScalarHighlight(
+      N,
+      V,
+      s,
+      this.direction,
+    );
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * this.intensity;
 
     return totalContributedIllumination;

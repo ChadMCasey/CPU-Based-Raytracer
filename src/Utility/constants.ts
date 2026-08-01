@@ -1,4 +1,4 @@
-import { Vec3 } from "./types.js";
+import { Vec3 } from "./types";
 
 // Canvas
 export const CANVAS_DEFAULT_BACKGROUND: Vec3 = [0, 0, 0];

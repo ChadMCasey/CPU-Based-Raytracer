@@ -1,5 +1,5 @@
-import Light from "./Light.js";
-import { RGB, serializedAmbientLight, Vec3 } from "../Utility/types.js";
+import Light from "./Light";
+import { RGB, serializedAmbientLight, Vec3 } from "../Utility/types";
 
 export default class AmbientLight extends Light {
   constructor(intensity: number, color: RGB) {

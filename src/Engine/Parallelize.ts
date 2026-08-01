@@ -22,8 +22,11 @@ export default class Parallelize {
 
   private createWorkers(): void {
     for (let i = 0; i < this.availableCores; i++) {
-      const worker = new Worker(new URL("./Worker.ts", import.meta.url), { type: "module" });
-      worker.onmessage = (event: MessageEvent) => this.handleWorkerResponse(worker);
+      const worker = new Worker(new URL("./Worker.ts", import.meta.url), {
+        type: "module",
+      });
+      worker.onmessage = (event: MessageEvent) =>
+        this.handleWorkerResponse(worker);
       this.workers.push(worker);
     }
   }
@@ -48,7 +51,13 @@ export default class Parallelize {
     }
   }
 
-  private createTasks(Cw: number, Ch: number, Vw: number, Vh: number, bands: number): Task[] {
+  private createTasks(
+    Cw: number,
+    Ch: number,
+    Vw: number,
+    Vh: number,
+    bands: number,
+  ): Task[] {
     // clear existing tasks
     this.tasks = [];
 
