@@ -1,11 +1,10 @@
+import { computeLighting } from "../Utility/lightUtils";
 import {
   RGB,
   ScenePayload,
   Task,
   Vec3,
   SceneIntersection,
-  HitRecord,
-  Primative,
 } from "../Utility/types";
 import {
   MAX_REFLECT_RECUR,
@@ -21,7 +20,6 @@ import {
   mapToCartesianPoints,
   closestIntersection,
 } from "../Utility/mathUtils";
-import { computeLighting } from "../Utility/lightUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
   const scenePayload: ScenePayload = event.data.scenePayload;

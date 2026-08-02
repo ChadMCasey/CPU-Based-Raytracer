@@ -1,14 +1,5 @@
+import { Vec3, Sphere } from "./types";
 import {
-  Vec3,
-  ScenePayload,
-  PointLight,
-  Light,
-  SceneIntersection,
-  DirectionLight,
-  Sphere,
-} from "./types";
-import {
-  reflectVector,
   dotVectorsV3,
   magnitudeV3,
   subtractVectors,
