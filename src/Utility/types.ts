@@ -65,9 +65,20 @@ export type Sphere = {
   type: "sphere";
   center: [number, number, number];
   radius: number;
-  color: [number, number, number];
+  color: RGB;
   specular: number;
   reflective: number;
+};
+
+export type Triangle = {
+  type: "triangle";
+  V1: Vec3;
+  V2: Vec3;
+  V3: Vec3;
+  color: RGB;
+  specular: number;
+  reflective: number;
+  normal: Vec3;
 };
 
 // LIGHTING
@@ -92,5 +103,5 @@ export type AmbientLight = {
   color: [number, number, number];
 };
 
-export type Primative = Sphere;
+export type Primative = Sphere | Triangle;
 export type Light = AmbientLight | DirectionLight | PointLight;
