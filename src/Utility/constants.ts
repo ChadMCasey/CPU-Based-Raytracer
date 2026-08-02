@@ -15,13 +15,6 @@ export const MIN_T: number = 0.001;
 // Recursive bound on reflection computation
 export const MAX_REFLECT_RECUR: number = 3;
 
-// Camera defaults
-export const CAMERA_POS: Vec3 = [0, 0, 0];
-export const CAMERA_ORIENTATION: number[][] = [
-  [1, 0, 0],
-  [0, 1, 0],
-  [0, 0, 1],
-];
 export const VALID_MOVEMENT_KEYS: string[] = ["w", "a", "s", "d"];
 export const CAMERA_MOVEMENT_SPEED: number = 2.5;
 export const CAMERA_ORIENTATION_SPEED: number = 0.15;

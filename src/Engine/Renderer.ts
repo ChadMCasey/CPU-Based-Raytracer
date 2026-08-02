@@ -1,8 +1,8 @@
-import { SceneData, Vec3, ScenePayload } from "../Utility/types";
-import Camera from "../Engine/Camera";
+import { SceneData, Vec3, ScenePayload, Camera } from "../Utility/types";
 import RenderTarget from "../Engine/RenderTarget";
 import Parallelize from "./Parallelize";
 import { BANDS } from "../Utility/constants";
+import { getCameraPosition, computeRotationMatrix } from "./Camera";
 
 export default class Renderer {
   private sceneData: SceneData;
@@ -24,8 +24,8 @@ export default class Renderer {
 
   async render(): Promise<void> {
     // serialize our world for this frame
-    const cameraPOS: Vec3 = this.camera.getCameraPosition();
-    const cameraRotation: number[][] = this.camera.computeRotationMatrix();
+    const cameraPOS: Vec3 = getCameraPosition(this.camera);
+    const cameraRotation: number[][] = computeRotationMatrix(this.camera);
     const sceneData = this.sceneData;
 
     const scenePayload: ScenePayload = { sceneData, cameraPOS, cameraRotation };

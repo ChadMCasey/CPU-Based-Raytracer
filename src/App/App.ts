@@ -1,12 +1,11 @@
-import { CAMERA_POS } from "../Utility/constants";
-
 // dependent services
 import Renderer from "../Engine/Renderer";
 import RenderTarget from "../Engine/RenderTarget";
 import { sceneData } from "../Engine/Scene";
-import Camera from "../Engine/Camera";
+import { camera } from "../Engine/Camera";
 import Controller from "./Controller";
 import Parallelize from "../Engine/Parallelize";
+import { Camera } from "../Utility/types";
 
 // the main app class, responsible for orchestrating the entire application
 class App {
@@ -18,10 +17,9 @@ class App {
 
   private lastTime: number = 0;
 
-  constructor() {
+  constructor(camera: Camera) {
+    this.camera = camera;
     this.renderTarget = new RenderTarget();
-
-    this.camera = new Camera(CAMERA_POS);
     this.parallelize = new Parallelize();
     this.controller = new Controller(this.camera, this.renderTarget);
     this.renderer = new Renderer(
@@ -47,5 +45,5 @@ class App {
 }
 
 // execute app
-const app = new App();
+const app = new App(camera);
 window.requestAnimationFrame((currentTime) => app.runAppLoop(currentTime));

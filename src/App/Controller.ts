@@ -1,4 +1,10 @@
-import Camera from "../Engine/Camera";
+import { Camera } from "../Utility/types";
+import {
+  updateYaw,
+  updatePitch,
+  updateCameraX,
+  updateCameraZ,
+} from "../Engine/Camera";
 import {
   VALID_MOVEMENT_KEYS,
   CAMERA_MOVEMENT_SPEED,
@@ -75,14 +81,14 @@ export default class Controller {
     const Dx = (elapsedMs / 1000) * movementVector[0] * CAMERA_MOVEMENT_SPEED;
     const Dz = (elapsedMs / 1000) * movementVector[1] * CAMERA_MOVEMENT_SPEED;
 
-    this.camera.updateCameraX(Dx);
-    this.camera.updateCameraZ(Dz);
+    updateCameraX(this.camera, Dx);
+    updateCameraZ(this.camera, Dz);
   }
 
   updateCameraOrientation() {
     // tell camera about the delta for pitch and yaw
-    if (this.cameraDy !== 0) this.camera.updatePitch(this.cameraDy);
-    if (this.cameraDx !== 0) this.camera.updateYaw(this.cameraDx);
+    if (this.cameraDy !== 0) updatePitch(this.camera, this.cameraDy);
+    if (this.cameraDx !== 0) updateYaw(this.camera, this.cameraDx);
     this.cameraDx = 0;
     this.cameraDy = 0;
   }

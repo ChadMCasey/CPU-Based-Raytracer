@@ -33,14 +33,15 @@ export type SceneIntersection = {
   object: Primative;
 };
 
-// every object in the scene can be intersected by a ray
-// export interface SceneObject {
-//   readonly color: RGB;
-//   readonly specular: number;
-//   readonly reflective: number;
-//   intersect(origin: Vec3, direction: Vec3): HitRecord | null;
-//   serialize(): Primative;
-// }
+export type Camera = {
+  position: Vec3;
+  rotation: Rotation;
+  rotationMatrix: number[][];
+  rotationChanged: boolean;
+  viewportWidth: number;
+  viewportHeight: number;
+  viewportDistance: number;
+};
 
 export type Rotation = {
   pitch: number;
