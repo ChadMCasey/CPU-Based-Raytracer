@@ -1,4 +1,12 @@
-import { Vec3, Vec2 } from "../Utility/types";
+import {
+  Vec3,
+  Vec2,
+  ScenePayload,
+  SceneIntersection,
+  Primative,
+  HitRecord,
+} from "./types";
+import { computeSphereIntersection } from "./sphereUtils";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -117,4 +125,75 @@ export function reflectVector(R: Vec3, N: Vec3): Vec3 {
   const Scale2N: Vec3 = scaleVectorV3(TwoN, RDotN);
   const subR: Vec3 = subtractVectors(Scale2N, R);
   return subR; // reflected vector
+}
+
+export function computeDirectionalVector(
+  Tw: number,
+  Th: number,
+  Vw: number,
+  Vh: number,
+  cartX: number,
+  cartY: number,
+): Vec3 {
+  const Vx = (Vw / Tw) * cartX;
+  const Vy = (Vh / Th) * cartY;
+  const Vz = 1;
+  return [Vx, Vy, Vz];
+}
+
+export function mapToCartesianPoints(
+  targetW: number,
+  targetH: number,
+  x: number,
+  y: number,
+): [number, number] {
+  let cartX: number, cartY: number;
+  cartX = x - targetW / 2;
+  cartY = targetH / 2 - y;
+
+  return [cartX, cartY];
+}
+
+export function closestIntersection(
+  O: Vec3,
+  D: Vec3,
+  minT: number,
+  maxT: number,
+  scenePayload: ScenePayload,
+): SceneIntersection | null {
+  let closestT: number = Number.POSITIVE_INFINITY;
+  let closestIntersection: SceneIntersection | null = null;
+
+  for (let object of scenePayload.sceneData.primatives) {
+    const intersection: HitRecord | null = computeIntersection(O, D, object);
+
+    if (!intersection) continue;
+
+    if (
+      intersection.distance >= minT &&
+      intersection.distance <= maxT &&
+      intersection.distance < closestT
+    ) {
+      closestT = intersection.distance;
+      closestIntersection = {
+        distance: intersection.distance,
+        position: intersection.position,
+        normal: intersection.normal,
+        object: object,
+      };
+    }
+  }
+
+  return closestIntersection;
+}
+
+export function computeIntersection(
+  O: Vec3,
+  D: Vec3,
+  object: Primative,
+): HitRecord | null {
+  switch (object.type) {
+    case "sphere":
+      return computeSphereIntersection(O, D, object);
+  }
 }

@@ -6,10 +6,6 @@ import {
   SceneIntersection,
   HitRecord,
   Primative,
-  Sphere,
-  Light,
-  DirectionLight,
-  PointLight,
 } from "../Utility/types";
 import {
   MAX_REFLECT_RECUR,
@@ -17,14 +13,15 @@ import {
   MIN_T,
 } from "../Utility/constants";
 import {
-  dotVectorsV3,
-  subtractVectors,
   addVectors,
   scaleVectorV3,
   multiplyDirectionByRotation,
   reflectVector,
-  magnitudeV3,
-} from "../Utility/MathUtils";
+  computeDirectionalVector,
+  mapToCartesianPoints,
+  closestIntersection,
+} from "../Utility/mathUtils";
+import { computeLighting } from "../Utility/lightUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
   const scenePayload: ScenePayload = event.data.scenePayload;
@@ -110,33 +107,6 @@ function writeColorDataToBuffer(
 }
 
 // mapp x to 2D cartesian X
-function mapToCartesianPoints(
-  targetW: number,
-  targetH: number,
-  x: number,
-  y: number,
-): [number, number] {
-  let cartX: number, cartY: number;
-  cartX = x - targetW / 2;
-  cartY = targetH / 2 - y;
-
-  return [cartX, cartY];
-}
-
-// compute directional D raw (scale and place 1 unit away at VP)
-function computeDirectionalVector(
-  Tw: number,
-  Th: number,
-  Vw: number,
-  Vh: number,
-  cartX: number,
-  cartY: number,
-): Vec3 {
-  const Vx = (Vw / Tw) * cartX;
-  const Vy = (Vh / Th) * cartY;
-  const Vz = 1;
-  return [Vx, Vy, Vz];
-}
 
 // trace the ray and return a color for the pixel
 function traceRay(
@@ -198,274 +168,4 @@ function traceRay(
 
   // sum the two values to produce the output value
   return addVectors(localContribution, reflectedContribution);
-}
-
-function closestIntersection(
-  O: Vec3,
-  D: Vec3,
-  minT: number,
-  maxT: number,
-  scenePayload: ScenePayload,
-): SceneIntersection | null {
-  let closestT: number = Number.POSITIVE_INFINITY;
-  let closestIntersection: SceneIntersection | null = null;
-
-  for (let object of scenePayload.sceneData.primatives) {
-    const intersection: HitRecord | null = computeIntersection(O, D, object);
-
-    if (!intersection) continue;
-
-    if (
-      intersection.distance >= minT &&
-      intersection.distance <= maxT &&
-      intersection.distance < closestT
-    ) {
-      closestT = intersection.distance;
-      closestIntersection = {
-        distance: intersection.distance,
-        position: intersection.position,
-        normal: intersection.normal,
-        object: object,
-      };
-    }
-  }
-
-  return closestIntersection;
-}
-
-function computeIntersection(
-  O: Vec3,
-  D: Vec3,
-  object: Primative,
-): HitRecord | null {
-  switch (object.type) {
-    case "sphere":
-      return computeSphereIntersection(O, D, object);
-  }
-}
-
-function computeSphereIntersection(O: Vec3, D: Vec3, sphere: Sphere) {
-  const r: number = sphere.radius;
-  const CO: Vec3 = subtractVectors(O, sphere.center);
-
-  const a: number = dotVectorsV3(D, D);
-  const b: number = 2 * dotVectorsV3(CO, D);
-  const c: number = dotVectorsV3(CO, CO) - r * r;
-
-  const discriminantSquared: number = b ** 2 - 4 * a * c;
-
-  if (discriminantSquared < 0) return null; // NO INTERSECTION
-
-  const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-  const intersections: Array<number> = [
-    (-b + discriminant) / (2 * a),
-    (-b - discriminant) / (2 * a),
-  ];
-
-  const validIntersections: number[] = intersections.filter((t) => t > 0);
-
-  if (!validIntersections.length) return null;
-
-  const distance: number = Math.min(...validIntersections);
-  const position: Vec3 = addVectors(O, scaleVectorV3(D, distance)); // P = O + t(V - O);
-  const normal: Vec3 = computeNormal(position, sphere);
-
-  return { distance, position, normal };
-}
-
-function computeNormal(position: Vec3, sphere: Sphere): Vec3 {
-  const CP: Vec3 = subtractVectors(position, sphere.center);
-  const magnitude = magnitudeV3(CP);
-  const normal = scaleVectorV3(CP, 1 / magnitude);
-  return normal;
-}
-
-function computeLighting(
-  P: Vec3,
-  N: Vec3,
-  V: Vec3,
-  specular: number,
-  scenePayload: ScenePayload,
-): number {
-  let intensity: number = 0.0;
-
-  for (let light of scenePayload.sceneData.lights) {
-    switch (light.type) {
-      case "ambient":
-        intensity += computeAmbientLighting(light);
-        break;
-      case "directional":
-        intensity += computeDirectionalLighting(
-          P,
-          N,
-          V,
-          specular,
-          light,
-          scenePayload,
-        );
-        break;
-      case "point":
-        intensity += computePointLighting(
-          P,
-          N,
-          V,
-          specular,
-          light,
-          scenePayload,
-        );
-        break;
-    }
-  }
-
-  return intensity;
-}
-
-function computeAmbientLighting(light: Light) {
-  return light.intensity;
-}
-
-function computeDirectionalLighting(
-  P: Vec3,
-  N: Vec3,
-  V: Vec3,
-  specular: number,
-  light: DirectionLight,
-  scenePayload: ScenePayload,
-) {
-  // shadow properties
-  const lightDirectionFromP: Vec3 = light.direction;
-  const maxT: number = light.maxT;
-
-  // compute closest intersection between P and light
-  const lightObstruction: SceneIntersection | null = closestIntersection(
-    P,
-    lightDirectionFromP,
-    MIN_T,
-    maxT,
-    scenePayload,
-  );
-
-  // no obstruction so add in lighting
-  if (!lightObstruction) {
-    const DotNL = dotVectorsV3(N, lightDirectionFromP);
-
-    if (DotNL < 0) return 0;
-
-    const diffuseScalar: number = computeDirectionalScalarDiffuse(
-      N,
-      lightDirectionFromP,
-      DotNL,
-    );
-    const specularScalar: number = computeDirectionalScalarHighlight(
-      N,
-      V,
-      specular,
-      lightDirectionFromP,
-    );
-
-    const totalScalar: number =
-      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
-    const totalContributedIllumination: number = totalScalar * light.intensity;
-
-    return totalContributedIllumination;
-  }
-
-  // for now obstruction means no contributed light
-  return 0;
-}
-
-function computeDirectionalScalarDiffuse(
-  N: Vec3,
-  L: Vec3,
-  DotNL: number,
-): number {
-  return DotNL / (magnitudeV3(L) * magnitudeV3(N));
-}
-
-function computeDirectionalScalarHighlight(
-  N: Vec3,
-  V: Vec3,
-  s: number,
-  L: Vec3,
-): number {
-  if (s === -1) return -1;
-
-  const R: Vec3 = reflectVector(L, N);
-  const RDotV: number = dotVectorsV3(R, V);
-
-  if (RDotV < 0) return -1;
-
-  const magR: number = magnitudeV3(R);
-  const magV: number = magnitudeV3(V);
-  const cosA: number = RDotV / (magR * magV);
-  const specularScalar: number = cosA ** s;
-
-  return specularScalar;
-}
-
-function computePointLighting(
-  P: Vec3,
-  N: Vec3,
-  V: Vec3,
-  s: number,
-  light: PointLight,
-  scenePayload: ScenePayload,
-): number {
-  // shadow properties
-  const lightDirectionFromP: Vec3 = subtractVectors(light.position, P);
-  const maxT: number = 1;
-
-  // compute closest intersection between P and light
-  const lightObstruction: SceneIntersection | null = closestIntersection(
-    P,
-    lightDirectionFromP,
-    MIN_T,
-    maxT,
-    scenePayload,
-  );
-
-  // no obstruction so add in lighting
-  if (!lightObstruction) {
-    const L: Vec3 = subtractVectors(light.position, P);
-    const DotNL: number = dotVectorsV3(N, L);
-
-    if (DotNL < 0) return 0;
-
-    const diffuseScalar: number = computePointScalarDiffuse(N, L, DotNL);
-    const specularScalar: number = computePointScalarHighlight(N, V, s, L);
-
-    const totalScalar: number =
-      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
-    const totalContributedIllumination: number = totalScalar * light.intensity;
-
-    return totalContributedIllumination;
-  }
-
-  // for now obstruction means no contributed light
-  return 0;
-}
-
-function computePointScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
-  return DotNL / (magnitudeV3(L) * magnitudeV3(N));
-}
-
-function computePointScalarHighlight(
-  N: Vec3,
-  V: Vec3,
-  s: number,
-  L: Vec3,
-): number {
-  if (s === -1) return -1;
-
-  const R: Vec3 = reflectVector(L, N);
-  const RDotV: number = dotVectorsV3(R, V);
-
-  if (RDotV < 0) return -1;
-
-  const magR: number = magnitudeV3(R);
-  const magV: number = magnitudeV3(V);
-  const cosA: number = RDotV / (magR * magV);
-  const specularScalar: number = cosA ** s;
-
-  return specularScalar;
 }

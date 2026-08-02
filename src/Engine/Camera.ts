@@ -4,7 +4,7 @@ import {
   computeRy,
   computeRz,
   multiplyRotationalMatrices,
-} from "../Utility/MathUtils";
+} from "../Utility/mathUtils";
 import { Vec3, Rotation, Camera } from "../Utility/types";
 import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED } from "../Utility/constants";
 

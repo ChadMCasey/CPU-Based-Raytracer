@@ -10,7 +10,7 @@ import {
   CAMERA_MOVEMENT_SPEED,
 } from "../Utility/constants";
 import { Vec2 } from "../Utility/types";
-import { magnitudeV2, scaleVectorV2 } from "../Utility/MathUtils";
+import { magnitudeV2, scaleVectorV2 } from "../Utility/mathUtils";
 import RenderTarget from "../Engine/RenderTarget";
 
 // read user input and update application
