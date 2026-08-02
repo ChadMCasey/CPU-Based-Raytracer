@@ -1,9 +1,4 @@
-import {
-  PointLight,
-  AmbientLight,
-  DirectionLight,
-  Light,
-} from "../Utility/types";
+import { PointLight, AmbientLight, DirectionLight } from "../Utility/types";
 
 export const pointLights: PointLight[] = [
   {
