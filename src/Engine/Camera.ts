@@ -1,103 +1,76 @@
-import MathUtils from "../Utility/MathUtils";
-import { Vec3, Rotation } from "../Utility/types";
 import {
-  ASPECT_RATIO,
-  CAMERA_ORIENTATION_SPEED,
-  CAMERA_ORIENTATION,
-} from "../Utility/constants";
+  convertDegToRad,
+  computeRx,
+  computeRy,
+  computeRz,
+  multiplyRotationalMatrices,
+} from "../Utility/mathUtils";
+import { Vec3, Rotation, Camera } from "../Utility/types";
+import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED } from "../Utility/constants";
 
-export default class Camera {
-  private readonly mathUtils = new MathUtils();
+// Camera defaults
+const CAMERA_POS: Vec3 = [0, 0, 0];
+const CAMERA_ROTATION: Rotation = { pitch: 0, yaw: 0, roll: 0 };
+const CAMERA_ROTATION_MATRIX: number[][] = [
+  [1, 0, 0],
+  [0, 1, 0],
+  [0, 0, 1],
+];
 
-  private position: Vec3;
-  public readonly viewportHeight: number;
-  public readonly viewportDistance: number;
+export const camera: Camera = {
+  viewportDistance: 1,
+  viewportHeight: 1,
+  viewportWidth: 1 * ASPECT_RATIO(),
+  position: CAMERA_POS,
+  rotation: CAMERA_ROTATION,
+  rotationMatrix: CAMERA_ROTATION_MATRIX,
+  rotationChanged: false,
+};
 
-  // compute the viewport width based on aspect ratio
-  public readonly viewportWidth = window.innerWidth / window.innerHeight;
+export function computeRotationMatrix(camera: Camera): number[][] {
+  if (camera.rotationChanged) {
+    // pitch yaw and roll of camera in radians
+    const pitch: number = convertDegToRad(camera.rotation.pitch);
+    const yaw: number = convertDegToRad(camera.rotation.yaw);
+    const roll: number = convertDegToRad(camera.rotation.roll);
 
-  // Pitch, Yaw and Roll in degrees
-  public readonly rotation: Rotation = { pitch: 0, yaw: 0, roll: 0 };
-  private cachedRotationMatrix: number[][] = CAMERA_ORIENTATION;
-  private rotationChanged: boolean = false; // cache flag
+    // compute rotational matrices for rotation about each axis
+    const Rx: number[][] = computeRx(pitch);
+    const Ry: number[][] = computeRy(yaw);
+    const Rz: number[][] = computeRz(roll);
 
-  constructor(position: Vec3) {
-    this.position = position;
+    // produce the final orthonormal rotation matrix
+    const RzRy: number[][] = multiplyRotationalMatrices(Rz, Ry);
+    const RzRyRz: number[][] = multiplyRotationalMatrices(RzRy, Rx);
 
-    // determine viewport size based off aspect ratio of browser
-    this.viewportDistance = 1;
-    this.viewportHeight = 1;
-    this.viewportWidth = this.viewportHeight * ASPECT_RATIO();
+    camera.rotationChanged = false;
+    camera.rotationMatrix = RzRyRz;
+    return RzRyRz;
   }
 
-  // compute directional ray originating from origin (0,0,0)
-  public canvasToViewport(
-    Cw: number,
-    Ch: number,
-    Cx: number,
-    Cy: number,
-  ): Vec3 {
-    const Vx: number = (this.viewportWidth / Cw) * Cx;
-    const Vy: number = (this.viewportHeight / Ch) * Cy;
-    const Vz: number = this.viewportDistance;
-    return [Vx, Vy, Vz];
-  }
+  return camera.rotationMatrix; // cache hit
+}
 
-  public computeRotationMatrix(): number[][] {
-    if (this.rotationChanged) {
-      // pitch yaw and roll of camera in radians
-      const pitch: number = this.mathUtils.convertDegToRad(this.rotation.pitch);
-      const yaw: number = this.mathUtils.convertDegToRad(this.rotation.yaw);
-      const roll: number = this.mathUtils.convertDegToRad(this.rotation.roll);
+export function updateCameraX(camera: Camera, Dx: number): void {
+  camera.position[0] += Dx;
+}
 
-      // compute rotational matrices for rotation about each axis
-      const Rx: number[][] = this.mathUtils.computeRx(pitch);
-      const Ry: number[][] = this.mathUtils.computeRy(yaw);
-      const Rz: number[][] = this.mathUtils.computeRz(roll);
+export function updateCameraZ(camera: Camera, Dz: number): void {
+  camera.position[2] += Dz;
+}
 
-      // produce the final orthonormal rotation matrix
-      const RzRy: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        Rz,
-        Ry,
-      );
-      const RzRyRz: number[][] = this.mathUtils.multiplyRotationalMatrices(
-        RzRy,
-        Rx,
-      );
+export function updatePitch(camera: Camera, Dy: number): void {
+  camera.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
+  camera.rotation.pitch = camera.rotation.pitch % 360;
+  camera.rotationChanged = true;
+}
 
-      this.cachedRotationMatrix = RzRyRz;
-      this.rotationChanged = false;
-      return RzRyRz;
-    }
+export function updateYaw(camera: Camera, Dx: number): void {
+  camera.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
+  camera.rotation.yaw = camera.rotation.yaw % 360;
+  camera.rotationChanged = true;
+}
 
-    return this.cachedRotationMatrix; // cache hit
-  }
-
-  public computeRotatedVector(R: number[][], D: Vec3): Vec3 {
-    return MathUtils.multiplyDirectionByRotation(R, D);
-  }
-
-  public updateCameraX(Dx: number): void {
-    this.position[0] += Dx;
-  }
-
-  public updateCameraZ(Dz: number): void {
-    this.position[2] += Dz;
-  }
-
-  public updatePitch(Dy: number): void {
-    this.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
-    this.rotation.pitch = this.rotation.pitch % 360;
-    this.rotationChanged = true;
-  }
-
-  public updateYaw(Dx: number): void {
-    this.rotation.yaw += Dx * CAMERA_ORIENTATION_SPEED;
-    this.rotation.yaw = this.rotation.yaw % 360;
-    this.rotationChanged = true;
-  }
-
-  public getCameraPosition(): Vec3 {
-    return this.position;
-  }
+export function getCameraPosition(camera: Camera): Vec3 {
+  return camera.position;
 }

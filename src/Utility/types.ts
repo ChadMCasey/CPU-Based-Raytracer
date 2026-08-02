@@ -30,25 +30,18 @@ export type SceneIntersection = {
   distance: number;
   position: Vec3;
   normal: Vec3;
-  object: SerializedPrimative;
+  object: Primative;
 };
 
-// every object in the scene can be intersected by a ray
-export interface SceneObject {
-  readonly color: RGB;
-  readonly specular: number;
-  readonly reflective: number;
-  intersect(origin: Vec3, direction: Vec3): HitRecord | null;
-  serialize(): SerializedPrimative;
-}
-
-// sphere representation
-export interface Sphere {
-  center: Vec3;
-  radius: number;
-}
-
-export type LightType = "Ambient" | "Directional" | "Point";
+export type Camera = {
+  position: Vec3;
+  rotation: Rotation;
+  rotationMatrix: number[][];
+  rotationChanged: boolean;
+  viewportWidth: number;
+  viewportHeight: number;
+  viewportDistance: number;
+};
 
 export type Rotation = {
   pitch: number;
@@ -56,16 +49,19 @@ export type Rotation = {
   roll: number;
 };
 
-// Data oriented design - flatten the world for workers
-export type SerializedPayload = {
+export type SceneData = {
+  lights: Light[];
+  primatives: Primative[];
+};
+
+export type ScenePayload = {
+  sceneData: SceneData;
   cameraPOS: Vec3;
   cameraRotation: number[][];
-  sceneObjects: SerializedPrimative[];
-  sceneLights: SerializedLight[];
 };
 
 // serialized sphere
-export type SerializedSphere = {
+export type Sphere = {
   type: "sphere";
   center: [number, number, number];
   radius: number;
@@ -74,7 +70,8 @@ export type SerializedSphere = {
   reflective: number;
 };
 
-export type serializedDirectionLight = {
+// LIGHTING
+export type DirectionLight = {
   type: "directional";
   direction: [number, number, number];
   intensity: number;
@@ -82,19 +79,18 @@ export type serializedDirectionLight = {
   maxT: number;
 };
 
-export type serializedPointLight = {
+export type PointLight = {
   type: "point";
   position: [number, number, number];
   intensity: number;
   color: [number, number, number];
 };
 
-export type serializedAmbientLight = {
+export type AmbientLight = {
   type: "ambient";
   intensity: number;
   color: [number, number, number];
 };
 
-export type SerializedPrimative = SerializedSphere;
-export type SerializedLight =
-  serializedAmbientLight | serializedDirectionLight | serializedPointLight;
+export type Primative = Sphere;
+export type Light = AmbientLight | DirectionLight | PointLight;
