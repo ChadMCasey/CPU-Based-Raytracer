@@ -7,6 +7,7 @@ import {
   HitRecord,
 } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
+import { computeTriangleIntersection } from "./triangleUtils";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -46,6 +47,14 @@ export function magnitudeV3(a: Vec3): number {
 
 export function convertDegToRad(degrees: number): number {
   return (Math.PI / 180) * degrees;
+}
+
+// cross a,b =  𝑎1*⁢𝑏2−𝑎2*⁢𝑏1, 𝑎2*⁢𝑏0−𝑎0*⁢𝑏2, 𝑎0*⁢𝑏1−𝑎1⁢*𝑏0
+export function crossProduct(a: Vec3, b: Vec3): Vec3 {
+  const v1: number = a[1] * b[2] - a[2] * b[1];
+  const v2: number = a[2] * b[0] - a[0] * b[2];
+  const v3: number = a[0] * b[1] - a[1] * b[0];
+  return [v1, v2, v3];
 }
 
 // hard coding the shit out of this, we need to fix this later
@@ -195,5 +204,9 @@ export function computeIntersection(
   switch (object.type) {
     case "sphere":
       return computeSphereIntersection(O, D, object);
+    case "triangle":
+      return computeTriangleIntersection(O, D, object);
+    default:
+      return null;
   }
 }

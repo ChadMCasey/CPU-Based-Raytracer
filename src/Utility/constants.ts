@@ -2,7 +2,7 @@ import { Vec3 } from "./types";
 
 // Canvas
 export const CANVAS_DEFAULT_BACKGROUND: Vec3 = [0, 0, 0];
-export const CANVAS_HEIGHT: number = 300;
+export const CANVAS_HEIGHT: number = 240;
 
 // aspect ratio
 export const ASPECT_RATIO = (): number => {
