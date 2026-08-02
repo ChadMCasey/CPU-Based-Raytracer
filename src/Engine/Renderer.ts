@@ -1,38 +1,34 @@
-import Scene from "./Scene";
+import { SceneData, Vec3, ScenePayload } from "../Utility/types";
 import Camera from "../Engine/Camera";
 import RenderTarget from "../Engine/RenderTarget";
-import Serializer from "../Utility/Serializer";
 import Parallelize from "./Parallelize";
 import { BANDS } from "../Utility/constants";
 
 export default class Renderer {
-  private scene: Scene;
+  private sceneData: SceneData;
   private camera: Camera;
   private renderTarget: RenderTarget;
-  private serializer: Serializer;
   private parallelize: Parallelize;
 
   constructor(
     renderTarget: RenderTarget,
-    scene: Scene,
+    sceneData: SceneData,
     camera: Camera,
-    serializer: Serializer,
     parallel: Parallelize,
   ) {
     this.renderTarget = renderTarget;
-    this.scene = scene;
+    this.sceneData = sceneData;
     this.camera = camera;
-    this.serializer = serializer;
     this.parallelize = parallel;
   }
 
   async render(): Promise<void> {
     // serialize our world for this frame
-    const serializedScene = this.serializer.serialize(
-      this.camera,
-      this.scene.sceneObjs,
-      this.scene.lights,
-    );
+    const cameraPOS: Vec3 = this.camera.getCameraPosition();
+    const cameraRotation: number[][] = this.camera.computeRotationMatrix();
+    const sceneData = this.sceneData;
+
+    const scenePayload: ScenePayload = { sceneData, cameraPOS, cameraRotation };
 
     // task creation is handled inside the the parallel class
     await this.parallelize.renderFrame(
@@ -41,7 +37,7 @@ export default class Renderer {
       this.camera.viewportWidth,
       this.camera.viewportHeight,
       BANDS,
-      serializedScene,
+      scenePayload,
       this.renderTarget.sharedArrayBuffer,
       this.renderTarget.updateScreen,
     );

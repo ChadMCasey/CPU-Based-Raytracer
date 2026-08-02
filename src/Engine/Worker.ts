@@ -1,15 +1,15 @@
 import {
   RGB,
-  SerializedPayload,
+  ScenePayload,
   Task,
   Vec3,
   SceneIntersection,
   HitRecord,
-  SerializedPrimative,
-  SerializedSphere,
-  SerializedLight,
-  serializedDirectionLight,
-  serializedPointLight,
+  Primative,
+  Sphere,
+  Light,
+  DirectionLight,
+  PointLight,
 } from "../Utility/types";
 import {
   MAX_REFLECT_RECUR,
@@ -27,7 +27,7 @@ import {
 } from "../Utility/MathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
-  const serializedScene: SerializedPayload = event.data.serializedScene;
+  const scenePayload: ScenePayload = event.data.scenePayload;
   const sharedArrayBuffer: Uint8ClampedArray = event.data.sharedArrayBuffer;
   const {
     startX,
@@ -63,18 +63,18 @@ self.addEventListener("message", (event: MessageEvent) => {
 
       // rotate D to account for camera rotation
       const rotatedD: Vec3 = multiplyDirectionByRotation(
-        serializedScene.cameraRotation,
+        scenePayload.cameraRotation,
         rawD,
       );
 
       // trace ray (this will originate D from the cameras position)
       const computedColor: RGB = traceRay(
-        serializedScene.cameraPOS,
+        scenePayload.cameraPOS,
         rotatedD,
         1,
         Number.POSITIVE_INFINITY,
         MAX_REFLECT_RECUR,
-        serializedScene,
+        scenePayload,
       );
 
       // write color data to buffer
@@ -145,7 +145,7 @@ function traceRay(
   minT: number,
   maxT: number,
   recurLeft: number,
-  serializedScene: SerializedPayload,
+  scenePayload: ScenePayload,
 ): RGB {
   // we first need to find the closest intersection between the ray and the scene objects
   const intersection: SceneIntersection | null = closestIntersection(
@@ -153,7 +153,7 @@ function traceRay(
     rotatedD,
     minT,
     maxT,
-    serializedScene,
+    scenePayload,
   );
 
   // return default background color if no intersection
@@ -165,7 +165,7 @@ function traceRay(
     intersection.normal,
     scaleVectorV3(rotatedD, -1),
     intersection.object.specular,
-    serializedScene,
+    scenePayload,
   );
 
   // compute the local color, scale color by intensity of light
@@ -189,7 +189,7 @@ function traceRay(
     MIN_T,
     Number.POSITIVE_INFINITY,
     recurLeft - 1,
-    serializedScene,
+    scenePayload,
   );
 
   // aggregate color data for reflection + local color
@@ -205,12 +205,12 @@ function closestIntersection(
   D: Vec3,
   minT: number,
   maxT: number,
-  serializedScene: SerializedPayload,
+  scenePayload: ScenePayload,
 ): SceneIntersection | null {
   let closestT: number = Number.POSITIVE_INFINITY;
   let closestIntersection: SceneIntersection | null = null;
 
-  for (let object of serializedScene.sceneObjects) {
+  for (let object of scenePayload.sceneData.primatives) {
     const intersection: HitRecord | null = computeIntersection(O, D, object);
 
     if (!intersection) continue;
@@ -236,7 +236,7 @@ function closestIntersection(
 function computeIntersection(
   O: Vec3,
   D: Vec3,
-  object: SerializedPrimative,
+  object: Primative,
 ): HitRecord | null {
   switch (object.type) {
     case "sphere":
@@ -244,7 +244,7 @@ function computeIntersection(
   }
 }
 
-function computeSphereIntersection(O: Vec3, D: Vec3, sphere: SerializedSphere) {
+function computeSphereIntersection(O: Vec3, D: Vec3, sphere: Sphere) {
   const r: number = sphere.radius;
   const CO: Vec3 = subtractVectors(O, sphere.center);
 
@@ -273,7 +273,7 @@ function computeSphereIntersection(O: Vec3, D: Vec3, sphere: SerializedSphere) {
   return { distance, position, normal };
 }
 
-function computeNormal(position: Vec3, sphere: SerializedSphere): Vec3 {
+function computeNormal(position: Vec3, sphere: Sphere): Vec3 {
   const CP: Vec3 = subtractVectors(position, sphere.center);
   const magnitude = magnitudeV3(CP);
   const normal = scaleVectorV3(CP, 1 / magnitude);
@@ -285,11 +285,11 @@ function computeLighting(
   N: Vec3,
   V: Vec3,
   specular: number,
-  scene: SerializedPayload,
+  scenePayload: ScenePayload,
 ): number {
   let intensity: number = 0.0;
 
-  for (let light of scene.sceneLights) {
+  for (let light of scenePayload.sceneData.lights) {
     switch (light.type) {
       case "ambient":
         intensity += computeAmbientLighting(light);
@@ -301,11 +301,18 @@ function computeLighting(
           V,
           specular,
           light,
-          scene,
+          scenePayload,
         );
         break;
       case "point":
-        intensity += computePointLighting(P, N, V, specular, light, scene);
+        intensity += computePointLighting(
+          P,
+          N,
+          V,
+          specular,
+          light,
+          scenePayload,
+        );
         break;
     }
   }
@@ -313,7 +320,7 @@ function computeLighting(
   return intensity;
 }
 
-function computeAmbientLighting(light: SerializedLight) {
+function computeAmbientLighting(light: Light) {
   return light.intensity;
 }
 
@@ -322,8 +329,8 @@ function computeDirectionalLighting(
   N: Vec3,
   V: Vec3,
   specular: number,
-  light: serializedDirectionLight,
-  scene: SerializedPayload,
+  light: DirectionLight,
+  scenePayload: ScenePayload,
 ) {
   // shadow properties
   const lightDirectionFromP: Vec3 = light.direction;
@@ -335,7 +342,7 @@ function computeDirectionalLighting(
     lightDirectionFromP,
     MIN_T,
     maxT,
-    scene,
+    scenePayload,
   );
 
   // no obstruction so add in lighting
@@ -401,8 +408,8 @@ function computePointLighting(
   N: Vec3,
   V: Vec3,
   s: number,
-  light: serializedPointLight,
-  scene: SerializedPayload,
+  light: PointLight,
+  scenePayload: ScenePayload,
 ): number {
   // shadow properties
   const lightDirectionFromP: Vec3 = subtractVectors(light.position, P);
@@ -414,7 +421,7 @@ function computePointLighting(
     lightDirectionFromP,
     MIN_T,
     maxT,
-    scene,
+    scenePayload,
   );
 
   // no obstruction so add in lighting
