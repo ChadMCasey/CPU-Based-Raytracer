@@ -1,10 +1,4 @@
-import {
-  convertDegToRad,
-  computeRx,
-  computeRy,
-  computeRz,
-  multiplyRotationalMatrices,
-} from "../Utility/mathUtils";
+import { convertDegToRad, computeRx, computeRy, computeRz, multiplyRotationalMatrices } from "../Utility/mathUtils";
 import { Vec3, Camera } from "../Utility/types";
 import {
   ASPECT_RATIO,

@@ -1,14 +1,6 @@
 import { Camera } from "../Utility/types";
-import {
-  updateYaw,
-  updatePitch,
-  updateCameraX,
-  updateCameraZ,
-} from "../Engine/Camera";
-import {
-  VALID_MOVEMENT_KEYS,
-  CAMERA_MOVEMENT_SPEED,
-} from "../Utility/constants";
+import { updateYaw, updatePitch, updateCameraX, updateCameraZ } from "../Engine/Camera";
+import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED } from "../Utility/constants";
 import { Vec2 } from "../Utility/types";
 import { magnitudeV2, scaleVectorV2 } from "../Utility/mathUtils";
 import RenderTarget from "../Engine/RenderTarget";

@@ -1,11 +1,5 @@
 import { Vec3, Sphere } from "./types";
-import {
-  dotVectorsV3,
-  magnitudeV3,
-  subtractVectors,
-  addVectors,
-  scaleVectorV3,
-} from "./mathUtils";
+import { dotVectorsV3, magnitudeV3, subtractVectors, addVectors, scaleVectorV3 } from "./mathUtils";
 
 export function computeSphereIntersection(O: Vec3, D: Vec3, sphere: Sphere) {
   const r: number = sphere.radius;
@@ -20,10 +14,7 @@ export function computeSphereIntersection(O: Vec3, D: Vec3, sphere: Sphere) {
   if (discriminantSquared < 0) return null; // NO INTERSECTION
 
   const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-  const intersections: Array<number> = [
-    (-b + discriminant) / (2 * a),
-    (-b - discriminant) / (2 * a),
-  ];
+  const intersections: Array<number> = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
 
   const validIntersections: number[] = intersections.filter((t) => t > 0);
 

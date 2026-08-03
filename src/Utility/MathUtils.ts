@@ -1,11 +1,4 @@
-import {
-  Vec3,
-  Vec2,
-  ScenePayload,
-  SceneIntersection,
-  Primative,
-  HitRecord,
-} from "./types";
+import { Vec3, Vec2, ScenePayload, SceneIntersection, Primative, HitRecord } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
 
@@ -58,33 +51,21 @@ export function crossProduct(a: Vec3, b: Vec3): Vec3 {
 }
 
 // hard coding the shit out of this, we need to fix this later
-export function multiplyRotationalMatrices(
-  A: number[][],
-  B: number[][],
-): number[][] {
+export function multiplyRotationalMatrices(A: number[][], B: number[][]): number[][] {
   // top row
-  const TopLeft: number =
-    A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
-  const TopCenter: number =
-    A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
-  const TopRight: number =
-    A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
+  const TopLeft: number = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
+  const TopCenter: number = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
+  const TopRight: number = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
 
   // middle row
-  const MiddleLeft: number =
-    A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
-  const MiddleCenter: number =
-    A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
-  const MiddleRight: number =
-    A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
+  const MiddleLeft: number = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
+  const MiddleCenter: number = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
+  const MiddleRight: number = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
 
   // bottom row
-  const BottomLeft: number =
-    A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
-  const BottomCenter: number =
-    A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
-  const BottomRight: number =
-    A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
+  const BottomLeft: number = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
+  const BottomCenter: number = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
+  const BottomRight: number = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
 
   const resultingMatrix: number[][] = [
     [TopLeft, TopCenter, TopRight],
@@ -150,12 +131,7 @@ export function computeDirectionalVector(
   return [Vx, Vy, Vz];
 }
 
-export function mapToCartesianPoints(
-  targetW: number,
-  targetH: number,
-  x: number,
-  y: number,
-): [number, number] {
+export function mapToCartesianPoints(targetW: number, targetH: number, x: number, y: number): [number, number] {
   let cartX: number, cartY: number;
   cartX = x - targetW / 2;
   cartY = targetH / 2 - y;
@@ -178,11 +154,7 @@ export function closestIntersection(
 
     if (!intersection) continue;
 
-    if (
-      intersection.distance >= minT &&
-      intersection.distance <= maxT &&
-      intersection.distance < closestT
-    ) {
+    if (intersection.distance >= minT && intersection.distance <= maxT && intersection.distance < closestT) {
       closestT = intersection.distance;
       closestIntersection = {
         distance: intersection.distance,
@@ -196,11 +168,7 @@ export function closestIntersection(
   return closestIntersection;
 }
 
-export function computeIntersection(
-  O: Vec3,
-  D: Vec3,
-  object: Primative,
-): HitRecord | null {
+export function computeIntersection(O: Vec3, D: Vec3, object: Primative): HitRecord | null {
   switch (object.type) {
     case "sphere":
       return computeSphereIntersection(O, D, object);
