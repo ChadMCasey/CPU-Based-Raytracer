@@ -17,7 +17,7 @@ export const MAX_REFLECT_RECUR: number = 3;
 
 export const VALID_MOVEMENT_KEYS: string[] = ["w", "a", "s", "d"];
 export const CAMERA_MOVEMENT_SPEED: number = 2.5;
-export const CAMERA_ORIENTATION_SPEED: number = 0.15;
+export const CAMERA_ORIENTATION_SPEED: number = 0.2;
 
 // canvas partition
 export const BANDS: number = 20;
