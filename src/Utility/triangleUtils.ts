@@ -1,12 +1,5 @@
 import { Vec3, Triangle, HitRecord, RGB } from "./types";
-import {
-  subtractVectors,
-  crossProduct,
-  scaleVectorV3,
-  magnitudeV3,
-  dotVectorsV3,
-  addVectors,
-} from "./mathUtils";
+import { subtractVectors, crossProduct, scaleVectorV3, magnitudeV3, dotVectorsV3, addVectors } from "./mathUtils";
 
 // factory function for triangles
 export function createTriangle(
@@ -30,13 +23,7 @@ export function createTriangle(
 }
 
 // factory function for cube
-export function createCube(
-  center: Vec3,
-  size: number,
-  color: RGB,
-  specular: number,
-  reflective: number,
-) {
+export function createCube(center: Vec3, size: number, color: RGB, specular: number, reflective: number) {
   const Cx = center[0];
   const Cy = center[1];
   const Cz = center[2];
@@ -53,90 +40,20 @@ export function createCube(
 
   const Triangles: Triangle[] = [
     // front face
-    createTriangle(
-      [minX, minY, minZ],
-      [maxX, maxY, minZ],
-      [maxX, minY, minZ],
-      color,
-      specular,
-      reflective,
-    ),
-    createTriangle(
-      [minX, maxY, minZ],
-      [maxX, maxY, minZ],
-      [minX, minY, minZ],
-      color,
-      specular,
-      reflective,
-    ),
+    createTriangle([minX, minY, minZ], [maxX, maxY, minZ], [maxX, minY, minZ], color, specular, reflective),
+    createTriangle([minX, maxY, minZ], [maxX, maxY, minZ], [minX, minY, minZ], color, specular, reflective),
     // back face
-    createTriangle(
-      [minX, minY, maxZ],
-      [maxX, minY, maxZ],
-      [maxX, maxY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
-    createTriangle(
-      [minX, maxY, maxZ],
-      [minX, minY, maxZ],
-      [maxX, maxY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
+    createTriangle([minX, minY, maxZ], [maxX, minY, maxZ], [maxX, maxY, maxZ], color, specular, reflective),
+    createTriangle([minX, maxY, maxZ], [minX, minY, maxZ], [maxX, maxY, maxZ], color, specular, reflective),
     // left face
-    createTriangle(
-      [minX, minY, minZ],
-      [minX, minY, maxZ],
-      [minX, maxY, minZ],
-      color,
-      specular,
-      reflective,
-    ),
-    createTriangle(
-      [minX, maxY, minZ],
-      [minX, minY, maxZ],
-      [minX, maxY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
+    createTriangle([minX, minY, minZ], [minX, minY, maxZ], [minX, maxY, minZ], color, specular, reflective),
+    createTriangle([minX, maxY, minZ], [minX, minY, maxZ], [minX, maxY, maxZ], color, specular, reflective),
     // right face
-    createTriangle(
-      [maxX, minY, minZ],
-      [maxX, maxY, minZ],
-      [maxX, minY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
-    createTriangle(
-      [maxX, maxY, minZ],
-      [maxX, maxY, maxZ],
-      [maxX, minY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
+    createTriangle([maxX, minY, minZ], [maxX, maxY, minZ], [maxX, minY, maxZ], color, specular, reflective),
+    createTriangle([maxX, maxY, minZ], [maxX, maxY, maxZ], [maxX, minY, maxZ], color, specular, reflective),
     // bottom face
-    createTriangle(
-      [minX, minY, minZ],
-      [maxX, minY, minZ],
-      [maxX, minY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
-    createTriangle(
-      [minX, minY, minZ],
-      [minX, minY, maxZ],
-      [maxX, minY, maxZ],
-      color,
-      specular,
-      reflective,
-    ),
+    createTriangle([minX, minY, minZ], [maxX, minY, minZ], [maxX, minY, maxZ], color, specular, reflective),
+    createTriangle([minX, minY, minZ], [minX, minY, maxZ], [maxX, minY, maxZ], color, specular, reflective),
   ];
 
   return Triangles;
@@ -152,19 +69,12 @@ export function computeTriangleNormal(V1: Vec3, V2: Vec3, V3: Vec3) {
   const perpToPlane: Vec3 = crossProduct(V12, V13);
 
   // scale to unit length for normal
-  const normalToPlane: Vec3 = scaleVectorV3(
-    perpToPlane,
-    1 / magnitudeV3(perpToPlane),
-  );
+  const normalToPlane: Vec3 = scaleVectorV3(perpToPlane, 1 / magnitudeV3(perpToPlane));
 
   return normalToPlane;
 }
 
-export function computeTriangleIntersection(
-  O: Vec3,
-  D: Vec3,
-  triangle: Triangle,
-): HitRecord | null {
+export function computeTriangleIntersection(O: Vec3, D: Vec3, triangle: Triangle): HitRecord | null {
   // if D dot N is 0 then our directional ray
   // is perpendicular to the normal N of our triangle.
   const dotProduct: number = dotVectorsV3(D, triangle.normal);
@@ -189,12 +99,9 @@ export function computeTriangleIntersection(
   const E3: Vec3 = subtractVectors(triangle.V1, triangle.V3);
   const Vp3: Vec3 = subtractVectors(P, triangle.V3);
 
-  const leftOfE1: boolean =
-    dotVectorsV3(crossProduct(E1, Vp1), triangle.normal) >= 0;
-  const leftOfE2: boolean =
-    dotVectorsV3(crossProduct(E2, Vp2), triangle.normal) >= 0;
-  const leftOfE3: boolean =
-    dotVectorsV3(crossProduct(E3, Vp3), triangle.normal) >= 0;
+  const leftOfE1: boolean = dotVectorsV3(crossProduct(E1, Vp1), triangle.normal) >= 0;
+  const leftOfE2: boolean = dotVectorsV3(crossProduct(E2, Vp2), triangle.normal) >= 0;
+  const leftOfE3: boolean = dotVectorsV3(crossProduct(E3, Vp3), triangle.normal) >= 0;
 
   // the point P is in our plane, and within our triangle
   if (leftOfE1 && leftOfE2 && leftOfE3) {
