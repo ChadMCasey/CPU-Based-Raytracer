@@ -1,6 +1,4 @@
 import { Triangle } from "../Utility/types";
-import { createTriangle } from "../Utility/triangleUtils";
+import { createTriangle, createCube } from "../Utility/triangleUtils";
 
-export const triangles: Triangle[] = [
-  createTriangle([-1, 1, 5], [1, 1, 5], [0, 2, 4], [255, 0, 0], 500, 0.3),
-];
+export const triangles: Triangle[] = [...createCube([0, 1, 3], 1, [200, 0, 255], 400, 0.8)];

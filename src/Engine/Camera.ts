@@ -5,17 +5,14 @@ import {
   computeRz,
   multiplyRotationalMatrices,
 } from "../Utility/mathUtils";
-import { Vec3, Rotation, Camera } from "../Utility/types";
-import { ASPECT_RATIO, CAMERA_ORIENTATION_SPEED } from "../Utility/constants";
-
-// Camera defaults
-const CAMERA_POS: Vec3 = [0, 0, 0];
-const CAMERA_ROTATION: Rotation = { pitch: 0, yaw: 0, roll: 0 };
-const CAMERA_ROTATION_MATRIX: number[][] = [
-  [1, 0, 0],
-  [0, 1, 0],
-  [0, 0, 1],
-];
+import { Vec3, Camera } from "../Utility/types";
+import {
+  ASPECT_RATIO,
+  CAMERA_ORIENTATION_SPEED,
+  CAMERA_POS,
+  CAMERA_ROTATION,
+  CAMERA_ROTATION_MATRIX,
+} from "../Utility/constants";
 
 export const camera: Camera = {
   viewportDistance: 1,
