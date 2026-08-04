@@ -105,3 +105,11 @@ export type AmbientLight = {
 
 export type Primative = Sphere | Triangle;
 export type Light = AmbientLight | DirectionLight | PointLight;
+
+export type BVHNode = {
+  left?: BVHNode;
+  right?: BVHNode;
+  minVals: Vec3;
+  maxVals: Vec3;
+  triangles?: Triangle[];
+};

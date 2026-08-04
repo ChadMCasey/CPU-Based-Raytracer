@@ -1,8 +1,27 @@
-import { Vec3, ScenePayload, PointLight, Light, SceneIntersection, DirectionLight } from "./types";
-import { reflectVector, dotVectorsV3, magnitudeV3, subtractVectors, closestIntersection } from "./mathUtils";
+import {
+  Vec3,
+  ScenePayload,
+  PointLight,
+  Light,
+  SceneIntersection,
+  DirectionLight,
+} from "./types";
+import {
+  reflectVector,
+  dotVectorsV3,
+  magnitudeV3,
+  subtractVectors,
+  closestIntersection,
+} from "./mathUtils";
 import { MIN_T } from "./constants";
 
-export function computeLighting(P: Vec3, N: Vec3, V: Vec3, specular: number, scenePayload: ScenePayload): number {
+export function computeLighting(
+  P: Vec3,
+  N: Vec3,
+  V: Vec3,
+  specular: number,
+  scenePayload: ScenePayload,
+): number {
   let intensity: number = 0.0;
 
   for (let light of scenePayload.sceneData.lights) {
@@ -11,10 +30,24 @@ export function computeLighting(P: Vec3, N: Vec3, V: Vec3, specular: number, sce
         intensity += computeAmbientLighting(light);
         break;
       case "directional":
-        intensity += computeDirectionalLighting(P, N, V, specular, light, scenePayload);
+        intensity += computeDirectionalLighting(
+          P,
+          N,
+          V,
+          specular,
+          light,
+          scenePayload,
+        );
         break;
       case "point":
-        intensity += computePointLighting(P, N, V, specular, light, scenePayload);
+        intensity += computePointLighting(
+          P,
+          N,
+          V,
+          specular,
+          light,
+          scenePayload,
+        );
         break;
     }
   }
@@ -53,10 +86,20 @@ export function computeDirectionalLighting(
 
     if (DotNL < 0) return 0;
 
-    const diffuseScalar: number = computeDirectionalScalarDiffuse(N, lightDirectionFromP, DotNL);
-    const specularScalar: number = computeDirectionalScalarHighlight(N, V, specular, lightDirectionFromP);
+    const diffuseScalar: number = computeDirectionalScalarDiffuse(
+      N,
+      lightDirectionFromP,
+      DotNL,
+    );
+    const specularScalar: number = computeDirectionalScalarHighlight(
+      N,
+      V,
+      specular,
+      lightDirectionFromP,
+    );
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
 
     return totalContributedIllumination;
@@ -66,11 +109,20 @@ export function computeDirectionalLighting(
   return 0;
 }
 
-function computeDirectionalScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
+function computeDirectionalScalarDiffuse(
+  N: Vec3,
+  L: Vec3,
+  DotNL: number,
+): number {
   return DotNL / (magnitudeV3(L) * magnitudeV3(N));
 }
 
-function computeDirectionalScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
+function computeDirectionalScalarHighlight(
+  N: Vec3,
+  V: Vec3,
+  s: number,
+  L: Vec3,
+): number {
   if (s === -1) return -1;
 
   const R: Vec3 = reflectVector(L, N);
@@ -117,7 +169,8 @@ function computePointLighting(
     const diffuseScalar: number = computePointScalarDiffuse(N, L, DotNL);
     const specularScalar: number = computePointScalarHighlight(N, V, s, L);
 
-    const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
+    const totalScalar: number =
+      (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
 
     return totalContributedIllumination;
@@ -127,7 +180,12 @@ function computePointLighting(
   return 0;
 }
 
-export function computePointScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
+export function computePointScalarHighlight(
+  N: Vec3,
+  V: Vec3,
+  s: number,
+  L: Vec3,
+): number {
   if (s === -1) return -1;
 
   const R: Vec3 = reflectVector(L, N);
@@ -143,6 +201,10 @@ export function computePointScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3
   return specularScalar;
 }
 
-export function computePointScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
+export function computePointScalarDiffuse(
+  N: Vec3,
+  L: Vec3,
+  DotNL: number,
+): number {
   return DotNL / (magnitudeV3(L) * magnitudeV3(N));
 }

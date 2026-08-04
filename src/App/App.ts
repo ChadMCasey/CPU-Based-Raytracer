@@ -22,7 +22,12 @@ class App {
     this.renderTarget = new RenderTarget();
     this.parallelize = new Parallelize();
     this.controller = new Controller(this.camera, this.renderTarget);
-    this.renderer = new Renderer(this.renderTarget, sceneData, this.camera, this.parallelize);
+    this.renderer = new Renderer(
+      this.renderTarget,
+      sceneData,
+      this.camera,
+      this.parallelize,
+    );
   }
 
   async runAppLoop(currentTime: number): Promise<void> {
