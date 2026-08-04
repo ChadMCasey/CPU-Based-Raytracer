@@ -107,9 +107,9 @@ export type Primative = Sphere | Triangle;
 export type Light = AmbientLight | DirectionLight | PointLight;
 
 export type BVHNode = {
-  left?: BVHNode;
-  right?: BVHNode;
+  left: BVHNode | null;
+  right: BVHNode | null;
   minVals: Vec3;
   maxVals: Vec3;
-  triangles?: Triangle[];
+  triangles: Triangle[] | null;
 };
