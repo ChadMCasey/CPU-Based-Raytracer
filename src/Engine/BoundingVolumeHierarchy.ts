@@ -1,8 +1,38 @@
-import { Triangle, BVHNode } from "../Utility/types";
+import { Triangle, BVHNode, Vec3 } from "../Utility/types";
+
+export function generateBVHNodeTBounds(
+  box: BVHNode,
+  O: Vec3,
+  D: Vec3,
+): [number, number] {
+  // compute min scalar t's for ray-box intersections
+  const tx1: number = (box.minVals[0] - O[0]) / D[0];
+  const ty1: number = (box.minVals[1] - O[1]) / D[1];
+  const tz1: number = (box.minVals[2] - O[2]) / D[2];
+
+  // compute max scalar t's for ray-box intersections
+  const tx2: number = (box.maxVals[0] - O[0]) / D[0];
+  const ty2: number = (box.maxVals[1] - O[1]) / D[1];
+  const tz2: number = (box.maxVals[2] - O[2]) / D[2];
+
+  const xEntry: number = Math.min(tx1, tx2);
+  const xExit: number = Math.max(tx1, tx2);
+
+  const yEntry: number = Math.min(ty1, ty2);
+  const yExit: number = Math.max(ty1, ty2);
+
+  const zEntry: number = Math.min(tz1, tz2);
+  const zExit: number = Math.max(tz1, tz2);
+
+  const boxEntry: number = Math.max(xEntry, yEntry, zEntry);
+  const boxExit: number = Math.min(xExit, yExit, zExit);
+
+  return [boxEntry, boxExit];
+}
 
 // generate the BVH tree
 export function generateBVH(triangles: Triangle[]): BVHNode | null {
-  // (1) edge case - starting up the app with no polygons in the scene at all
+  // (1) edge case - starting up the app with no polygons
   if (triangles.length === 0) return null;
 
   // (2) determine the longest axis

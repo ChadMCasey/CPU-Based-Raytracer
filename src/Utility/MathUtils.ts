@@ -5,9 +5,11 @@ import {
   SceneIntersection,
   Primative,
   HitRecord,
+  BVHNode,
 } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
+import { generateBVHNodeTBounds } from "../Engine/BoundingVolumeHierarchy";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -172,12 +174,55 @@ export function closestIntersection(
 ): SceneIntersection | null {
   let closestT: number = Number.POSITIVE_INFINITY;
   let closestIntersection: SceneIntersection | null = null;
+  let bvhRoot = scenePayload.sceneData.bvh;
 
-  for (let object of scenePayload.sceneData.primatives) {
-    const intersection: HitRecord | null = computeIntersection(O, D, object);
+  if (!bvhRoot) return null;
 
+  const stack: BVHNode[] = [bvhRoot];
+  while (stack.length > 0) {
+    const box = stack.pop();
+    if (!box) continue;
+
+    const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, O, D);
+    if (boxExitT < boxEntryT) continue; // the ray is never fully contained within the box, cull it
+    if (boxExitT < 1) continue; // the ray exits the box in front of the viewport plane, cull it
+    if (boxEntryT > closestT) continue; // if the box is beyond our closest intersection, cull it
+
+    // non leaf case, examine the children nodes
+    if (!box.triangles) {
+      if (box.left) stack.push(box.left);
+      if (box.right) stack.push(box.right);
+    } else {
+      // leaf case, compute ray triangle intersections
+      for (let triangle of box.triangles) {
+        const intersection: HitRecord | null = computeIntersection(
+          O,
+          D,
+          triangle,
+        );
+        if (!intersection) continue;
+        if (
+          intersection.distance >= minT &&
+          intersection.distance <= maxT &&
+          intersection.distance < closestT
+        ) {
+          closestT = intersection.distance;
+          closestIntersection = {
+            distance: intersection.distance,
+            position: intersection.position,
+            normal: intersection.normal,
+            object: triangle,
+          };
+        }
+      }
+    }
+  }
+
+  // disgusting second loop for spheres - for the love of god fix this chad
+  for (let primitive of scenePayload.sceneData.primatives) {
+    if (primitive.type !== "sphere") continue;
+    const intersection: HitRecord | null = computeIntersection(O, D, primitive);
     if (!intersection) continue;
-
     if (
       intersection.distance >= minT &&
       intersection.distance <= maxT &&
@@ -188,7 +233,7 @@ export function closestIntersection(
         distance: intersection.distance,
         position: intersection.position,
         normal: intersection.normal,
-        object: object,
+        object: primitive,
       };
     }
   }

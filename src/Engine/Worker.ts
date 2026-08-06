@@ -38,7 +38,7 @@ self.addEventListener("message", (event: MessageEvent) => {
   // iterate section of render target upon which our calculations will be done
   for (let y = startY; y < startY + height; y++) {
     for (let x = startX; x < startX + width; x++) {
-      // transform (x,y) into coordinates defined by a 2d cartesian plane
+      // transform (x,y) into coordinates defined by a 2D cartesian plane
       const [cartX, cartY] = mapToCartesianPoints(
         targetWidth,
         targetHeight,

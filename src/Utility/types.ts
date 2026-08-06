@@ -52,6 +52,7 @@ export type Rotation = {
 export type SceneData = {
   lights: Light[];
   primatives: Primative[];
+  bvh: BVHNode | null;
 };
 
 export type ScenePayload = {

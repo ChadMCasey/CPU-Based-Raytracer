@@ -12,12 +12,14 @@ import {
   CAMERA_POS,
   CAMERA_ROTATION,
   CAMERA_ROTATION_MATRIX,
+  VIEWPORT_DISTANCE,
+  VIEWPORT_HEIGHT,
 } from "../Utility/constants";
 
 export const camera: Camera = {
-  viewportDistance: 1,
-  viewportHeight: 1,
-  viewportWidth: 1 * ASPECT_RATIO(),
+  viewportDistance: VIEWPORT_DISTANCE,
+  viewportHeight: VIEWPORT_HEIGHT,
+  viewportWidth: VIEWPORT_HEIGHT * ASPECT_RATIO(),
   position: CAMERA_POS,
   rotation: CAMERA_ROTATION,
   rotationMatrix: CAMERA_ROTATION_MATRIX,
