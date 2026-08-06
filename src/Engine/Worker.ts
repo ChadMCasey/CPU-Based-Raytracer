@@ -33,6 +33,7 @@ self.addEventListener("message", (event: MessageEvent) => {
     targetHeight,
     viewportWidth,
     viewportHeight,
+    viewportDistance,
   }: Task = event.data.openTask;
 
   // iterate section of render target upon which our calculations will be done
@@ -70,6 +71,7 @@ self.addEventListener("message", (event: MessageEvent) => {
         Number.POSITIVE_INFINITY,
         MAX_REFLECT_RECUR,
         scenePayload,
+        viewportDistance,
       );
 
       // write color data to buffer
@@ -114,6 +116,7 @@ function traceRay(
   maxT: number,
   recurLeft: number,
   scenePayload: ScenePayload,
+  viewportDistance: number,
 ): RGB {
   // we first need to find the closest intersection between the ray and the scene objects
   const intersection: SceneIntersection | null = closestIntersection(
@@ -122,6 +125,7 @@ function traceRay(
     minT,
     maxT,
     scenePayload,
+    viewportDistance,
   );
 
   // return default background color if no intersection
@@ -134,6 +138,7 @@ function traceRay(
     scaleVectorV3(rotatedD, -1),
     intersection.object.specular,
     scenePayload,
+    viewportDistance,
   );
 
   // compute the local color, scale color by intensity of light
@@ -158,6 +163,7 @@ function traceRay(
     Number.POSITIVE_INFINITY,
     recurLeft - 1,
     scenePayload,
+    viewportDistance,
   );
 
   // aggregate color data for reflection + local color

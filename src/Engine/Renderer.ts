@@ -34,8 +34,7 @@ export default class Renderer {
     await this.parallelize.renderFrame(
       this.renderTarget.width,
       this.renderTarget.height,
-      this.camera.viewportWidth,
-      this.camera.viewportHeight,
+      this.camera,
       BANDS,
       scenePayload,
       this.renderTarget.sharedArrayBuffer,

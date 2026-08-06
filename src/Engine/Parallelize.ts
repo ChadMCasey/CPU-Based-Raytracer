@@ -1,4 +1,4 @@
-import { ScenePayload, Task } from "../Utility/types";
+import { ScenePayload, Task, Camera } from "../Utility/types";
 
 export default class Parallelize {
   // cores available for parallelization
@@ -54,8 +54,7 @@ export default class Parallelize {
   private createTasks(
     Cw: number,
     Ch: number,
-    Vw: number,
-    Vh: number,
+    camera: Camera,
     bands: number,
   ): Task[] {
     // clear existing tasks
@@ -74,8 +73,9 @@ export default class Parallelize {
         height: bandHeight,
         targetWidth: Cw,
         targetHeight: Ch,
-        viewportWidth: Vw,
-        viewportHeight: Vh,
+        viewportWidth: camera.viewportWidth,
+        viewportHeight: camera.viewportHeight,
+        viewportDistance: camera.viewportDistance,
       });
     }
 
@@ -87,15 +87,14 @@ export default class Parallelize {
   public async renderFrame(
     Cw: number,
     Ch: number,
-    Vw: number,
-    Vh: number,
+    camera: Camera,
     bands: number,
     scenePayload: ScenePayload,
     sharedArrayBuffer: Uint8ClampedArray,
     updateScreenCallback: Function,
   ): Promise<void> {
     return new Promise((resolve) => {
-      this.createTasks(Cw, Ch, Vw, Vh, bands);
+      this.createTasks(Cw, Ch, camera, bands);
       this.scenePayload = scenePayload;
       this.sharedArrayBuffer = sharedArrayBuffer;
       this.updateScreenCallback = updateScreenCallback;

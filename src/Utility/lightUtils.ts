@@ -21,6 +21,7 @@ export function computeLighting(
   V: Vec3,
   specular: number,
   scenePayload: ScenePayload,
+  viewportDistance: number,
 ): number {
   let intensity: number = 0.0;
 
@@ -37,6 +38,7 @@ export function computeLighting(
           specular,
           light,
           scenePayload,
+          viewportDistance,
         );
         break;
       case "point":
@@ -47,6 +49,7 @@ export function computeLighting(
           specular,
           light,
           scenePayload,
+          viewportDistance,
         );
         break;
     }
@@ -66,6 +69,7 @@ export function computeDirectionalLighting(
   specular: number,
   light: DirectionLight,
   scenePayload: ScenePayload,
+  viewportDistance: number,
 ) {
   // shadow properties
   const lightDirectionFromP: Vec3 = light.direction;
@@ -78,6 +82,7 @@ export function computeDirectionalLighting(
     MIN_T,
     maxT,
     scenePayload,
+    viewportDistance,
   );
 
   // no obstruction so add in lighting
@@ -145,6 +150,7 @@ function computePointLighting(
   s: number,
   light: PointLight,
   scenePayload: ScenePayload,
+  viewportDistance: number,
 ): number {
   // shadow properties
   const lightDirectionFromP: Vec3 = subtractVectors(light.position, P);
@@ -157,6 +163,7 @@ function computePointLighting(
     MIN_T,
     maxT,
     scenePayload,
+    viewportDistance,
   );
 
   // no obstruction so add in lighting
