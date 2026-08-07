@@ -111,6 +111,7 @@ export type Light = AmbientLight | DirectionLight | PointLight;
 export type BVHNode = {
   left: BVHNode | null;
   right: BVHNode | null;
+  splitAxis: number; // axis along which node was partitioned
   minVals: Vec3;
   maxVals: Vec3;
   triangles: Triangle[] | null;

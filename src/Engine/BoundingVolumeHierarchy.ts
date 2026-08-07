@@ -6,7 +6,7 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
   if (triangles.length === 0) return null;
 
   // (2) determine the longest axis
-  const { minX, maxX, minY, maxY, minZ, maxZ, axis } =
+  const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } =
     determineLongestAxis(triangles);
 
   // (3) leaf node case - no children, has triangles attached
@@ -14,6 +14,7 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
     return {
       left: null,
       right: null,
+      splitAxis,
       minVals: [minX, minY, minZ],
       maxVals: [maxX, maxY, maxZ],
       triangles,
@@ -21,7 +22,10 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
   }
 
   // (4) partition the triangles along the longest axis
-  const [leftTriangles, rightTriangles] = partitionTriangles(triangles, axis);
+  const [leftTriangles, rightTriangles] = partitionTriangles(
+    triangles,
+    splitAxis,
+  );
 
   // (5) generate children nodes
   const leftNode: BVHNode | null = generateBVH(leftTriangles);
@@ -31,6 +35,7 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
   return {
     left: leftNode,
     right: rightNode,
+    splitAxis,
     minVals: [minX, minY, minZ],
     maxVals: [maxX, maxY, maxZ],
     triangles: null,
@@ -59,7 +64,8 @@ function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
   const zAxisLen: number = maxZ - minZ;
 
   const maxAxisLen = Math.max(xAxisLen, yAxisLen, zAxisLen);
-  const axis = xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
+  const splitAxis: 0 | 1 | 2 =
+    xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
 
   return {
     minX,
@@ -68,7 +74,7 @@ function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
     maxY,
     minZ,
     maxZ,
-    axis,
+    splitAxis,
   };
 }
 

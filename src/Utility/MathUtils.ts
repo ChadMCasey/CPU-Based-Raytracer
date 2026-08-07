@@ -204,8 +204,14 @@ export function closestIntersection(
 
     // non leaf case, examine the children nodes
     if (!box.triangles) {
-      if (box.left) stack.push(box.left);
-      if (box.right) stack.push(box.right);
+      const left = box.left;
+      const right = box.right;
+      if (left && !right) stack.push(left); // left only
+      if (!left && right) stack.push(right); // right only
+      if (left && right)
+        D[box.splitAxis] > 0
+          ? stack.push(right, left)
+          : stack.push(left, right);
     } else {
       // leaf case, compute ray triangle intersections
       for (let primitive of box.triangles) {
