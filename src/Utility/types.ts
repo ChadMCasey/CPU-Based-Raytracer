@@ -23,6 +23,7 @@ export type Task = {
   targetHeight: number;
   viewportWidth: number;
   viewportHeight: number;
+  viewportDistance: number;
 };
 
 // a generic scene intersection
@@ -30,7 +31,7 @@ export type SceneIntersection = {
   distance: number;
   position: Vec3;
   normal: Vec3;
-  object: Primative;
+  object: Primitive;
 };
 
 export type Camera = {
@@ -51,7 +52,8 @@ export type Rotation = {
 
 export type SceneData = {
   lights: Light[];
-  primatives: Primative[];
+  primatives: Primitive[];
+  bvh: BVHNode | null;
 };
 
 export type ScenePayload = {
@@ -103,5 +105,14 @@ export type AmbientLight = {
   color: [number, number, number];
 };
 
-export type Primative = Sphere | Triangle;
+export type Primitive = Sphere | Triangle;
 export type Light = AmbientLight | DirectionLight | PointLight;
+
+export type BVHNode = {
+  left: BVHNode | null;
+  right: BVHNode | null;
+  splitAxis: number; // axis along which node was partitioned
+  minVals: Vec3;
+  maxVals: Vec3;
+  triangles: Triangle[] | null;
+};

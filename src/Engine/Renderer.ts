@@ -10,7 +10,12 @@ export default class Renderer {
   private renderTarget: RenderTarget;
   private parallelize: Parallelize;
 
-  constructor(renderTarget: RenderTarget, sceneData: SceneData, camera: Camera, parallel: Parallelize) {
+  constructor(
+    renderTarget: RenderTarget,
+    sceneData: SceneData,
+    camera: Camera,
+    parallel: Parallelize,
+  ) {
     this.renderTarget = renderTarget;
     this.sceneData = sceneData;
     this.camera = camera;
@@ -29,8 +34,7 @@ export default class Renderer {
     await this.parallelize.renderFrame(
       this.renderTarget.width,
       this.renderTarget.height,
-      this.camera.viewportWidth,
-      this.camera.viewportHeight,
+      this.camera,
       BANDS,
       scenePayload,
       this.renderTarget.sharedArrayBuffer,
