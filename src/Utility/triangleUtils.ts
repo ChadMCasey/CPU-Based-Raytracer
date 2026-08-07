@@ -137,6 +137,23 @@ export function createCube(
       specular,
       reflective,
     ),
+    // top face
+    createTriangle(
+      [minX, maxY, minZ],
+      [maxX, maxY, minZ],
+      [maxX, maxY, maxZ],
+      color,
+      specular,
+      reflective,
+    ),
+    createTriangle(
+      [minX, maxY, minZ],
+      [minX, maxY, maxZ],
+      [maxX, maxY, maxZ],
+      color,
+      specular,
+      reflective,
+    ),
   ];
 
   return Triangles;
