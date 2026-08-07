@@ -4,6 +4,7 @@ import {
   computeRy,
   computeRz,
   multiplyRotationalMatrices,
+  addVectors,
 } from "../Utility/mathUtils";
 import { Vec3, Camera } from "../Utility/types";
 import {
@@ -50,14 +51,9 @@ export function computeRotationMatrix(camera: Camera): number[][] {
   return camera.rotationMatrix; // cache hit
 }
 
-export function updateCameraX(camera: Camera, Dx: number): void {
-  camera.position[0] += Dx;
+export function updateCameraPosition(position: Vec3, movement: Vec3): Vec3 {
+  return addVectors(position, movement);
 }
-
-export function updateCameraZ(camera: Camera, Dz: number): void {
-  camera.position[2] += Dz;
-}
-
 export function updatePitch(camera: Camera, Dy: number): void {
   camera.rotation.pitch -= Dy * CAMERA_ORIENTATION_SPEED;
   camera.rotation.pitch = camera.rotation.pitch % 360;

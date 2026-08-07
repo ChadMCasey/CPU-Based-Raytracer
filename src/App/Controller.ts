@@ -1,16 +1,16 @@
 import { Camera } from "../Utility/types";
-import {
-  updateYaw,
-  updatePitch,
-  updateCameraX,
-  updateCameraZ,
-} from "../Engine/Camera";
+import { updateYaw, updatePitch, updateCameraPosition } from "../Engine/Camera";
 import {
   VALID_MOVEMENT_KEYS,
   CAMERA_MOVEMENT_SPEED,
 } from "../Utility/constants";
-import { Vec2 } from "../Utility/types";
-import { magnitudeV2, scaleVectorV2 } from "../Utility/mathUtils";
+import { Vec2, Vec3 } from "../Utility/types";
+import {
+  magnitudeV2,
+  scaleVectorV2,
+  scaleVectorV3,
+  addVectors,
+} from "../Utility/mathUtils";
 import RenderTarget from "../Engine/RenderTarget";
 
 // read user input and update application
@@ -80,9 +80,20 @@ export default class Controller {
     // normalize change in position based on time since last frame
     const Dx = (elapsedMs / 1000) * movementVector[0] * CAMERA_MOVEMENT_SPEED;
     const Dz = (elapsedMs / 1000) * movementVector[1] * CAMERA_MOVEMENT_SPEED;
+    const r: number[][] = this.camera.rotationMatrix;
 
-    updateCameraX(this.camera, Dx);
-    updateCameraZ(this.camera, Dz);
+    // grab the forward vector in the rotation matrix
+    const right: Vec3 = [r[0][0], r[1][0], r[2][0]];
+    const forward: Vec3 = [r[0][2], r[1][2], r[2][2]];
+
+    // scale the directional vectors by our Dx and Dz
+    const scaleRight: Vec3 = scaleVectorV3(right, Dx);
+    const scaleForward: Vec3 = scaleVectorV3(forward, Dz);
+
+    // compute the total movement in this frame
+    const movement: Vec3 = addVectors(scaleRight, scaleForward);
+
+    this.camera.position = updateCameraPosition(this.camera.position, movement);
   }
 
   updateCameraOrientation() {
