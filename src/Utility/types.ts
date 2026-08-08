@@ -68,7 +68,8 @@ export type ScenePayload = {
 export type Sphere = {
   type: "sphere";
   center: [number, number, number];
-  radius: number;
+  r: number;
+  rSquared: number;
   color: RGB;
   specular: number;
   reflective: number;

@@ -3,7 +3,8 @@ import { Sphere } from "../Utility/types";
 export const spheres: Sphere[] = [
   {
     type: "sphere",
-    radius: 1,
+    r: 1,
+    rSquared: 1 * 1,
     center: [0, -1, 3],
     color: [102, 197, 204],
     specular: 500,
@@ -11,7 +12,8 @@ export const spheres: Sphere[] = [
   },
   {
     type: "sphere",
-    radius: 1,
+    r: 1,
+    rSquared: 1 * 1,
     center: [2, 0, 4],
     color: [246, 207, 113],
     specular: 500,
@@ -19,7 +21,8 @@ export const spheres: Sphere[] = [
   },
   {
     type: "sphere",
-    radius: 1,
+    r: 1,
+    rSquared: 1 * 1,
     center: [-2, 0, 4],
     color: [248, 156, 116],
     specular: 10,
@@ -27,7 +30,8 @@ export const spheres: Sphere[] = [
   },
   {
     type: "sphere",
-    radius: 5000,
+    r: 5000,
+    rSquared: 5000 * 5000,
     center: [0, -5001, 0],
     color: [255, 255, 255],
     specular: 1000,

@@ -13,12 +13,12 @@ export function computeSphereIntersection(
   DdotD: number,
   sphere: Sphere,
 ) {
-  const r: number = sphere.radius;
+  const r: number = sphere.r;
   const CO: Vec3 = subtractVectors(O, sphere.center);
 
   const a: number = DdotD;
   const b: number = 2 * dotVectorsV3(CO, D);
-  const c: number = dotVectorsV3(CO, CO) - r * r;
+  const c: number = dotVectorsV3(CO, CO) - sphere.rSquared;
 
   const discriminantSquared: number = b ** 2 - 4 * a * c;
 
