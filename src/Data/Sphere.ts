@@ -1,36 +1,9 @@
 import { Sphere } from "../Utility/types";
+import { createSphere } from "../Utility/sphereUtils";
 
 export const spheres: Sphere[] = [
-  {
-    type: "sphere",
-    radius: 1,
-    center: [0, -1, 3],
-    color: [102, 197, 204],
-    specular: 500,
-    reflective: 0.2,
-  },
-  {
-    type: "sphere",
-    radius: 1,
-    center: [2, 0, 4],
-    color: [246, 207, 113],
-    specular: 500,
-    reflective: 0.3,
-  },
-  {
-    type: "sphere",
-    radius: 1,
-    center: [-2, 0, 4],
-    color: [248, 156, 116],
-    specular: 10,
-    reflective: 0.4,
-  },
-  {
-    type: "sphere",
-    radius: 5000,
-    center: [0, -5001, 0],
-    color: [255, 255, 255],
-    specular: 1000,
-    reflective: 0.5,
-  },
+  createSphere(1, [0, -1, 3], [102, 197, 204], 500, 0.2),
+  createSphere(1, [2, 0, 4], [246, 207, 113], 500, 0.3),
+  createSphere(1, [-2, 0, 4], [248, 156, 116], 10, 0.4),
+  createSphere(5000, [0, -5001, 0], [255, 255, 255], 1000, 0.5),
 ];

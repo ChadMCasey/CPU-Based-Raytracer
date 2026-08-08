@@ -10,12 +10,7 @@ export default class Renderer {
   private renderTarget: RenderTarget;
   private parallelize: Parallelize;
 
-  constructor(
-    renderTarget: RenderTarget,
-    sceneData: SceneData,
-    camera: Camera,
-    parallel: Parallelize,
-  ) {
+  constructor(renderTarget: RenderTarget, sceneData: SceneData, camera: Camera, parallel: Parallelize) {
     this.renderTarget = renderTarget;
     this.sceneData = sceneData;
     this.camera = camera;

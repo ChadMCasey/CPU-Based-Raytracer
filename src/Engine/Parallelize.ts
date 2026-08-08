@@ -25,8 +25,7 @@ export default class Parallelize {
       const worker = new Worker(new URL("./Worker.ts", import.meta.url), {
         type: "module",
       });
-      worker.onmessage = (event: MessageEvent) =>
-        this.handleWorkerResponse(worker);
+      worker.onmessage = (event: MessageEvent) => this.handleWorkerResponse(worker);
       this.workers.push(worker);
     }
   }
@@ -51,12 +50,7 @@ export default class Parallelize {
     }
   }
 
-  private createTasks(
-    Cw: number,
-    Ch: number,
-    camera: Camera,
-    bands: number,
-  ): Task[] {
+  private createTasks(Cw: number, Ch: number, camera: Camera, bands: number): Task[] {
     // clear existing tasks
     this.tasks = [];
 
@@ -73,8 +67,10 @@ export default class Parallelize {
         height: bandHeight,
         targetWidth: Cw,
         targetHeight: Ch,
-        viewportWidth: camera.viewportWidth,
-        viewportHeight: camera.viewportHeight,
+        halfTargetWidth: Cw / 2, // eliminate divison operations per ray trace
+        halfTargetHeight: Ch / 2, // eliminate divison operations per ray trace
+        viewportScaleX: camera.viewportWidth / Cw,
+        viewportScaleY: camera.viewportHeight / Ch,
         viewportDistance: camera.viewportDistance,
       });
     }

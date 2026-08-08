@@ -1,35 +1,31 @@
-import { Triangle, BVHNode, Vec3 } from "../Utility/types";
+import { Primitive, BVHNode, Vec3 } from "../Utility/types";
 
 // generate the BVH tree
-export function generateBVH(triangles: Triangle[]): BVHNode | null {
+export function generateBVH(primitives: Primitive[]): BVHNode | null {
   // (1) edge case - starting up the app with no polygons
-  if (triangles.length === 0) return null;
+  if (primitives.length === 0) return null;
 
   // (2) determine the longest axis
-  const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } =
-    determineLongestAxis(triangles);
+  const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } = determineLongestAxis(primitives);
 
-  // (3) leaf node case - no children, has triangles attached
-  if (triangles.length < 3) {
+  // (3) leaf node case - no children, has primitives attached
+  if (primitives.length < 3) {
     return {
       left: null,
       right: null,
       splitAxis,
       minVals: [minX, minY, minZ],
       maxVals: [maxX, maxY, maxZ],
-      triangles,
+      primitives,
     };
   }
 
-  // (4) partition the triangles along the longest axis
-  const [leftTriangles, rightTriangles] = partitionTriangles(
-    triangles,
-    splitAxis,
-  );
+  // (4) partition the primitives along the longest axis
+  const [leftPrimitives, rightPrimitves] = partitionPrimitives(primitives, splitAxis);
 
   // (5) generate children nodes
-  const leftNode: BVHNode | null = generateBVH(leftTriangles);
-  const rightNode: BVHNode | null = generateBVH(rightTriangles);
+  const leftNode: BVHNode | null = generateBVH(leftPrimitives);
+  const rightNode: BVHNode | null = generateBVH(rightPrimitves);
 
   // (6) pass the node up the call stack
   return {
@@ -38,25 +34,26 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
     splitAxis,
     minVals: [minX, minY, minZ],
     maxVals: [maxX, maxY, maxZ],
-    triangles: null,
+    primitives: null,
   };
 }
 
-function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
+function determineLongestAxis(primitives: Primitive[]): Record<string, number> {
   let minX: number = Number.POSITIVE_INFINITY;
-  let maxX: number = Number.NEGATIVE_INFINITY;
   let minY: number = Number.POSITIVE_INFINITY;
-  let maxY: number = Number.NEGATIVE_INFINITY;
   let minZ: number = Number.POSITIVE_INFINITY;
+
+  let maxX: number = Number.NEGATIVE_INFINITY;
+  let maxY: number = Number.NEGATIVE_INFINITY;
   let maxZ: number = Number.NEGATIVE_INFINITY;
 
-  for (let t of triangles) {
-    minX = Math.min(t.V1[0], t.V2[0], t.V3[0], minX);
-    maxX = Math.max(t.V1[0], t.V2[0], t.V3[0], maxX);
-    minY = Math.min(t.V1[1], t.V2[1], t.V3[1], minY);
-    maxY = Math.max(t.V1[1], t.V2[1], t.V3[1], maxY);
-    minZ = Math.min(t.V1[2], t.V2[2], t.V3[2], minZ);
-    maxZ = Math.max(t.V1[2], t.V2[2], t.V3[2], maxZ);
+  for (let p of primitives) {
+    minX = Math.min(p.bounds.minX, minX);
+    maxX = Math.max(p.bounds.maxX, maxX);
+    minY = Math.min(p.bounds.minY, minY);
+    maxY = Math.max(p.bounds.maxY, maxY);
+    minZ = Math.min(p.bounds.minZ, minZ);
+    maxZ = Math.max(p.bounds.maxZ, maxZ);
   }
 
   const xAxisLen: number = maxX - minX;
@@ -64,8 +61,7 @@ function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
   const zAxisLen: number = maxZ - minZ;
 
   const maxAxisLen = Math.max(xAxisLen, yAxisLen, zAxisLen);
-  const splitAxis: 0 | 1 | 2 =
-    xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
+  const splitAxis: 0 | 1 | 2 = xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
 
   return {
     minX,
@@ -78,39 +74,32 @@ function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
   };
 }
 
-function partitionTriangles(
-  triangles: Triangle[],
-  axis: number,
-): [Triangle[], Triangle[]] {
-  const sortedTriangles: Triangle[] = triangles.sort((a, b) => {
-    const aMinOnAxis = Math.min(a.V1[axis], a.V2[axis], a.V3[axis]);
-    const bMinOnAxis = Math.min(b.V1[axis], b.V2[axis], b.V3[axis]);
+function partitionPrimitives(primitives: Primitive[], axis: number): [Primitive[], Primitive[]] {
+  const sortedPrimitives: Primitive[] = primitives.sort((a, b) => {
+    const aMinOnAxis = axis === 0 ? a.bounds.minX : axis === 1 ? a.bounds.minY : a.bounds.minZ;
+    const bMinOnAxis = axis === 0 ? b.bounds.minX : axis === 1 ? b.bounds.minY : b.bounds.minZ;
     return aMinOnAxis - bMinOnAxis;
   });
 
-  const length = sortedTriangles.length;
+  const length = sortedPrimitives.length;
   const half = Math.floor(length / 2);
 
-  const leftHalf = sortedTriangles.slice(0, half);
-  const rightHalf = sortedTriangles.slice(half, length);
+  const leftHalf = sortedPrimitives.slice(0, half);
+  const rightHalf = sortedPrimitives.slice(half, length);
 
   return [leftHalf, rightHalf];
 }
 
-export function generateBVHNodeTBounds(
-  box: BVHNode,
-  O: Vec3,
-  D: Vec3,
-): [number, number] {
+export function generateBVHNodeTBounds(box: BVHNode, O: Vec3, invD: Vec3): [number, number] {
   // compute min scalar t's for ray-box intersections
-  const tx1: number = (box.minVals[0] - O[0]) / D[0];
-  const ty1: number = (box.minVals[1] - O[1]) / D[1];
-  const tz1: number = (box.minVals[2] - O[2]) / D[2];
+  const tx1: number = (box.minVals[0] - O[0]) * invD[0];
+  const ty1: number = (box.minVals[1] - O[1]) * invD[1];
+  const tz1: number = (box.minVals[2] - O[2]) * invD[2];
 
   // compute max scalar t's for ray-box intersections
-  const tx2: number = (box.maxVals[0] - O[0]) / D[0];
-  const ty2: number = (box.maxVals[1] - O[1]) / D[1];
-  const tz2: number = (box.maxVals[2] - O[2]) / D[2];
+  const tx2: number = (box.maxVals[0] - O[0]) * invD[0];
+  const ty2: number = (box.maxVals[1] - O[1]) * invD[1];
+  const tz2: number = (box.maxVals[2] - O[2]) * invD[2];
 
   const xEntry: number = Math.min(tx1, tx2);
   const xExit: number = Math.max(tx1, tx2);
@@ -139,7 +128,7 @@ export function determineValidBVHInteresection(
   // the ray exits the box in front of the viewport plane, cull it
   if (boxExitT < viewportDistance) return false;
 
-  // if the box is beyond our closest triangle intersection, cull it
+  // if the box is beyond our closest primitive intersection, cull it
   if (boxEntryT > closestT) return false;
 
   // the intersection is valid

@@ -21,8 +21,10 @@ export type Task = {
   height: number;
   targetWidth: number;
   targetHeight: number;
-  viewportWidth: number;
-  viewportHeight: number;
+  halfTargetWidth: number;
+  halfTargetHeight: number;
+  viewportScaleX: number;
+  viewportScaleY: number;
   viewportDistance: number;
 };
 
@@ -66,7 +68,9 @@ export type ScenePayload = {
 export type Sphere = {
   type: "sphere";
   center: [number, number, number];
-  radius: number;
+  bounds: Bounds;
+  r: number;
+  rSquared: number;
   color: RGB;
   specular: number;
   reflective: number;
@@ -77,10 +81,28 @@ export type Triangle = {
   V1: Vec3;
   V2: Vec3;
   V3: Vec3;
+  bounds: Bounds;
+  edges: Edges;
   color: RGB;
   specular: number;
   reflective: number;
   normal: Vec3;
+  planeDistance: number;
+};
+
+export type Bounds = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
+};
+
+export type Edges = {
+  E1: Vec3;
+  E2: Vec3;
+  E3: Vec3;
 };
 
 // LIGHTING
@@ -114,5 +136,5 @@ export type BVHNode = {
   splitAxis: number; // axis along which node was partitioned
   minVals: Vec3;
   maxVals: Vec3;
-  triangles: Triangle[] | null;
+  primitives: Primitive[] | null;
 };

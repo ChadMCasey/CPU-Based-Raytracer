@@ -1,24 +1,16 @@
 import { computeLighting } from "../Utility/lightUtils";
-import {
-  RGB,
-  ScenePayload,
-  Task,
-  Vec3,
-  SceneIntersection,
-} from "../Utility/types";
-import {
-  MAX_REFLECT_RECUR,
-  CANVAS_DEFAULT_BACKGROUND,
-  MIN_T,
-} from "../Utility/constants";
+import { RGB, ScenePayload, Task, Vec3, SceneIntersection } from "../Utility/types";
+import { MAX_REFLECT_RECUR, CANVAS_DEFAULT_BACKGROUND, MIN_T } from "../Utility/constants";
 import {
   addVectors,
   scaleVectorV3,
   multiplyDirectionByRotation,
   reflectVector,
   computeDirectionalVector,
-  mapToCartesianPoints,
+  mapToCartesianX,
+  mapToCartesianY,
   closestIntersection,
+  dotVectorsV3,
 } from "../Utility/mathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
@@ -31,37 +23,27 @@ self.addEventListener("message", (event: MessageEvent) => {
     height,
     targetWidth,
     targetHeight,
-    viewportWidth,
-    viewportHeight,
+    halfTargetWidth,
+    halfTargetHeight,
+    viewportScaleX,
+    viewportScaleY,
     viewportDistance,
   }: Task = event.data.openTask;
 
   // iterate section of render target upon which our calculations will be done
   for (let y = startY; y < startY + height; y++) {
+    // map to 2D cartesian plane from canvas coords
+    const cartY = mapToCartesianY(halfTargetHeight, y);
+
     for (let x = startX; x < startX + width; x++) {
-      // transform (x,y) into coordinates defined by a 2D cartesian plane
-      const [cartX, cartY] = mapToCartesianPoints(
-        targetWidth,
-        targetHeight,
-        x,
-        y,
-      );
+      // map to 2D cartesian plane from canvas coords
+      const cartX = mapToCartesianX(halfTargetWidth, x);
 
       // compute D from the origin to the point on the viewport
-      const rawD: Vec3 = computeDirectionalVector(
-        targetWidth,
-        targetHeight,
-        viewportWidth,
-        viewportHeight,
-        cartX,
-        cartY,
-      );
+      const rawD: Vec3 = computeDirectionalVector(viewportScaleX, viewportScaleY, cartX, cartY);
 
       // rotate D to account for camera rotation
-      const rotatedD: Vec3 = multiplyDirectionByRotation(
-        scenePayload.cameraRotation,
-        rawD,
-      );
+      const rotatedD: Vec3 = multiplyDirectionByRotation(scenePayload.cameraRotation, rawD);
 
       // trace ray (this will originate D from the cameras position)
       const computedColor: RGB = traceRay(
@@ -75,13 +57,7 @@ self.addEventListener("message", (event: MessageEvent) => {
       );
 
       // write color data to buffer
-      writeColorDataToBuffer(
-        sharedArrayBuffer,
-        computedColor,
-        targetWidth,
-        x,
-        y,
-      );
+      writeColorDataToBuffer(sharedArrayBuffer, computedColor, targetWidth, x, y);
     }
   }
 
@@ -122,6 +98,7 @@ function traceRay(
   const intersection: SceneIntersection | null = closestIntersection(
     cameraPOS,
     rotatedD,
+    dotVectorsV3(rotatedD, rotatedD),
     minT,
     maxT,
     scenePayload,
@@ -142,20 +119,14 @@ function traceRay(
   );
 
   // compute the local color, scale color by intensity of light
-  const localColor: RGB = scaleVectorV3(
-    intersection.object.color,
-    lightIntensity,
-  );
+  const localColor: RGB = scaleVectorV3(intersection.object.color, lightIntensity);
 
   // if an object is not reflective or we hit our recur limit, return local color
   const reflective: number = intersection.object.reflective;
   if (recurLeft <= 0 || reflective <= 0) return localColor;
 
   // otherwise compute the reflected color
-  const R: Vec3 = reflectVector(
-    scaleVectorV3(rotatedD, -1),
-    intersection.normal,
-  );
+  const R: Vec3 = reflectVector(scaleVectorV3(rotatedD, -1), intersection.normal);
   const reflectedColor: RGB = traceRay(
     intersection.position,
     R,

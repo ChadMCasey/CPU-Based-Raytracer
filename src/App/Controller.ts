@@ -1,16 +1,8 @@
 import { Camera } from "../Utility/types";
 import { updateYaw, updatePitch, updateCameraPosition } from "../Engine/Camera";
-import {
-  VALID_MOVEMENT_KEYS,
-  CAMERA_MOVEMENT_SPEED,
-} from "../Utility/constants";
+import { VALID_MOVEMENT_KEYS, CAMERA_MOVEMENT_SPEED } from "../Utility/constants";
 import { Vec2, Vec3 } from "../Utility/types";
-import {
-  magnitudeV2,
-  scaleVectorV2,
-  scaleVectorV3,
-  addVectors,
-} from "../Utility/mathUtils";
+import { magnitudeV2, scaleVectorV2, scaleVectorV3, addVectors } from "../Utility/mathUtils";
 import RenderTarget from "../Engine/RenderTarget";
 
 // read user input and update application
@@ -82,7 +74,7 @@ export default class Controller {
     const Dz = (elapsedMs / 1000) * movementVector[1] * CAMERA_MOVEMENT_SPEED;
     const r: number[][] = this.camera.rotationMatrix;
 
-    // grab the forward vector in the rotation matrix
+    // grab directional vectors of the cameras rotation matrix
     const right: Vec3 = [r[0][0], r[1][0], r[2][0]];
     const forward: Vec3 = [r[0][2], r[1][2], r[2][2]];
 
