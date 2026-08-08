@@ -1,10 +1,11 @@
 // dependent services
 import Renderer from "../Engine/Renderer";
 import RenderTarget from "../Engine/RenderTarget";
-import { sceneData } from "../Engine/Scene";
-import { camera } from "../Engine/Camera";
 import Controller from "./Controller";
 import Parallelize from "../Engine/Parallelize";
+import UIManager from "./UIManager";
+import { sceneData } from "../Engine/Scene";
+import { camera } from "../Engine/Camera";
 import { Camera } from "../Utility/types";
 
 // the main app class, responsible for orchestrating the entire application
@@ -14,22 +15,29 @@ class App {
   private readonly renderer: Renderer;
   private readonly controller: Controller;
   private readonly parallelize: Parallelize;
+  private readonly uiManager: UIManager;
 
-  private lastTime: number = 0;
+  private lastFrame: number = 0;
 
   constructor(camera: Camera) {
     this.camera = camera;
     this.renderTarget = new RenderTarget();
     this.parallelize = new Parallelize();
     this.controller = new Controller(this.camera, this.renderTarget);
+    this.uiManager = new UIManager();
     this.renderer = new Renderer(this.renderTarget, sceneData, this.camera, this.parallelize);
   }
 
   async runAppLoop(currentTime: number): Promise<void> {
-    // the scene responds to user input
-    this.controller.update(currentTime - this.lastTime);
+    const frameDelta = currentTime - this.lastFrame;
 
-    this.lastTime = currentTime;
+    // controller handles user input & orchestrates with scene
+    this.controller.update(frameDelta);
+
+    // the UI manager is an abstraction that communicates with our UI layer
+    this.uiManager.update(frameDelta);
+
+    this.lastFrame = currentTime;
 
     // the scene can be drawn now
     await this.renderer.render();
