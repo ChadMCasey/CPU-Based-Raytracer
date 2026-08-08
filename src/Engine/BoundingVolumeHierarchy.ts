@@ -6,8 +6,7 @@ export function generateBVH(primitives: Primitive[]): BVHNode | null {
   if (primitives.length === 0) return null;
 
   // (2) determine the longest axis
-  const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } =
-    determineLongestAxis(primitives);
+  const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } = determineLongestAxis(primitives);
 
   // (3) leaf node case - no children, has primitives attached
   if (primitives.length < 3) {
@@ -22,10 +21,7 @@ export function generateBVH(primitives: Primitive[]): BVHNode | null {
   }
 
   // (4) partition the primitives along the longest axis
-  const [leftPrimitives, rightPrimitves] = partitionPrimitives(
-    primitives,
-    splitAxis,
-  );
+  const [leftPrimitives, rightPrimitves] = partitionPrimitives(primitives, splitAxis);
 
   // (5) generate children nodes
   const leftNode: BVHNode | null = generateBVH(leftPrimitives);
@@ -65,8 +61,7 @@ function determineLongestAxis(primitives: Primitive[]): Record<string, number> {
   const zAxisLen: number = maxZ - minZ;
 
   const maxAxisLen = Math.max(xAxisLen, yAxisLen, zAxisLen);
-  const splitAxis: 0 | 1 | 2 =
-    xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
+  const splitAxis: 0 | 1 | 2 = xAxisLen === maxAxisLen ? 0 : yAxisLen === maxAxisLen ? 1 : 2;
 
   return {
     minX,
@@ -79,15 +74,10 @@ function determineLongestAxis(primitives: Primitive[]): Record<string, number> {
   };
 }
 
-function partitionPrimitives(
-  primitives: Primitive[],
-  axis: number,
-): [Primitive[], Primitive[]] {
+function partitionPrimitives(primitives: Primitive[], axis: number): [Primitive[], Primitive[]] {
   const sortedPrimitives: Primitive[] = primitives.sort((a, b) => {
-    const aMinOnAxis =
-      axis === 0 ? a.bounds.minX : axis === 1 ? a.bounds.minY : a.bounds.minZ;
-    const bMinOnAxis =
-      axis === 0 ? b.bounds.minX : axis === 1 ? b.bounds.minY : b.bounds.minZ;
+    const aMinOnAxis = axis === 0 ? a.bounds.minX : axis === 1 ? a.bounds.minY : a.bounds.minZ;
+    const bMinOnAxis = axis === 0 ? b.bounds.minX : axis === 1 ? b.bounds.minY : b.bounds.minZ;
     return aMinOnAxis - bMinOnAxis;
   });
 
@@ -100,11 +90,7 @@ function partitionPrimitives(
   return [leftHalf, rightHalf];
 }
 
-export function generateBVHNodeTBounds(
-  box: BVHNode,
-  O: Vec3,
-  invD: Vec3,
-): [number, number] {
+export function generateBVHNodeTBounds(box: BVHNode, O: Vec3, invD: Vec3): [number, number] {
   // compute min scalar t's for ray-box intersections
   const tx1: number = (box.minVals[0] - O[0]) * invD[0];
   const ty1: number = (box.minVals[1] - O[1]) * invD[1];

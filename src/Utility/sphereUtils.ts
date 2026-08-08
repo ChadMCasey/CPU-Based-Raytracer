@@ -1,19 +1,7 @@
 import { Vec3, Sphere, RGB, Bounds } from "./types";
-import {
-  dotVectorsV3,
-  magnitudeV3,
-  subtractVectors,
-  addVectors,
-  scaleVectorV3,
-} from "./mathUtils";
+import { dotVectorsV3, magnitudeV3, subtractVectors, addVectors, scaleVectorV3 } from "./mathUtils";
 
-export function createSphere(
-  radius: number,
-  center: Vec3,
-  color: RGB,
-  specular: number,
-  reflective: number,
-): Sphere {
+export function createSphere(radius: number, center: Vec3, color: RGB, specular: number, reflective: number): Sphere {
   return {
     type: "sphere",
     r: radius,
@@ -26,12 +14,7 @@ export function createSphere(
   };
 }
 
-export function computeSphereIntersection(
-  O: Vec3,
-  D: Vec3,
-  DdotD: number,
-  sphere: Sphere,
-) {
+export function computeSphereIntersection(O: Vec3, D: Vec3, DdotD: number, sphere: Sphere) {
   const r: number = sphere.r;
   const CO: Vec3 = subtractVectors(O, sphere.center);
 
@@ -44,10 +27,7 @@ export function computeSphereIntersection(
   if (discriminantSquared < 0) return null; // NO INTERSECTION
 
   const discriminant: number = Math.sqrt(b ** 2 - 4 * a * c);
-  const intersections: Array<number> = [
-    (-b + discriminant) / (2 * a),
-    (-b - discriminant) / (2 * a),
-  ];
+  const intersections: Array<number> = [(-b + discriminant) / (2 * a), (-b - discriminant) / (2 * a)];
 
   const validIntersections: number[] = intersections.filter((t) => t > 0);
 

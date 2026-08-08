@@ -1,18 +1,7 @@
-import {
-  Vec3,
-  Vec2,
-  ScenePayload,
-  SceneIntersection,
-  Primitive,
-  HitRecord,
-  BVHNode,
-} from "./types";
+import { Vec3, Vec2, ScenePayload, SceneIntersection, Primitive, HitRecord, BVHNode } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
-import {
-  generateBVHNodeTBounds,
-  determineValidBVHInteresection,
-} from "../Engine/BoundingVolumeHierarchy";
+import { generateBVHNodeTBounds, determineValidBVHInteresection } from "../Engine/BoundingVolumeHierarchy";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -63,33 +52,21 @@ export function crossProduct(a: Vec3, b: Vec3): Vec3 {
 }
 
 // hard coding the shit out of this, we need to fix this later
-export function multiplyRotationalMatrices(
-  A: number[][],
-  B: number[][],
-): number[][] {
+export function multiplyRotationalMatrices(A: number[][], B: number[][]): number[][] {
   // top row
-  const TopLeft: number =
-    A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
-  const TopCenter: number =
-    A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
-  const TopRight: number =
-    A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
+  const TopLeft: number = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0];
+  const TopCenter: number = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1];
+  const TopRight: number = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2];
 
   // middle row
-  const MiddleLeft: number =
-    A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
-  const MiddleCenter: number =
-    A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
-  const MiddleRight: number =
-    A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
+  const MiddleLeft: number = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0];
+  const MiddleCenter: number = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1];
+  const MiddleRight: number = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2];
 
   // bottom row
-  const BottomLeft: number =
-    A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
-  const BottomCenter: number =
-    A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
-  const BottomRight: number =
-    A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
+  const BottomLeft: number = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0];
+  const BottomCenter: number = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1];
+  const BottomRight: number = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2];
 
   const resultingMatrix: number[][] = [
     [TopLeft, TopCenter, TopRight],
@@ -190,12 +167,7 @@ export function closestIntersection(
     const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, O, invD);
 
     // determine if valid box intersection
-    const validIntersection: boolean = determineValidBVHInteresection(
-      closestT,
-      boxEntryT,
-      boxExitT,
-      viewportDistance,
-    );
+    const validIntersection: boolean = determineValidBVHInteresection(closestT, boxEntryT, boxExitT, viewportDistance);
 
     if (!validIntersection) continue;
 
@@ -205,25 +177,13 @@ export function closestIntersection(
       const right = box.right;
       if (left && !right) stack.push(left); // left only
       if (!left && right) stack.push(right); // right only
-      if (left && right)
-        D[box.splitAxis] > 0
-          ? stack.push(right, left)
-          : stack.push(left, right);
+      if (left && right) D[box.splitAxis] > 0 ? stack.push(right, left) : stack.push(left, right);
     } else {
       // leaf case, compute ray triangle intersections
       for (let primitive of box.primitives) {
-        const intersection: HitRecord | null = computeIntersection(
-          O,
-          D,
-          DdotD,
-          primitive,
-        );
+        const intersection: HitRecord | null = computeIntersection(O, D, DdotD, primitive);
         if (!intersection) continue;
-        if (
-          intersection.distance >= minT &&
-          intersection.distance <= maxT &&
-          intersection.distance < closestT
-        ) {
+        if (intersection.distance >= minT && intersection.distance <= maxT && intersection.distance < closestT) {
           closestT = intersection.distance;
           closestIntersection = {
             distance: intersection.distance,
@@ -239,12 +199,7 @@ export function closestIntersection(
   return closestIntersection;
 }
 
-export function computeIntersection(
-  O: Vec3,
-  D: Vec3,
-  DdotD: number,
-  object: Primitive,
-): HitRecord | null {
+export function computeIntersection(O: Vec3, D: Vec3, DdotD: number, object: Primitive): HitRecord | null {
   switch (object.type) {
     case "sphere":
       return computeSphereIntersection(O, D, DdotD, object);
