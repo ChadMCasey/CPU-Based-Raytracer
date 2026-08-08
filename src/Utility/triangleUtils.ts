@@ -1,4 +1,4 @@
-import { Vec3, Triangle, HitRecord, RGB, Bounds } from "./types";
+import { Vec3, Triangle, HitRecord, RGB, Bounds, Edges } from "./types";
 import { subtractVectors, crossProduct, scaleVectorV3, magnitudeV3, dotVectorsV3, addVectors } from "./mathUtils";
 
 // factory function for triangles
@@ -10,16 +10,27 @@ export function createTriangle(
   specular: number,
   reflective: number,
 ): Triangle {
+  const bounds: Bounds = computeTriangleBounds(V1, V2, V3);
+  const normal: Vec3 = computeTriangleNormal(V1, V2, V3);
+  const planeDistance: number = dotVectorsV3(V1, normal);
+  const edges: Edges = {
+    E1: subtractVectors(V2, V1),
+    E2: subtractVectors(V3, V2),
+    E3: subtractVectors(V1, V3),
+  };
+
   return {
     type: "triangle",
     V1,
     V2,
     V3,
-    bounds: computeTriangleBounds(V1, V2, V3),
+    planeDistance,
+    bounds,
     color,
     specular,
     reflective,
-    normal: computeTriangleNormal(V1, V2, V3),
+    normal,
+    edges,
   };
 }
 
@@ -81,44 +92,41 @@ export function computeTriangleNormal(V1: Vec3, V2: Vec3, V3: Vec3) {
 export function computeTriangleIntersection(O: Vec3, D: Vec3, triangle: Triangle): HitRecord | null {
   // if D dot N is 0 then our directional ray
   // is perpendicular to the normal N of our triangle.
-  const dotProduct: number = dotVectorsV3(D, triangle.normal);
+  const DdotN: number = dotVectorsV3(D, triangle.normal);
 
   // D is parallel to our triangle
-  if (dotProduct === 0) return null;
+  if (DdotN === 0) return null;
 
   // D intersects our plane, solve for t where P = O + tD.
-  const VdotN: number = dotVectorsV3(triangle.V1, triangle.normal);
+  const VdotN: number = triangle.planeDistance;
   const OdotN: number = dotVectorsV3(O, triangle.normal);
-  const DdotN: number = dotVectorsV3(D, triangle.normal);
   const t: number = (VdotN - OdotN) / DdotN;
+
+  // early return if the intersection is behind us
+  if (t < 0) return null;
 
   // now we can find P, the point in our plane
   const P: Vec3 = addVectors(O, scaleVectorV3(D, t));
 
-  // create edge vectors and the corresponding Vp vector
-  const E1: Vec3 = subtractVectors(triangle.V2, triangle.V1);
+  const edges: Edges = triangle.edges;
+
   const Vp1: Vec3 = subtractVectors(P, triangle.V1);
-  const E2: Vec3 = subtractVectors(triangle.V3, triangle.V2);
+  const leftOfE1: boolean = dotVectorsV3(crossProduct(edges.E1, Vp1), triangle.normal) >= 0;
+  if (!leftOfE1) return null;
+
   const Vp2: Vec3 = subtractVectors(P, triangle.V2);
-  const E3: Vec3 = subtractVectors(triangle.V1, triangle.V3);
+  const leftOfE2: boolean = dotVectorsV3(crossProduct(edges.E2, Vp2), triangle.normal) >= 0;
+  if (!leftOfE2) return null;
+
   const Vp3: Vec3 = subtractVectors(P, triangle.V3);
+  const leftOfE3: boolean = dotVectorsV3(crossProduct(edges.E3, Vp3), triangle.normal) >= 0;
+  if (!leftOfE3) return null;
 
-  const leftOfE1: boolean = dotVectorsV3(crossProduct(E1, Vp1), triangle.normal) >= 0;
-  const leftOfE2: boolean = dotVectorsV3(crossProduct(E2, Vp2), triangle.normal) >= 0;
-  const leftOfE3: boolean = dotVectorsV3(crossProduct(E3, Vp3), triangle.normal) >= 0;
-
-  // the point P is in our plane, and within our triangle
-  if (leftOfE1 && leftOfE2 && leftOfE3) {
-    return {
-      distance: t,
-      position: P,
-      normal: triangle.normal,
-    };
-  }
-
-  // the case when D does intersect our triangle plane
-  // but the intersection does not occur within the bounds of our triangle
-  return null;
+  return {
+    distance: t,
+    position: P,
+    normal: triangle.normal,
+  };
 }
 
 function computeTriangleBounds(V1: Vec3, V2: Vec3, V3: Vec3): Bounds {

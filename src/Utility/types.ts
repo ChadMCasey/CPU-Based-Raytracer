@@ -82,10 +82,12 @@ export type Triangle = {
   V2: Vec3;
   V3: Vec3;
   bounds: Bounds;
+  edges: Edges;
   color: RGB;
   specular: number;
   reflective: number;
   normal: Vec3;
+  planeDistance: number;
 };
 
 export type Bounds = {
@@ -95,6 +97,12 @@ export type Bounds = {
   maxY: number;
   minZ: number;
   maxZ: number;
+};
+
+export type Edges = {
+  E1: Vec3;
+  E2: Vec3;
+  E3: Vec3;
 };
 
 // LIGHTING
