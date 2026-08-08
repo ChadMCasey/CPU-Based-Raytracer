@@ -29,13 +29,14 @@ class App {
   }
 
   async runAppLoop(currentTime: number): Promise<void> {
-    const frameDelta = currentTime - this.lastFrame;
+    // the time since last frame should be 0 for the first frame
+    const msFrameDelta = this.lastFrame === 0 ? 0 : currentTime - this.lastFrame;
 
     // controller handles user input & orchestrates with scene
-    this.controller.update(frameDelta);
+    this.controller.update(msFrameDelta);
 
     // the UI manager is an abstraction that communicates with our UI layer
-    this.uiManager.update(frameDelta);
+    this.uiManager.update(msFrameDelta);
 
     this.lastFrame = currentTime;
 
