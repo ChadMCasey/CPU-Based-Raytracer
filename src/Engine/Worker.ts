@@ -17,7 +17,8 @@ import {
   multiplyDirectionByRotation,
   reflectVector,
   computeDirectionalVector,
-  mapToCartesianPoints,
+  mapToCartesianX,
+  mapToCartesianY,
   closestIntersection,
 } from "../Utility/mathUtils";
 
@@ -31,28 +32,26 @@ self.addEventListener("message", (event: MessageEvent) => {
     height,
     targetWidth,
     targetHeight,
-    viewportWidth,
-    viewportHeight,
+    halfTargetWidth,
+    halfTargetHeight,
+    viewportScaleX,
+    viewportScaleY,
     viewportDistance,
   }: Task = event.data.openTask;
 
   // iterate section of render target upon which our calculations will be done
   for (let y = startY; y < startY + height; y++) {
+    // map to 2D cartesian plane from canvas coords
+    const cartY = mapToCartesianY(halfTargetHeight, y);
+
     for (let x = startX; x < startX + width; x++) {
-      // transform (x,y) into coordinates defined by a 2D cartesian plane
-      const [cartX, cartY] = mapToCartesianPoints(
-        targetWidth,
-        targetHeight,
-        x,
-        y,
-      );
+      // map to 2D cartesian plane from canvas coords
+      const cartX = mapToCartesianX(halfTargetWidth, x);
 
       // compute D from the origin to the point on the viewport
       const rawD: Vec3 = computeDirectionalVector(
-        targetWidth,
-        targetHeight,
-        viewportWidth,
-        viewportHeight,
+        viewportScaleX,
+        viewportScaleY,
         cartX,
         cartY,
       );

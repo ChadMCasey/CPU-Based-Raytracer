@@ -1,4 +1,3 @@
-import { Vec2, Vec3 } from "../Utility/types";
 import { CANVAS_HEIGHT, ASPECT_RATIO } from "../Utility/constants";
 
 // The canvas is a render target in the context of the web

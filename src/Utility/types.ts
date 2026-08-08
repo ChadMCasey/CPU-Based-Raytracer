@@ -21,8 +21,10 @@ export type Task = {
   height: number;
   targetWidth: number;
   targetHeight: number;
-  viewportWidth: number;
-  viewportHeight: number;
+  halfTargetWidth: number;
+  halfTargetHeight: number;
+  viewportScaleX: number;
+  viewportScaleY: number;
   viewportDistance: number;
 };
 

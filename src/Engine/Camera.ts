@@ -41,11 +41,11 @@ export function computeRotationMatrix(camera: Camera): number[][] {
 
     // produce the final orthonormal rotation matrix
     const RzRy: number[][] = multiplyRotationalMatrices(Rz, Ry);
-    const RzRyRz: number[][] = multiplyRotationalMatrices(RzRy, Rx);
+    const RzRyRx: number[][] = multiplyRotationalMatrices(RzRy, Rx);
 
     camera.rotationChanged = false;
-    camera.rotationMatrix = RzRyRz;
-    return RzRyRz;
+    camera.rotationMatrix = RzRyRx;
+    return RzRyRx;
   }
 
   return camera.rotationMatrix; // cache hit

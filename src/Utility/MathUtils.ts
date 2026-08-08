@@ -142,30 +142,23 @@ export function reflectVector(R: Vec3, N: Vec3): Vec3 {
 }
 
 export function computeDirectionalVector(
-  Tw: number,
-  Th: number,
-  Vw: number,
-  Vh: number,
+  viewportScaleX: number,
+  viewportScaleY: number,
   cartX: number,
   cartY: number,
 ): Vec3 {
-  const Vx = (Vw / Tw) * cartX;
-  const Vy = (Vh / Th) * cartY;
+  const Vx = viewportScaleX * cartX;
+  const Vy = viewportScaleY * cartY;
   const Vz = 1;
   return [Vx, Vy, Vz];
 }
 
-export function mapToCartesianPoints(
-  targetW: number,
-  targetH: number,
-  x: number,
-  y: number,
-): [number, number] {
-  let cartX: number, cartY: number;
-  cartX = x - targetW / 2;
-  cartY = targetH / 2 - y;
+export function mapToCartesianX(halfTargetW: number, x: number): number {
+  return x - halfTargetW;
+}
 
-  return [cartX, cartY];
+export function mapToCartesianY(halfTargetH: number, y: number): number {
+  return halfTargetH - y;
 }
 
 export function closestIntersection(

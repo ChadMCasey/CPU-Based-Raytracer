@@ -73,8 +73,10 @@ export default class Parallelize {
         height: bandHeight,
         targetWidth: Cw,
         targetHeight: Ch,
-        viewportWidth: camera.viewportWidth,
-        viewportHeight: camera.viewportHeight,
+        halfTargetWidth: Cw / 2, // eliminate divison operations per ray trace
+        halfTargetHeight: Ch / 2, // eliminate divison operations per ray trace
+        viewportScaleX: camera.viewportWidth / Cw,
+        viewportScaleY: camera.viewportHeight / Ch,
         viewportDistance: camera.viewportDistance,
       });
     }
