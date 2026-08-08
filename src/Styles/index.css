@@ -1,3 +1,5 @@
+@import "./fonts.css";
+
 body {
   margin: 0;
   padding: 0;
@@ -14,4 +16,14 @@ canvas {
   width: 100vw;
   height: 100vh;
   image-rendering: pixelated;
+}
+
+.fps {
+  margin: 0;
+  font-family: "Google Sans";
+  font-weight: 600;
+  position: absolute;
+  right: 0.8rem;
+  top: 0.5rem;
+  color: white;
 }
