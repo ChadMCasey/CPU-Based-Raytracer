@@ -68,6 +68,7 @@ export type ScenePayload = {
 export type Sphere = {
   type: "sphere";
   center: [number, number, number];
+  bounds: Bounds;
   r: number;
   rSquared: number;
   color: RGB;
@@ -80,10 +81,20 @@ export type Triangle = {
   V1: Vec3;
   V2: Vec3;
   V3: Vec3;
+  bounds: Bounds;
   color: RGB;
   specular: number;
   reflective: number;
   normal: Vec3;
+};
+
+export type Bounds = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
 };
 
 // LIGHTING
@@ -117,5 +128,5 @@ export type BVHNode = {
   splitAxis: number; // axis along which node was partitioned
   minVals: Vec3;
   maxVals: Vec3;
-  triangles: Triangle[] | null;
+  primitives: Primitive[] | null;
 };

@@ -200,7 +200,7 @@ export function closestIntersection(
     if (!validIntersection) continue;
 
     // non leaf case, examine the children nodes
-    if (!box.triangles) {
+    if (!box.primitives) {
       const left = box.left;
       const right = box.right;
       if (left && !right) stack.push(left); // left only
@@ -211,7 +211,7 @@ export function closestIntersection(
           : stack.push(left, right);
     } else {
       // leaf case, compute ray triangle intersections
-      for (let primitive of box.triangles) {
+      for (let primitive of box.primitives) {
         const intersection: HitRecord | null = computeIntersection(
           O,
           D,
@@ -233,31 +233,6 @@ export function closestIntersection(
           };
         }
       }
-    }
-  }
-
-  // weird second loop for spheres - TODO: makes spheres out of triangles
-  for (let primitive of scenePayload.sceneData.primatives) {
-    if (primitive.type !== "sphere") continue;
-    const intersection: HitRecord | null = computeIntersection(
-      O,
-      D,
-      DdotD,
-      primitive,
-    );
-    if (!intersection) continue;
-    if (
-      intersection.distance >= minT &&
-      intersection.distance <= maxT &&
-      intersection.distance < closestT
-    ) {
-      closestT = intersection.distance;
-      closestIntersection = {
-        distance: intersection.distance,
-        position: intersection.position,
-        normal: intersection.normal,
-        object: primitive,
-      };
     }
   }
 

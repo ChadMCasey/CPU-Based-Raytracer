@@ -1,35 +1,35 @@
-import { Triangle, BVHNode, Vec3 } from "../Utility/types";
+import { Primitive, BVHNode, Vec3 } from "../Utility/types";
 
 // generate the BVH tree
-export function generateBVH(triangles: Triangle[]): BVHNode | null {
+export function generateBVH(primitives: Primitive[]): BVHNode | null {
   // (1) edge case - starting up the app with no polygons
-  if (triangles.length === 0) return null;
+  if (primitives.length === 0) return null;
 
   // (2) determine the longest axis
   const { minX, maxX, minY, maxY, minZ, maxZ, splitAxis } =
-    determineLongestAxis(triangles);
+    determineLongestAxis(primitives);
 
-  // (3) leaf node case - no children, has triangles attached
-  if (triangles.length < 3) {
+  // (3) leaf node case - no children, has primitives attached
+  if (primitives.length < 3) {
     return {
       left: null,
       right: null,
       splitAxis,
       minVals: [minX, minY, minZ],
       maxVals: [maxX, maxY, maxZ],
-      triangles,
+      primitives,
     };
   }
 
-  // (4) partition the triangles along the longest axis
-  const [leftTriangles, rightTriangles] = partitionTriangles(
-    triangles,
+  // (4) partition the primitives along the longest axis
+  const [leftPrimitives, rightPrimitves] = partitionPrimitives(
+    primitives,
     splitAxis,
   );
 
   // (5) generate children nodes
-  const leftNode: BVHNode | null = generateBVH(leftTriangles);
-  const rightNode: BVHNode | null = generateBVH(rightTriangles);
+  const leftNode: BVHNode | null = generateBVH(leftPrimitives);
+  const rightNode: BVHNode | null = generateBVH(rightPrimitves);
 
   // (6) pass the node up the call stack
   return {
@@ -38,25 +38,26 @@ export function generateBVH(triangles: Triangle[]): BVHNode | null {
     splitAxis,
     minVals: [minX, minY, minZ],
     maxVals: [maxX, maxY, maxZ],
-    triangles: null,
+    primitives: null,
   };
 }
 
-function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
+function determineLongestAxis(primitives: Primitive[]): Record<string, number> {
   let minX: number = Number.POSITIVE_INFINITY;
-  let maxX: number = Number.NEGATIVE_INFINITY;
   let minY: number = Number.POSITIVE_INFINITY;
-  let maxY: number = Number.NEGATIVE_INFINITY;
   let minZ: number = Number.POSITIVE_INFINITY;
+
+  let maxX: number = Number.NEGATIVE_INFINITY;
+  let maxY: number = Number.NEGATIVE_INFINITY;
   let maxZ: number = Number.NEGATIVE_INFINITY;
 
-  for (let t of triangles) {
-    minX = Math.min(t.V1[0], t.V2[0], t.V3[0], minX);
-    maxX = Math.max(t.V1[0], t.V2[0], t.V3[0], maxX);
-    minY = Math.min(t.V1[1], t.V2[1], t.V3[1], minY);
-    maxY = Math.max(t.V1[1], t.V2[1], t.V3[1], maxY);
-    minZ = Math.min(t.V1[2], t.V2[2], t.V3[2], minZ);
-    maxZ = Math.max(t.V1[2], t.V2[2], t.V3[2], maxZ);
+  for (let p of primitives) {
+    minX = Math.min(p.bounds.minX, minX);
+    maxX = Math.max(p.bounds.maxX, maxX);
+    minY = Math.min(p.bounds.minY, minY);
+    maxY = Math.max(p.bounds.maxY, maxY);
+    minZ = Math.min(p.bounds.minZ, minZ);
+    maxZ = Math.max(p.bounds.maxZ, maxZ);
   }
 
   const xAxisLen: number = maxX - minX;
@@ -78,21 +79,23 @@ function determineLongestAxis(triangles: Triangle[]): Record<string, number> {
   };
 }
 
-function partitionTriangles(
-  triangles: Triangle[],
+function partitionPrimitives(
+  primitives: Primitive[],
   axis: number,
-): [Triangle[], Triangle[]] {
-  const sortedTriangles: Triangle[] = triangles.sort((a, b) => {
-    const aMinOnAxis = Math.min(a.V1[axis], a.V2[axis], a.V3[axis]);
-    const bMinOnAxis = Math.min(b.V1[axis], b.V2[axis], b.V3[axis]);
+): [Primitive[], Primitive[]] {
+  const sortedPrimitives: Primitive[] = primitives.sort((a, b) => {
+    const aMinOnAxis =
+      axis === 0 ? a.bounds.minX : axis === 1 ? a.bounds.minY : a.bounds.minZ;
+    const bMinOnAxis =
+      axis === 0 ? b.bounds.minX : axis === 1 ? b.bounds.minY : b.bounds.minZ;
     return aMinOnAxis - bMinOnAxis;
   });
 
-  const length = sortedTriangles.length;
+  const length = sortedPrimitives.length;
   const half = Math.floor(length / 2);
 
-  const leftHalf = sortedTriangles.slice(0, half);
-  const rightHalf = sortedTriangles.slice(half, length);
+  const leftHalf = sortedPrimitives.slice(0, half);
+  const rightHalf = sortedPrimitives.slice(half, length);
 
   return [leftHalf, rightHalf];
 }
@@ -139,7 +142,7 @@ export function determineValidBVHInteresection(
   // the ray exits the box in front of the viewport plane, cull it
   if (boxExitT < viewportDistance) return false;
 
-  // if the box is beyond our closest triangle intersection, cull it
+  // if the box is beyond our closest primitive intersection, cull it
   if (boxEntryT > closestT) return false;
 
   // the intersection is valid

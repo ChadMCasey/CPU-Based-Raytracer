@@ -1,4 +1,4 @@
-import { Vec3, Triangle, HitRecord, RGB } from "./types";
+import { Vec3, Triangle, HitRecord, RGB, Bounds } from "./types";
 import {
   subtractVectors,
   crossProduct,
@@ -22,6 +22,7 @@ export function createTriangle(
     V1,
     V2,
     V3,
+    bounds: computeTriangleBounds(V1, V2, V3),
     color,
     specular,
     reflective,
@@ -225,4 +226,15 @@ export function computeTriangleIntersection(
   // the case when D does intersect our triangle plane
   // but the intersection does not occur within the bounds of our triangle
   return null;
+}
+
+function computeTriangleBounds(V1: Vec3, V2: Vec3, V3: Vec3): Bounds {
+  return {
+    minX: Math.min(V1[0], V2[0], V3[0]),
+    maxX: Math.max(V1[0], V2[0], V3[0]),
+    minY: Math.min(V1[1], V2[1], V3[1]),
+    maxY: Math.max(V1[1], V2[1], V3[1]),
+    minZ: Math.min(V1[2], V2[2], V3[2]),
+    maxZ: Math.max(V1[2], V2[2], V3[2]),
+  };
 }

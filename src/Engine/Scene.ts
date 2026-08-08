@@ -10,7 +10,7 @@ export const lights: Light[] = [
   ...directionalLights,
   ...ambientLights,
 ];
-export const bvh: BVHNode | null = generateBVH(triangles);
+export const bvh: BVHNode | null = generateBVH(primatives);
 
 // scene data
 export const sceneData: SceneData = { lights, primatives, bvh };

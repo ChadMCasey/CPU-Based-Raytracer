@@ -1,4 +1,4 @@
-import { Vec3, Sphere } from "./types";
+import { Vec3, Sphere, RGB, Bounds } from "./types";
 import {
   dotVectorsV3,
   magnitudeV3,
@@ -6,6 +6,25 @@ import {
   addVectors,
   scaleVectorV3,
 } from "./mathUtils";
+
+export function createSphere(
+  radius: number,
+  center: Vec3,
+  color: RGB,
+  specular: number,
+  reflective: number,
+): Sphere {
+  return {
+    type: "sphere",
+    r: radius,
+    rSquared: radius * radius,
+    center,
+    bounds: computeSphereBounds(center, radius),
+    color,
+    specular,
+    reflective,
+  };
+}
 
 export function computeSphereIntersection(
   O: Vec3,
@@ -46,4 +65,15 @@ export function computeNormal(position: Vec3, sphere: Sphere): Vec3 {
   const magnitude = magnitudeV3(CP);
   const normal = scaleVectorV3(CP, 1 / magnitude);
   return normal;
+}
+
+export function computeSphereBounds(center: Vec3, r: number): Bounds {
+  return {
+    minX: center[0] - r,
+    maxX: center[0] + r,
+    minY: center[1] - r,
+    maxY: center[1] + r,
+    minZ: center[2] - r,
+    maxZ: center[2] + r,
+  };
 }
