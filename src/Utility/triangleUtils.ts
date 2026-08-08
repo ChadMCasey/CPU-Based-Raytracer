@@ -1,4 +1,4 @@
-import { Vec3, Triangle, HitRecord, RGB, Ray } from "./types";
+import { Vec3, Triangle, HitRecord, RGB } from "./types";
 import {
   subtractVectors,
   crossProduct,
@@ -178,24 +178,25 @@ export function computeTriangleNormal(V1: Vec3, V2: Vec3, V3: Vec3) {
 }
 
 export function computeTriangleIntersection(
-  ray: Ray,
+  O: Vec3,
+  D: Vec3,
   triangle: Triangle,
 ): HitRecord | null {
   // if D dot N is 0 then our directional ray
   // is perpendicular to the normal N of our triangle.
-  const dotProduct: number = dotVectorsV3(ray.D, triangle.normal);
+  const dotProduct: number = dotVectorsV3(D, triangle.normal);
 
   // D is parallel to our triangle
   if (dotProduct === 0) return null;
 
   // D intersects our plane, solve for t where P = O + tD.
   const VdotN: number = dotVectorsV3(triangle.V1, triangle.normal);
-  const OdotN: number = dotVectorsV3(ray.O, triangle.normal);
-  const DdotN: number = dotVectorsV3(ray.D, triangle.normal);
+  const OdotN: number = dotVectorsV3(O, triangle.normal);
+  const DdotN: number = dotVectorsV3(D, triangle.normal);
   const t: number = (VdotN - OdotN) / DdotN;
 
   // now we can find P, the point in our plane
-  const P: Vec3 = addVectors(ray.O, scaleVectorV3(ray.D, t));
+  const P: Vec3 = addVectors(O, scaleVectorV3(D, t));
 
   // create edge vectors and the corresponding Vp vector
   const E1: Vec3 = subtractVectors(triangle.V2, triangle.V1);

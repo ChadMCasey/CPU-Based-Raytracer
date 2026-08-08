@@ -36,13 +36,6 @@ export type SceneIntersection = {
   object: Primitive;
 };
 
-export type Ray = {
-  O: Vec3;
-  D: Vec3;
-  invD: Vec3;
-  DdotD: number;
-};
-
 export type Camera = {
   position: Vec3;
   rotation: Rotation;

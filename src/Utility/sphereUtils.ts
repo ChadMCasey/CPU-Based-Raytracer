@@ -1,4 +1,4 @@
-import { Vec3, Sphere, Ray } from "./types";
+import { Vec3, Sphere } from "./types";
 import {
   dotVectorsV3,
   magnitudeV3,
@@ -7,12 +7,12 @@ import {
   scaleVectorV3,
 } from "./mathUtils";
 
-export function computeSphereIntersection(ray: Ray, sphere: Sphere) {
+export function computeSphereIntersection(O: Vec3, D: Vec3, sphere: Sphere) {
   const r: number = sphere.radius;
-  const CO: Vec3 = subtractVectors(ray.O, sphere.center);
+  const CO: Vec3 = subtractVectors(O, sphere.center);
 
-  const a: number = ray.DdotD;
-  const b: number = 2 * dotVectorsV3(CO, ray.D);
+  const a: number = dotVectorsV3(D, D);
+  const b: number = 2 * dotVectorsV3(CO, D);
   const c: number = dotVectorsV3(CO, CO) - r * r;
 
   const discriminantSquared: number = b ** 2 - 4 * a * c;
@@ -30,7 +30,7 @@ export function computeSphereIntersection(ray: Ray, sphere: Sphere) {
   if (!validIntersections.length) return null;
 
   const distance: number = Math.min(...validIntersections);
-  const position: Vec3 = addVectors(ray.O, scaleVectorV3(ray.D, distance)); // P = O + t(V - O);
+  const position: Vec3 = addVectors(O, scaleVectorV3(D, distance)); // P = O + t(V - O);
   const normal: Vec3 = computeNormal(position, sphere);
 
   return { distance, position, normal };

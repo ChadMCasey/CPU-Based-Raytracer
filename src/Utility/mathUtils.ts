@@ -6,7 +6,6 @@ import {
   Primitive,
   HitRecord,
   BVHNode,
-  Ray,
 } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
@@ -163,7 +162,8 @@ export function mapToCartesianY(halfTargetH: number, y: number): number {
 }
 
 export function closestIntersection(
-  ray: Ray,
+  O: Vec3,
+  D: Vec3,
   minT: number,
   maxT: number,
   scenePayload: ScenePayload,
@@ -176,6 +176,7 @@ export function closestIntersection(
   if (!bvhRoot) return null;
 
   // compute inverse D values (avoid re-computing per BVH node)
+  const invD: Vec3 = [1 / D[0], 1 / D[1], 1 / D[2]];
 
   const stack: BVHNode[] = [bvhRoot];
   while (stack.length) {
@@ -185,7 +186,7 @@ export function closestIntersection(
     if (!box) continue;
 
     // produce the bounds on our box
-    const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, ray);
+    const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, O, invD);
 
     // determine if valid box intersection
     const validIntersection: boolean = determineValidBVHInteresection(
@@ -204,14 +205,15 @@ export function closestIntersection(
       if (left && !right) stack.push(left); // left only
       if (!left && right) stack.push(right); // right only
       if (left && right)
-        ray.D[box.splitAxis] > 0
+        D[box.splitAxis] > 0
           ? stack.push(right, left)
           : stack.push(left, right);
     } else {
       // leaf case, compute ray triangle intersections
       for (let primitive of box.triangles) {
         const intersection: HitRecord | null = computeIntersection(
-          ray,
+          O,
+          D,
           primitive,
         );
         if (!intersection) continue;
@@ -235,7 +237,7 @@ export function closestIntersection(
   // weird second loop for spheres - TODO: makes spheres out of triangles
   for (let primitive of scenePayload.sceneData.primatives) {
     if (primitive.type !== "sphere") continue;
-    const intersection: HitRecord | null = computeIntersection(ray, primitive);
+    const intersection: HitRecord | null = computeIntersection(O, D, primitive);
     if (!intersection) continue;
     if (
       intersection.distance >= minT &&
@@ -256,24 +258,16 @@ export function closestIntersection(
 }
 
 export function computeIntersection(
-  ray: Ray,
+  O: Vec3,
+  D: Vec3,
   object: Primitive,
 ): HitRecord | null {
   switch (object.type) {
     case "sphere":
-      return computeSphereIntersection(ray, object);
+      return computeSphereIntersection(O, D, object);
     case "triangle":
-      return computeTriangleIntersection(ray, object);
+      return computeTriangleIntersection(O, D, object);
     default:
       return null;
   }
-}
-
-export function computeRay(origination: Vec3, direction: Vec3): Ray {
-  return {
-    O: origination,
-    D: direction,
-    invD: [1 / direction[0], 1 / direction[1], 1 / direction[2]],
-    DdotD: dotVectorsV3(direction, direction),
-  };
 }

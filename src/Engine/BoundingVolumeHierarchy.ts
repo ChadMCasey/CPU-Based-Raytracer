@@ -1,4 +1,4 @@
-import { Triangle, BVHNode, Ray } from "../Utility/types";
+import { Triangle, BVHNode, Vec3 } from "../Utility/types";
 
 // generate the BVH tree
 export function generateBVH(triangles: Triangle[]): BVHNode | null {
@@ -99,17 +99,18 @@ function partitionTriangles(
 
 export function generateBVHNodeTBounds(
   box: BVHNode,
-  ray: Ray,
+  O: Vec3,
+  invD: Vec3,
 ): [number, number] {
   // compute min scalar t's for ray-box intersections
-  const tx1: number = (box.minVals[0] - ray.O[0]) * ray.invD[0];
-  const ty1: number = (box.minVals[1] - ray.O[1]) * ray.invD[1];
-  const tz1: number = (box.minVals[2] - ray.O[2]) * ray.invD[2];
+  const tx1: number = (box.minVals[0] - O[0]) * invD[0];
+  const ty1: number = (box.minVals[1] - O[1]) * invD[1];
+  const tz1: number = (box.minVals[2] - O[2]) * invD[2];
 
   // compute max scalar t's for ray-box intersections
-  const tx2: number = (box.maxVals[0] - ray.O[0]) * ray.invD[0];
-  const ty2: number = (box.maxVals[1] - ray.O[1]) * ray.invD[1];
-  const tz2: number = (box.maxVals[2] - ray.O[2]) * ray.invD[2];
+  const tx2: number = (box.maxVals[0] - O[0]) * invD[0];
+  const ty2: number = (box.maxVals[1] - O[1]) * invD[1];
+  const tz2: number = (box.maxVals[2] - O[2]) * invD[2];
 
   const xEntry: number = Math.min(tx1, tx2);
   const xExit: number = Math.max(tx1, tx2);
