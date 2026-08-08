@@ -79,6 +79,7 @@ export function computeDirectionalLighting(
   const lightObstruction: SceneIntersection | null = closestIntersection(
     P,
     lightDirectionFromP,
+    dotVectorsV3(lightDirectionFromP, lightDirectionFromP),
     MIN_T,
     maxT,
     scenePayload,
@@ -160,6 +161,7 @@ function computePointLighting(
   const lightObstruction: SceneIntersection | null = closestIntersection(
     P,
     lightDirectionFromP,
+    dotVectorsV3(lightDirectionFromP, lightDirectionFromP),
     MIN_T,
     maxT,
     scenePayload,

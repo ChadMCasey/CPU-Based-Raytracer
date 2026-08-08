@@ -164,6 +164,7 @@ export function mapToCartesianY(halfTargetH: number, y: number): number {
 export function closestIntersection(
   O: Vec3,
   D: Vec3,
+  DdotD: number,
   minT: number,
   maxT: number,
   scenePayload: ScenePayload,
@@ -214,6 +215,7 @@ export function closestIntersection(
         const intersection: HitRecord | null = computeIntersection(
           O,
           D,
+          DdotD,
           primitive,
         );
         if (!intersection) continue;
@@ -237,7 +239,12 @@ export function closestIntersection(
   // weird second loop for spheres - TODO: makes spheres out of triangles
   for (let primitive of scenePayload.sceneData.primatives) {
     if (primitive.type !== "sphere") continue;
-    const intersection: HitRecord | null = computeIntersection(O, D, primitive);
+    const intersection: HitRecord | null = computeIntersection(
+      O,
+      D,
+      DdotD,
+      primitive,
+    );
     if (!intersection) continue;
     if (
       intersection.distance >= minT &&
@@ -260,11 +267,12 @@ export function closestIntersection(
 export function computeIntersection(
   O: Vec3,
   D: Vec3,
+  DdotD: number,
   object: Primitive,
 ): HitRecord | null {
   switch (object.type) {
     case "sphere":
-      return computeSphereIntersection(O, D, object);
+      return computeSphereIntersection(O, D, DdotD, object);
     case "triangle":
       return computeTriangleIntersection(O, D, object);
     default:

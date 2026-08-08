@@ -122,6 +122,7 @@ function traceRay(
   const intersection: SceneIntersection | null = closestIntersection(
     cameraPOS,
     rotatedD,
+    dotVectorsV3(rotatedD, rotatedD),
     minT,
     maxT,
     scenePayload,
