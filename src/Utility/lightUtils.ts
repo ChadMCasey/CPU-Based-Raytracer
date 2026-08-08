@@ -5,6 +5,7 @@ import {
   Light,
   SceneIntersection,
   DirectionLight,
+  Ray,
 } from "./types";
 import {
   reflectVector,
@@ -12,6 +13,7 @@ import {
   magnitudeV3,
   subtractVectors,
   closestIntersection,
+  computeRay,
 } from "./mathUtils";
 import { MIN_T } from "./constants";
 
@@ -74,11 +76,11 @@ export function computeDirectionalLighting(
   // shadow properties
   const lightDirectionFromP: Vec3 = light.direction;
   const maxT: number = light.maxT;
+  const ray: Ray = computeRay(P, lightDirectionFromP);
 
   // compute closest intersection between P and light
   const lightObstruction: SceneIntersection | null = closestIntersection(
-    P,
-    lightDirectionFromP,
+    ray,
     MIN_T,
     maxT,
     scenePayload,
@@ -155,11 +157,11 @@ function computePointLighting(
   // shadow properties
   const lightDirectionFromP: Vec3 = subtractVectors(light.position, P);
   const maxT: number = 1;
+  const ray: Ray = computeRay(P, lightDirectionFromP);
 
   // compute closest intersection between P and light
   const lightObstruction: SceneIntersection | null = closestIntersection(
-    P,
-    lightDirectionFromP,
+    ray,
     MIN_T,
     maxT,
     scenePayload,

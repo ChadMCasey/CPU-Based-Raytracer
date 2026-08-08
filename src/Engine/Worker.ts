@@ -5,6 +5,7 @@ import {
   Task,
   Vec3,
   SceneIntersection,
+  Ray,
 } from "../Utility/types";
 import {
   MAX_REFLECT_RECUR,
@@ -21,6 +22,7 @@ import {
   mapToCartesianY,
   closestIntersection,
   dotVectorsV3,
+  computeRay,
 } from "../Utility/mathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
@@ -32,7 +34,6 @@ self.addEventListener("message", (event: MessageEvent) => {
     width,
     height,
     targetWidth,
-    targetHeight,
     halfTargetWidth,
     halfTargetHeight,
     viewportScaleX,
@@ -56,17 +57,15 @@ self.addEventListener("message", (event: MessageEvent) => {
         cartX,
         cartY,
       );
-
-      // rotate D to account for camera rotation
-      const rotatedD: Vec3 = multiplyDirectionByRotation(
+      const D: Vec3 = multiplyDirectionByRotation(
         scenePayload.cameraRotation,
         rawD,
       );
+      const ray: Ray = computeRay(scenePayload.cameraPOS, D);
 
       // trace ray (this will originate D from the cameras position)
       const computedColor: RGB = traceRay(
-        scenePayload.cameraPOS,
-        rotatedD,
+        ray,
         1,
         Number.POSITIVE_INFINITY,
         MAX_REFLECT_RECUR,
@@ -110,8 +109,7 @@ function writeColorDataToBuffer(
 
 // trace the ray and return a color for the pixel
 function traceRay(
-  cameraPOS: Vec3,
-  rotatedD: Vec3,
+  ray: Ray,
   minT: number,
   maxT: number,
   recurLeft: number,
@@ -120,8 +118,7 @@ function traceRay(
 ): RGB {
   // we first need to find the closest intersection between the ray and the scene objects
   const intersection: SceneIntersection | null = closestIntersection(
-    cameraPOS,
-    rotatedD,
+    ray,
     minT,
     maxT,
     scenePayload,
@@ -135,7 +132,7 @@ function traceRay(
   const lightIntensity: number = computeLighting(
     intersection.position,
     intersection.normal,
-    scaleVectorV3(rotatedD, -1),
+    scaleVectorV3(ray.D, -1),
     intersection.object.specular,
     scenePayload,
     viewportDistance,
@@ -152,13 +149,11 @@ function traceRay(
   if (recurLeft <= 0 || reflective <= 0) return localColor;
 
   // otherwise compute the reflected color
-  const R: Vec3 = reflectVector(
-    scaleVectorV3(rotatedD, -1),
-    intersection.normal,
-  );
+  const D: Vec3 = reflectVector(scaleVectorV3(ray.D, -1), intersection.normal);
+  const rayFromIntersection: Ray = computeRay(intersection.position, D);
+
   const reflectedColor: RGB = traceRay(
-    intersection.position,
-    R,
+    rayFromIntersection,
     MIN_T,
     Number.POSITIVE_INFINITY,
     recurLeft - 1,
