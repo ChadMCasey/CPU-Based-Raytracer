@@ -175,15 +175,18 @@ export function closestIntersection(
 
   if (!bvhRoot) return null;
 
+  // compute inverse D values (avoid re-computing per BVH node)
+  const invD: Vec3 = [1 / D[0], 1 / D[1], 1 / D[2]];
+
   const stack: BVHNode[] = [bvhRoot];
-  while (stack.length > 0) {
+  while (stack.length) {
     const box = stack.pop();
 
     // pop can return undefined
     if (!box) continue;
 
     // produce the bounds on our box
-    const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, O, D);
+    const [boxEntryT, boxExitT] = generateBVHNodeTBounds(box, O, invD);
 
     // determine if valid box intersection
     const validIntersection: boolean = determineValidBVHInteresection(
@@ -231,7 +234,7 @@ export function closestIntersection(
     }
   }
 
-  // painful second loop for spheres - do something about this
+  // weird second loop for spheres - TODO: makes spheres out of triangles
   for (let primitive of scenePayload.sceneData.primatives) {
     if (primitive.type !== "sphere") continue;
     const intersection: HitRecord | null = computeIntersection(O, D, primitive);

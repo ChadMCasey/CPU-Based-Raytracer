@@ -20,6 +20,7 @@ import {
   mapToCartesianX,
   mapToCartesianY,
   closestIntersection,
+  dotVectorsV3,
 } from "../Utility/mathUtils";
 
 self.addEventListener("message", (event: MessageEvent) => {
