@@ -31,17 +31,16 @@ class App {
   async runAppLoop(currentTime: number): Promise<void> {
     // the time since last frame should be 0 for the first frame
     const msFrameDelta = this.lastFrame === 0 ? 0 : currentTime - this.lastFrame;
+    this.lastFrame = currentTime;
+
+    // the scene can be drawn now
+    await this.renderer.render();
 
     // controller handles user input & orchestrates with scene
     this.controller.update(msFrameDelta);
 
     // the UI manager is an abstraction that communicates with our UI layer
     this.uiManager.update(msFrameDelta);
-
-    this.lastFrame = currentTime;
-
-    // the scene can be drawn now
-    await this.renderer.render();
 
     // loop continously
     window.requestAnimationFrame((currentTime) => this.runAppLoop(currentTime));

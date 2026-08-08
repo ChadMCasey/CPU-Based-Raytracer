@@ -1,5 +1,5 @@
 export default class UIManager {
-  private msSinceLastFrame: number = 0;
+  private accumulateMs: number = 0;
   private frameCount: number = 0;
 
   update(msFrameDelta: number) {
@@ -7,15 +7,21 @@ export default class UIManager {
   }
 
   updateFPSCounter(msFrameDelta: number) {
-    const aSecondHasElapsed = this.msSinceLastFrame + msFrameDelta >= 1000;
+    // increment the frame
+    this.frameCount++;
 
-    if (aSecondHasElapsed) {
-      console.log(`Frames this past second: ${this.frameCount}`);
-      this.msSinceLastFrame = 0;
+    // accumulate the ms since the last frame
+    this.accumulateMs += msFrameDelta;
+
+    // a second has elapsed since the last FPS render
+    if (this.accumulateMs >= 1000) {
+      console.log(`Frames in the last second: ${this.frameCount}`);
+
+      // we keep the ms that exceed 1000 in our accumulator
+      this.accumulateMs -= 1000;
+
+      // reset the frame count
       this.frameCount = 0;
-    } else {
-      this.frameCount++;
-      this.msSinceLastFrame += msFrameDelta;
     }
   }
 }
