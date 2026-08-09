@@ -35,7 +35,7 @@ export function createTriangle(
 }
 
 // factory function for cube
-export function createCube(center: Vec3, size: number, color: RGB, specular: number, reflective: number) {
+export function createCube(center: Vec3, size: number, color: RGB, specular: number, reflective: number): Triangle[] {
   const Cx = center[0];
   const Cy = center[1];
   const Cz = center[2];
@@ -72,6 +72,39 @@ export function createCube(center: Vec3, size: number, color: RGB, specular: num
   ];
 
   return Triangles;
+}
+
+export function createSquarePyramid(
+  center: Vec3,
+  size: number,
+  color: RGB,
+  specular: number,
+  reflective: number,
+): Triangle[] {
+  // compute half size
+  const s = size / 2;
+
+  const Cx = center[0];
+  const Cy = center[1];
+  const Cz = center[2];
+
+  // determine the min and max along each axis based on size
+  const minX = Cx - s;
+  const maxX = Cx + s;
+  const minY = Cy - s;
+  const maxY = Cy + s;
+  const minZ = Cz - s;
+  const maxZ = Cz + s;
+
+  return [
+    // base plate
+    createTriangle([minX, minY, maxZ], [maxX, minY, minZ], [minX, minY, minZ], color, specular, reflective),
+    createTriangle([minX, minY, maxZ], [maxX, minY, maxZ], [maxX, minY, minZ], color, specular, reflective),
+    createTriangle([minX, minY, minZ], [minX, minY, maxZ], [Cx, maxY, Cz], color, specular, reflective), // left face
+    createTriangle([maxX, minY, maxZ], [maxX, minY, minZ], [Cx, maxY, Cz], color, specular, reflective), // right face
+    createTriangle([maxX, minY, minZ], [minX, minY, minZ], [Cx, maxY, Cz], color, specular, reflective), // front face
+    createTriangle([minX, minY, maxZ], [maxX, minY, maxZ], [Cx, maxY, Cz], color, specular, reflective), // back face
+  ];
 }
 
 export function computeTriangleNormal(V1: Vec3, V2: Vec3, V3: Vec3) {
