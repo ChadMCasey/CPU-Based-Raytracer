@@ -1,4 +1,5 @@
 import { PointLight, AmbientLight, DirectionLight } from "../Utility/types";
+import { createDirectionalLight } from "../Utility/lightUtils";
 
 export const pointLights: PointLight[] = [
   {
@@ -10,13 +11,7 @@ export const pointLights: PointLight[] = [
 ];
 
 export const directionalLights: DirectionLight[] = [
-  {
-    type: "directional",
-    intensity: 0.2,
-    color: [255, 255, 255],
-    direction: [1, 4, 4],
-    maxT: Number.POSITIVE_INFINITY,
-  },
+  createDirectionalLight([255, 255, 255], 0.2, [1, 4, 4], Number.POSITIVE_INFINITY),
 ];
 
 export const ambientLights: AmbientLight[] = [{ type: "ambient", intensity: 0.2, color: [255, 255, 255] }];

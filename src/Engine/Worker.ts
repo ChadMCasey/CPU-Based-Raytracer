@@ -22,7 +22,6 @@ self.addEventListener("message", (event: MessageEvent) => {
     width,
     height,
     targetWidth,
-    targetHeight,
     halfTargetWidth,
     halfTargetHeight,
     viewportScaleX,
