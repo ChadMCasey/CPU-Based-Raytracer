@@ -1,7 +1,11 @@
 import { Vec3, Vec2, ScenePayload, SceneIntersection, Primitive, HitRecord, BVHNode } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
-import { generateBVHNodeTBounds, determineValidBVHInteresection } from "../Engine/BoundingVolumeHierarchy";
+import {
+  generateBVHNodeTBounds,
+  determineValidBVHInteresection,
+  determineBoxEdgeIntersection,
+} from "../Engine/BoundingVolumeHierarchy";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -168,8 +172,16 @@ export function closestIntersection(
 
     // determine if valid box intersection
     const validIntersection: boolean = determineValidBVHInteresection(closestT, boxEntryT, boxExitT, viewportDistance);
-
     if (!validIntersection) continue;
+
+    // we know that the ray intersects the AABB
+    // the next question, does it intersect the box right at a
+    // boundary, if so, we hard override the color / intersection.
+    const isBoxEdgeIntersection = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
+
+    // dummy logic - if we have a front left intersection just return null for intersection
+    // maybe something interesting will happen
+    if (isBoxEdgeIntersection) return null;
 
     // non leaf case, examine the children nodes
     if (!box.primitives) {

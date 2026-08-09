@@ -2,7 +2,7 @@ import { Vec3, Rotation } from "./types";
 
 // Canvas
 export const CANVAS_DEFAULT_BACKGROUND: Vec3 = [10, 10, 10];
-export const CANVAS_HEIGHT: number = 320;
+export const CANVAS_HEIGHT: number = 300;
 
 // aspect ratio
 export const ASPECT_RATIO = (): number => {
@@ -13,7 +13,7 @@ export const ASPECT_RATIO = (): number => {
 export const MIN_T: number = 0.00001;
 
 // Recursive bound on reflection computation
-export const MAX_REFLECT_RECUR: number = 1;
+export const MAX_REFLECT_RECUR: number = 0;
 
 export const VALID_MOVEMENT_KEYS: string[] = ["w", "a", "s", "d"];
 export const CAMERA_MOVEMENT_SPEED: number = 2.5;

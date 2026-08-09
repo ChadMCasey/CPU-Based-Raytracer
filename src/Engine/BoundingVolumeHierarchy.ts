@@ -1,4 +1,5 @@
 import { Primitive, BVHNode, Vec3 } from "../Utility/types";
+import { addVectors, scaleVectorV3 } from "../Utility/mathUtils";
 
 // generate the BVH tree
 export function generateBVH(primitives: Primitive[]): BVHNode | null {
@@ -110,10 +111,11 @@ export function generateBVHNodeTBounds(box: BVHNode, O: Vec3, invD: Vec3): [numb
   const zEntry: number = Math.min(tz1, tz2);
   const zExit: number = Math.max(tz1, tz2);
 
-  const boxEntry: number = Math.max(xEntry, yEntry, zEntry);
-  const boxExit: number = Math.min(xExit, yExit, zExit);
+  const boxEntryT: number = Math.max(xEntry, yEntry, zEntry);
+  const boxExitT: number = Math.min(xExit, yExit, zExit);
 
-  return [boxEntry, boxExit];
+  // the min max Ts where the ray actually enters the box
+  return [boxEntryT, boxExitT];
 }
 
 export function determineValidBVHInteresection(
@@ -133,4 +135,68 @@ export function determineValidBVHInteresection(
 
   // the intersection is valid
   return true;
+}
+
+// determine if the intersection with the bounding box is right along an edge of the box
+export function determineBoxEdgeIntersection(
+  box: BVHNode,
+  boxEntryT: number,
+  boxExitT: number,
+  O: Vec3,
+  D: Vec3,
+): boolean {
+  // parametric ray equation P = O + tD
+  const PEntry: Vec3 = addVectors(O, scaleVectorV3(D, boxEntryT));
+  const PExit: Vec3 = addVectors(O, scaleVectorV3(D, boxExitT));
+
+  // all 3 entry coordinates
+  let PEntryX: number = PEntry[0];
+  let PEntryY: number = PEntry[1];
+  let PEntryZ: number = PEntry[2];
+
+  // all 3 exit coorindates
+  let PExitX: number = PExit[0];
+  let PExitY: number = PExit[1];
+  let PExitZ: number = PExit[2];
+
+  // pull out our bounds on our box
+  let boxMinX: number = box.minVals[0];
+  let boxMinY: number = box.minVals[1];
+  let boxMinZ: number = box.minVals[2];
+  let boxMaxX: number = box.maxVals[0];
+  let boxMaxY: number = box.maxVals[1];
+  let boxMaxZ: number = box.maxVals[2];
+
+  // note that the rays shoot out from our camera into the infintely deep 3d space
+  // if we want lines aronud our AABB's that are uniform in width, we need to scale those lines
+  // based on the distance of the bounding box from the camera.
+
+  const closeBound = 0.005 * boxEntryT;
+  const farBound = 0.005 * boxExitT;
+
+  // determine if we have an intersection on entry
+  const fl = Math.abs(PEntryX - boxMinX) <= closeBound && Math.abs(PEntryZ - boxMinZ) <= closeBound;
+  const fb = Math.abs(PEntryY - boxMinY) <= closeBound && Math.abs(PEntryZ - boxMinZ) <= closeBound;
+  const fr = Math.abs(PEntryX - boxMaxX) <= closeBound && Math.abs(PEntryZ - boxMinZ) <= closeBound;
+  const ft = Math.abs(PEntryZ - boxMinZ) <= closeBound && Math.abs(PEntryY - boxMaxY) <= closeBound;
+
+  const fbl = Math.abs(PEntryX - boxMinX) <= closeBound && Math.abs(PEntryY - boxMinY) <= closeBound;
+  const ftl = Math.abs(PEntryX - boxMinX) <= closeBound && Math.abs(PEntryY - boxMaxY) <= closeBound;
+  const ftr = Math.abs(PEntryX - boxMaxX) <= closeBound && Math.abs(PEntryY - boxMaxY) <= closeBound;
+  const fbr = Math.abs(PEntryX - boxMaxX) <= closeBound && Math.abs(PEntryY - boxMinY) <= closeBound;
+
+  // determine if we have an intersection on entry
+
+  const bl = Math.abs(PExitX - boxMinX) <= farBound && Math.abs(PExitZ - boxMaxZ) <= farBound;
+  const br = Math.abs(PExitX - boxMaxX) <= farBound && Math.abs(PExitZ - boxMaxZ) <= farBound;
+  const bb = Math.abs(PExitY - boxMinY) <= farBound && Math.abs(PExitZ - boxMaxZ) <= farBound;
+  const bt = Math.abs(PExitY - boxMaxY) <= farBound && Math.abs(PExitZ - boxMaxZ) <= farBound;
+
+  const bbl = Math.abs(PExitX - boxMinX) <= farBound && Math.abs(PExitY - boxMinY) <= farBound;
+  const btl = Math.abs(PExitX - boxMinX) <= farBound && Math.abs(PExitY - boxMaxY) <= farBound;
+  const btr = Math.abs(PExitX - boxMaxX) <= farBound && Math.abs(PExitY - boxMaxY) <= farBound;
+  const bbr = Math.abs(PExitX - boxMaxX) <= closeBound && Math.abs(PExitY - boxMinY) <= closeBound;
+
+  // if we return null for an intersection here, it iwll just paint white..?
+  return fl || fb || fr || ft || bl || br || bb || bt || fbl || bbl || ftl || btl || ftr || btr || fbr || bbr;
 }
