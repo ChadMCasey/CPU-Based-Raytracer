@@ -104,8 +104,7 @@ function traceRay(
 
   // return default background color if no intersection
   if (!intersection) return CANVAS_DEFAULT_BACKGROUND;
-
-  return intersection.object.color;
+  if (intersection) return intersection.object.color;
 
   // apply lighting to the closest intersection to the camera
   const lightIntensity: number = computeLighting(

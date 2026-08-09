@@ -34,6 +34,7 @@ export type SceneIntersection = {
   position: Vec3;
   normal: Vec3;
   object: Primitive;
+  debug?: boolean;
 };
 
 export type Camera = {
@@ -90,6 +91,15 @@ export type Triangle = {
   planeDistance: number;
 };
 
+export type BVHNode = {
+  left: BVHNode | null;
+  right: BVHNode | null;
+  splitAxis: number; // axis along which node was partitioned
+  minVals: Vec3;
+  maxVals: Vec3;
+  primitives: Primitive[] | null;
+};
+
 export type Bounds = {
   minX: number;
   maxX: number;
@@ -131,12 +141,3 @@ export type AmbientLight = {
 
 export type Primitive = Sphere | Triangle;
 export type Light = AmbientLight | DirectionLight | PointLight;
-
-export type BVHNode = {
-  left: BVHNode | null;
-  right: BVHNode | null;
-  splitAxis: number; // axis along which node was partitioned
-  minVals: Vec3;
-  maxVals: Vec3;
-  primitives: Primitive[] | null;
-};

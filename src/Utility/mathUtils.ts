@@ -177,11 +177,21 @@ export function closestIntersection(
     // we know that the ray intersects the AABB
     // the next question, does it intersect the box right at a
     // boundary, if so, we hard override the color / intersection.
-    const isBoxEdgeIntersection = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
-
-    // dummy logic - if we have a front left intersection just return null for intersection
-    // maybe something interesting will happen
-    if (isBoxEdgeIntersection) return null;
+    const debugIntersection = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
+    if (
+      debugIntersection &&
+      debugIntersection.distance >= minT &&
+      debugIntersection.distance <= maxT &&
+      debugIntersection.distance < closestT
+    ) {
+      closestT = debugIntersection.distance;
+      closestIntersection = {
+        distance: debugIntersection.distance,
+        position: debugIntersection.position,
+        normal: debugIntersection.normal,
+        object: debugIntersection.object,
+      };
+    }
 
     // non leaf case, examine the children nodes
     if (!box.primitives) {

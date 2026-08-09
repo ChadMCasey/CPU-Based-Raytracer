@@ -1,4 +1,4 @@
-import { Primitive, BVHNode, Vec3 } from "../Utility/types";
+import { Primitive, BVHNode, Vec3, SceneIntersection } from "../Utility/types";
 import { addVectors, scaleVectorV3 } from "../Utility/mathUtils";
 
 // generate the BVH tree
@@ -144,7 +144,7 @@ export function determineBoxEdgeIntersection(
   boxExitT: number,
   O: Vec3,
   D: Vec3,
-): boolean {
+): SceneIntersection | null {
   // parametric ray equation P = O + tD
   const PEntry: Vec3 = addVectors(O, scaleVectorV3(D, boxEntryT));
   const PExit: Vec3 = addVectors(O, scaleVectorV3(D, boxExitT));
@@ -197,6 +197,19 @@ export function determineBoxEdgeIntersection(
   const btr = Math.abs(PExitX - boxMaxX) <= farBound && Math.abs(PExitY - boxMaxY) <= farBound;
   const bbr = Math.abs(PExitX - boxMaxX) <= closeBound && Math.abs(PExitY - boxMinY) <= closeBound;
 
-  // if we return null for an intersection here, it iwll just paint white..?
-  return fl || fb || fr || ft || bl || br || bb || bt || fbl || bbl || ftl || btl || ftr || btr || fbr || bbr;
+  const hasEntryIntersection = fl || fb || fr || ft || fbl || ftl || ftr || fbr;
+  const hasExitIntersection = bl || br || bb || bt || bbl || btl || btr || bbr;
+  const hasBoundsIntersection = hasEntryIntersection || hasExitIntersection;
+
+  if (!hasBoundsIntersection) return null;
+
+  const intersection: SceneIntersection = {
+    distance: hasEntryIntersection ? boxEntryT : boxExitT,
+    position: hasEntryIntersection ? PEntry : PExit,
+    normal: [0, 0, 0],
+    object: { color: [255, 255, 255] } as Primitive,
+    debug: true,
+  };
+
+  return intersection;
 }
