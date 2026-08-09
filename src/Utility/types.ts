@@ -105,6 +105,8 @@ export type Edges = {
   E3: Vec3;
 };
 
+export type LightType = "directional" | "point" | "ambient";
+
 // LIGHTING
 export type DirectionLight = {
   type: "directional";

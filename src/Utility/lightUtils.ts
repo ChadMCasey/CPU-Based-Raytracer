@@ -1,6 +1,23 @@
-import { Vec3, ScenePayload, PointLight, Light, SceneIntersection, DirectionLight } from "./types";
-import { reflectVector, dotVectorsV3, magnitudeV3, subtractVectors, closestIntersection } from "./mathUtils";
+import { Vec3, ScenePayload, PointLight, Light, SceneIntersection, DirectionLight, LightType } from "./types";
+import {
+  reflectVector,
+  dotVectorsV3,
+  magnitudeV3,
+  scaleVectorV3,
+  subtractVectors,
+  closestIntersection,
+} from "./mathUtils";
 import { MIN_T } from "./constants";
+
+export function createDirectionalLight(color: Vec3, intensity: number, direction: Vec3, maxT: number): DirectionLight {
+  return {
+    color,
+    type: "directional",
+    intensity,
+    direction: scaleVectorV3(direction, 1 / magnitudeV3(direction)),
+    maxT,
+  };
+}
 
 export function computeLighting(
   P: Vec3,
@@ -46,6 +63,9 @@ export function computeDirectionalLighting(
   const lightDirectionFromP: Vec3 = light.direction;
   const maxT: number = light.maxT;
 
+  const DotNL = dotVectorsV3(N, lightDirectionFromP);
+  if (DotNL < 0) return 0;
+
   // compute closest intersection between P and light
   const lightObstruction: SceneIntersection | null = closestIntersection(
     P,
@@ -59,11 +79,7 @@ export function computeDirectionalLighting(
 
   // no obstruction so add in lighting
   if (!lightObstruction) {
-    const DotNL = dotVectorsV3(N, lightDirectionFromP);
-
-    if (DotNL < 0) return 0;
-
-    const diffuseScalar: number = computeDirectionalScalarDiffuse(N, lightDirectionFromP, DotNL);
+    const diffuseScalar: number = DotNL;
     const specularScalar: number = computeDirectionalScalarHighlight(N, V, specular, lightDirectionFromP);
 
     const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
@@ -74,10 +90,6 @@ export function computeDirectionalLighting(
 
   // for now obstruction means no contributed light
   return 0;
-}
-
-function computeDirectionalScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
-  return DotNL / (magnitudeV3(L) * magnitudeV3(N));
 }
 
 function computeDirectionalScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3): number {
@@ -109,6 +121,10 @@ function computePointLighting(
   const lightDirectionFromP: Vec3 = subtractVectors(light.position, P);
   const maxT: number = 1;
 
+  // N dot L < 0 means that the surface is facing opposite the direction of the light
+  const DotNL: number = dotVectorsV3(N, lightDirectionFromP);
+  if (DotNL < 0) return 0;
+
   // compute closest intersection between P and light
   const lightObstruction: SceneIntersection | null = closestIntersection(
     P,
@@ -122,13 +138,8 @@ function computePointLighting(
 
   // no obstruction so add in lighting
   if (!lightObstruction) {
-    const L: Vec3 = subtractVectors(light.position, P);
-    const DotNL: number = dotVectorsV3(N, L);
-
-    if (DotNL < 0) return 0;
-
-    const diffuseScalar: number = computePointScalarDiffuse(N, L, DotNL);
-    const specularScalar: number = computePointScalarHighlight(N, V, s, L);
+    const diffuseScalar: number = DotNL / magnitudeV3(lightDirectionFromP);
+    const specularScalar: number = computePointScalarHighlight(N, V, s, lightDirectionFromP);
 
     const totalScalar: number = (specularScalar === -1 ? 0 : specularScalar) + diffuseScalar;
     const totalContributedIllumination: number = totalScalar * light.intensity;
@@ -154,8 +165,4 @@ export function computePointScalarHighlight(N: Vec3, V: Vec3, s: number, L: Vec3
   const specularScalar: number = cosA ** s;
 
   return specularScalar;
-}
-
-export function computePointScalarDiffuse(N: Vec3, L: Vec3, DotNL: number): number {
-  return DotNL / (magnitudeV3(L) * magnitudeV3(N));
 }
