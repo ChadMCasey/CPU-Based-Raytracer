@@ -91,6 +91,8 @@ export default class Parallelize {
   ): Promise<void> {
     return new Promise((resolve) => {
       this.createTasks(Cw, Ch, camera, bands);
+
+      // kind of janky, could fix sometime
       this.scenePayload = scenePayload;
       this.sharedArrayBuffer = sharedArrayBuffer;
       this.updateScreenCallback = updateScreenCallback;

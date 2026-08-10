@@ -1,8 +1,8 @@
-import { Vec3, Rotation } from "./types";
+import { Vec3, Rotation, RGB } from "./types";
 
 // Canvas
 export const CANVAS_DEFAULT_BACKGROUND: Vec3 = [10, 10, 10];
-export const CANVAS_HEIGHT: number = 540;
+export const CANVAS_HEIGHT: number = 320;
 
 // aspect ratio
 export const ASPECT_RATIO = (): number => {
@@ -10,10 +10,10 @@ export const ASPECT_RATIO = (): number => {
 };
 
 // Minimal T for shadow determination
-export const MIN_T: number = 0.00001;
+export const MIN_T: number = 0.001;
 
 // Recursive bound on reflection computation
-export const MAX_REFLECT_RECUR: number = 0;
+export const MAX_REFLECT_RECUR: number = 1;
 
 export const VALID_MOVEMENT_KEYS: string[] = ["w", "a", "s", "d"];
 export const CAMERA_MOVEMENT_SPEED: number = 2.5;
@@ -34,3 +34,8 @@ export const CAMERA_ROTATION_MATRIX: number[][] = [
 
 // canvas partition
 export const BANDS: number = 20;
+
+// debug config
+export const DEBUG_MAIN_COLOR: RGB = [44, 255, 5];
+export const DEBUG_SPECULAR: number = 0;
+export const DEBUG_REFLECTIVE: number = 0;

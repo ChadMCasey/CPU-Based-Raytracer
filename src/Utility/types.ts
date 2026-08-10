@@ -63,6 +63,7 @@ export type ScenePayload = {
   sceneData: SceneData;
   cameraPOS: Vec3;
   cameraRotation: number[][];
+  debug: boolean;
 };
 
 // serialized sphere
@@ -92,12 +93,15 @@ export type Triangle = {
 };
 
 export type BVHNode = {
+  type: "BVHNode";
   left: BVHNode | null;
   right: BVHNode | null;
-  splitAxis: number; // axis along which node was partitioned
-  minVals: Vec3;
-  maxVals: Vec3;
+  splitAxis: number;
+  bounds: Bounds;
   primitives: Primitive[] | null;
+  reflective: number;
+  specular: number;
+  color: RGB;
 };
 
 export type Bounds = {
@@ -139,5 +143,5 @@ export type AmbientLight = {
   color: [number, number, number];
 };
 
-export type Primitive = Sphere | Triangle;
+export type Primitive = Sphere | Triangle | BVHNode;
 export type Light = AmbientLight | DirectionLight | PointLight;

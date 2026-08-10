@@ -172,25 +172,29 @@ export function closestIntersection(
 
     // determine if valid box intersection
     const validIntersection: boolean = determineValidBVHInteresection(closestT, boxEntryT, boxExitT, viewportDistance);
+
+    // early return if the box is not intersected
     if (!validIntersection) continue;
 
-    // we know that the ray intersects the AABB
-    // the next question, does it intersect the box right at a
-    // boundary, if so, we hard override the color / intersection.
-    const debugIntersection = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
-    if (
-      debugIntersection &&
-      debugIntersection.distance >= minT &&
-      debugIntersection.distance <= maxT &&
-      debugIntersection.distance < closestT
-    ) {
-      closestT = debugIntersection.distance;
-      closestIntersection = {
-        distance: debugIntersection.distance,
-        position: debugIntersection.position,
-        normal: debugIntersection.normal,
-        object: debugIntersection.object,
-      };
+    // debug intersection test
+    if (scenePayload.debug) {
+      const debugIntersection: SceneIntersection | null = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
+
+      if (
+        debugIntersection &&
+        debugIntersection.distance >= minT &&
+        debugIntersection.distance <= maxT &&
+        debugIntersection.distance < closestT
+      ) {
+        closestT = debugIntersection.distance;
+        closestIntersection = {
+          distance: debugIntersection.distance,
+          position: debugIntersection.position,
+          normal: debugIntersection.normal,
+          object: debugIntersection.object,
+          debug: debugIntersection.debug,
+        };
+      }
     }
 
     // non leaf case, examine the children nodes
