@@ -17,13 +17,13 @@ export default class Renderer {
     this.parallelize = parallel;
   }
 
-  async render(): Promise<void> {
+  async render(debug: boolean): Promise<void> {
     // serialize our world for this frame
     const cameraPOS: Vec3 = getCameraPosition(this.camera);
     const cameraRotation: number[][] = computeRotationMatrix(this.camera);
     const sceneData = this.sceneData;
 
-    const scenePayload: ScenePayload = { sceneData, cameraPOS, cameraRotation };
+    const scenePayload: ScenePayload = { sceneData, cameraPOS, cameraRotation, debug };
 
     // task creation is handled inside the the parallel class
     await this.parallelize.renderFrame(

@@ -1,4 +1,6 @@
-import { Primitive, BVHNode, Vec3 } from "../Utility/types";
+import { Primitive, BVHNode, Vec3, SceneIntersection } from "../Utility/types";
+import { addVectors, scaleVectorV3 } from "../Utility/mathUtils";
+import { DEBUG_MAIN_COLOR, DEBUG_SPECULAR, DEBUG_REFLECTIVE } from "../Utility/constants";
 
 // generate the BVH tree
 export function generateBVH(primitives: Primitive[]): BVHNode | null {
@@ -11,11 +13,14 @@ export function generateBVH(primitives: Primitive[]): BVHNode | null {
   // (3) leaf node case - no children, has primitives attached
   if (primitives.length < 3) {
     return {
+      type: "BVHNode",
       left: null,
       right: null,
       splitAxis,
-      minVals: [minX, minY, minZ],
-      maxVals: [maxX, maxY, maxZ],
+      bounds: { minX, maxX, minZ, maxZ, minY, maxY },
+      color: DEBUG_MAIN_COLOR,
+      specular: DEBUG_SPECULAR,
+      reflective: DEBUG_REFLECTIVE,
       primitives,
     };
   }
@@ -29,11 +34,14 @@ export function generateBVH(primitives: Primitive[]): BVHNode | null {
 
   // (6) pass the node up the call stack
   return {
+    type: "BVHNode",
     left: leftNode,
     right: rightNode,
     splitAxis,
-    minVals: [minX, minY, minZ],
-    maxVals: [maxX, maxY, maxZ],
+    bounds: { minX, maxX, minZ, maxZ, minY, maxY },
+    color: DEBUG_MAIN_COLOR,
+    specular: DEBUG_SPECULAR,
+    reflective: DEBUG_REFLECTIVE,
     primitives: null,
   };
 }
@@ -92,14 +100,14 @@ function partitionPrimitives(primitives: Primitive[], axis: number): [Primitive[
 
 export function generateBVHNodeTBounds(box: BVHNode, O: Vec3, invD: Vec3): [number, number] {
   // compute min scalar t's for ray-box intersections
-  const tx1: number = (box.minVals[0] - O[0]) * invD[0];
-  const ty1: number = (box.minVals[1] - O[1]) * invD[1];
-  const tz1: number = (box.minVals[2] - O[2]) * invD[2];
+  const tx1: number = (box.bounds.minX - O[0]) * invD[0];
+  const ty1: number = (box.bounds.minY - O[1]) * invD[1];
+  const tz1: number = (box.bounds.minZ - O[2]) * invD[2];
 
   // compute max scalar t's for ray-box intersections
-  const tx2: number = (box.maxVals[0] - O[0]) * invD[0];
-  const ty2: number = (box.maxVals[1] - O[1]) * invD[1];
-  const tz2: number = (box.maxVals[2] - O[2]) * invD[2];
+  const tx2: number = (box.bounds.maxX - O[0]) * invD[0];
+  const ty2: number = (box.bounds.maxY - O[1]) * invD[1];
+  const tz2: number = (box.bounds.maxZ - O[2]) * invD[2];
 
   const xEntry: number = Math.min(tx1, tx2);
   const xExit: number = Math.max(tx1, tx2);
@@ -110,10 +118,11 @@ export function generateBVHNodeTBounds(box: BVHNode, O: Vec3, invD: Vec3): [numb
   const zEntry: number = Math.min(tz1, tz2);
   const zExit: number = Math.max(tz1, tz2);
 
-  const boxEntry: number = Math.max(xEntry, yEntry, zEntry);
-  const boxExit: number = Math.min(xExit, yExit, zExit);
+  const boxEntryT: number = Math.max(xEntry, yEntry, zEntry);
+  const boxExitT: number = Math.min(xExit, yExit, zExit);
 
-  return [boxEntry, boxExit];
+  // the min max Ts where the ray actually enters the box
+  return [boxEntryT, boxExitT];
 }
 
 export function determineValidBVHInteresection(
@@ -133,4 +142,66 @@ export function determineValidBVHInteresection(
 
   // the intersection is valid
   return true;
+}
+
+// determine if the intersection with the bounding box is right along an edge of the box
+export function determineBoxEdgeIntersection(
+  box: BVHNode,
+  boxEntryT: number,
+  boxExitT: number,
+  O: Vec3,
+  D: Vec3,
+): SceneIntersection | null {
+  let boxMinX: number = box.bounds.minX;
+  let boxMinY: number = box.bounds.minY;
+  let boxMinZ: number = box.bounds.minZ;
+  let boxMaxX: number = box.bounds.maxX;
+  let boxMaxY: number = box.bounds.maxY;
+  let boxMaxZ: number = box.bounds.maxZ;
+
+  const PEntry: Vec3 = addVectors(O, scaleVectorV3(D, boxEntryT));
+  const entryBounds = 0.005 * boxEntryT;
+  let PEntryX: number = PEntry[0];
+  let PEntryY: number = PEntry[1];
+  let PEntryZ: number = PEntry[2];
+
+  // a collision on an edge occurs when two + boundaries are hit at once
+  const xEntryHit = Math.abs(PEntryX - boxMinX) < entryBounds || Math.abs(PEntryX - boxMaxX) < entryBounds ? 1 : 0;
+  const yEntryHit = Math.abs(PEntryY - boxMinY) < entryBounds || Math.abs(PEntryY - boxMaxY) < entryBounds ? 1 : 0;
+  const zEntryHit = Math.abs(PEntryZ - boxMinZ) < entryBounds || Math.abs(PEntryZ - boxMaxZ) < entryBounds ? 1 : 0;
+  const entryColisionCount = xEntryHit + yEntryHit + zEntryHit;
+
+  // hits edge of AABB on entry
+  if (entryColisionCount >= 2)
+    return {
+      distance: boxEntryT,
+      position: PEntry,
+      normal: [0, 0, 0],
+      object: box,
+      debug: true,
+    };
+
+  const PExit: Vec3 = addVectors(O, scaleVectorV3(D, boxExitT));
+  const exitBounds = 0.005 * boxExitT;
+  let PExitX: number = PExit[0];
+  let PExitY: number = PExit[1];
+  let PExitZ: number = PExit[2];
+
+  const xExitHit = Math.abs(PExitX - boxMinX) < exitBounds || Math.abs(PExitX - boxMaxX) < exitBounds ? 1 : 0;
+  const yExitHit = Math.abs(PExitY - boxMinY) < exitBounds || Math.abs(PExitY - boxMaxY) < exitBounds ? 1 : 0;
+  const zExitHit = Math.abs(PExitZ - boxMinZ) < exitBounds || Math.abs(PExitZ - boxMaxZ) < exitBounds ? 1 : 0;
+  const exitColisionCount = xExitHit + yExitHit + zExitHit;
+
+  // hits edge of AABB on exit
+  if (exitColisionCount >= 2)
+    return {
+      distance: boxExitT,
+      position: PExit,
+      normal: [0, 0, 0],
+      object: box,
+      debug: true,
+    };
+
+  // no edge collision
+  return null;
 }

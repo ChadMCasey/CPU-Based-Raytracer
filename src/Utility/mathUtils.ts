@@ -1,7 +1,11 @@
 import { Vec3, Vec2, ScenePayload, SceneIntersection, Primitive, HitRecord, BVHNode } from "./types";
 import { computeSphereIntersection } from "./sphereUtils";
 import { computeTriangleIntersection } from "./triangleUtils";
-import { generateBVHNodeTBounds, determineValidBVHInteresection } from "../Engine/BoundingVolumeHierarchy";
+import {
+  generateBVHNodeTBounds,
+  determineValidBVHInteresection,
+  determineBoxEdgeIntersection,
+} from "../Engine/BoundingVolumeHierarchy";
 
 // calculate the dot product of 2 vectors
 export function dotVectorsV3(a: Vec3, b: Vec3): number {
@@ -169,7 +173,29 @@ export function closestIntersection(
     // determine if valid box intersection
     const validIntersection: boolean = determineValidBVHInteresection(closestT, boxEntryT, boxExitT, viewportDistance);
 
+    // early return if the box is not intersected
     if (!validIntersection) continue;
+
+    // debug intersection test
+    if (scenePayload.debug) {
+      const debugIntersection: SceneIntersection | null = determineBoxEdgeIntersection(box, boxEntryT, boxExitT, O, D);
+
+      if (
+        debugIntersection &&
+        debugIntersection.distance >= minT &&
+        debugIntersection.distance <= maxT &&
+        debugIntersection.distance < closestT
+      ) {
+        closestT = debugIntersection.distance;
+        closestIntersection = {
+          distance: debugIntersection.distance,
+          position: debugIntersection.position,
+          normal: debugIntersection.normal,
+          object: debugIntersection.object,
+          debug: debugIntersection.debug,
+        };
+      }
+    }
 
     // non leaf case, examine the children nodes
     if (!box.primitives) {

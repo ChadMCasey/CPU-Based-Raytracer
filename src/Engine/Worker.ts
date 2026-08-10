@@ -81,8 +81,6 @@ function writeColorDataToBuffer(
   sharedArrayBuffer[index + 3] = 255; // A
 }
 
-// mapp x to 2D cartesian X
-
 // trace the ray and return a color for the pixel
 function traceRay(
   cameraPOS: Vec3,
@@ -106,6 +104,9 @@ function traceRay(
 
   // return default background color if no intersection
   if (!intersection) return CANVAS_DEFAULT_BACKGROUND;
+
+  // debug flag = early return, return the intersection color - no lighting
+  if (scenePayload.debug && intersection.debug) return intersection.object.color;
 
   // apply lighting to the closest intersection to the camera
   const lightIntensity: number = computeLighting(

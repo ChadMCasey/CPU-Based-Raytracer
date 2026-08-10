@@ -18,6 +18,8 @@ export default class Controller {
   public readonly camera: Camera;
   public readonly renderTarget: RenderTarget;
 
+  private debug: boolean = false;
+
   constructor(camera: Camera, renderTarget: RenderTarget) {
     this.camera = camera;
     this.renderTarget = renderTarget;
@@ -34,6 +36,7 @@ export default class Controller {
   addEventListeners() {
     document.addEventListener("keydown", (e) => {
       if (this.validMovementKeySet.has(e.key)) this.keyPressedSet.add(e.key);
+      if (e.key === "r") this.debug = !this.debug; // debug toggle
     });
     document.addEventListener("keyup", (e) => {
       if (this.validMovementKeySet.has(e.key)) this.keyPressedSet.delete(e.key);
@@ -94,5 +97,9 @@ export default class Controller {
     if (this.cameraDx !== 0) updateYaw(this.camera, this.cameraDx);
     this.cameraDx = 0;
     this.cameraDy = 0;
+  }
+
+  get debugFlag() {
+    return this.debug;
   }
 }
